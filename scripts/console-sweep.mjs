@@ -2,11 +2,28 @@
  * One-off Playwright console sweep: load each available game, play a few
  * human moves (vs-AI when possible), capture console + unhandled rejections.
  * Writes JSON to /opt/cursor/artifacts/console-sweep-raw.json
+ *
+ * Options: -h, --help (exits before browser launch)
  */
 import { chromium } from '@playwright/test';
 import { createRequire } from 'module';
 import { writeFileSync, mkdirSync } from 'fs';
 import { dismissOwl } from './lib/dismiss-owl.mjs';
+import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
+
+const USAGE = `Usage: node scripts/console-sweep.mjs
+
+One-off Playwright console sweep across available games.
+Writes JSON to SWEEP_OUT (default /opt/cursor/artifacts/console-sweep-raw.json).
+
+Options:
+  -h, --help       Show this help and exit (no browser launch)
+
+Env:
+  BASE_URL         Dev server URL (default http://localhost:5173)
+  SWEEP_OUT        Output JSON path`;
+
+applyBrowserHarnessCli(process.argv.slice(2), USAGE);
 
 const require = createRequire(import.meta.url);
 // Pull game ids from compiled-ish source via dynamic import of TS is hard;

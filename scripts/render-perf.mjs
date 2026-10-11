@@ -15,6 +15,8 @@
  *   npm run perf:render
  *   PERF_PHASE=before|after npm run perf:render
  *   PERF_GAMES=hex,juggle PERF_MOVES=20 npm run perf:render
+ *
+ * Options: -h, --help (exits before browser / vite server)
  */
 
 import { chromium } from '@playwright/test';
@@ -25,6 +27,20 @@ import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import { gotoGame, startHuman } from './lib/page-ready.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
+import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
+
+const USAGE = `Usage: node scripts/render-perf.mjs
+
+Render / input latency harness (Playwright + CDP + Performance API).
+Prefer: npm run perf:render
+
+Options:
+  -h, --help       Show this help and exit (no browser launch)
+
+Env:
+  PERF_PHASE / PERF_GAMES / PERF_MOVES / PERF_CPU_RATE / PERF_BASE_URL`;
+
+applyBrowserHarnessCli(process.argv.slice(2), USAGE);
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -79,7 +95,6 @@ const GAMES = filter.length
   ? ALL_GAMES.filter((g) => filter.includes(g))
   : ALL_GAMES;
 
-
 async function waitDoubleRaf(page) {
   await page.evaluate(
     () =>
@@ -98,7 +113,6 @@ async function waitForReadySoft(page, selector, timeout = 2_000) {
     .catch(() => {});
   await waitDoubleRaf(page);
 }
-
 
 /** Attempt one scripted legal action for the active seat. */
 async function attemptScriptedMove(page, gameId) {
