@@ -150,12 +150,18 @@ const nodePureFiles = [
   'tests/unit/report-lint-buckets-parse-args.test.ts',
   // offline probe early --help (q-mp-886); spawnSync CLI check needs node env.
   'tests/unit/offline-probe-cli-help.test.ts',
+  // deep-playtest early --help (q-mp-910); spawnSync CLI check needs node env.
+  'tests/unit/deep-playtest-cli-help.test.ts',
   // help-only CLI argv (q-mp-885); spawnSync CLI check needs node env.
   'tests/unit/help-only-cli.test.ts',
-  // harness env Number() parser (q-mp-876); spawnSync CLI check needs node env.
+  // harness env Number() parser (q-mp-876 / q-mp-908); spawnSync CLI check needs node env.
   'tests/unit/env-number.test.ts',
   // mutation-report argv validation (q-mp-867 / q-mp-868); spawnSync CLI check.
   'tests/unit/mutation-report-args.test.ts',
+  // report-coverage-map flag-like argv rejection (q-mp-906); spawnSync CLI check.
+  'tests/unit/report-coverage-map-cli-args.test.ts',
+  // browser harness early --help (q-mp-900); spawnSync CLI check needs node env.
+  'tests/unit/browser-harness-cli-help.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional

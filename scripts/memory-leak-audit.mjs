@@ -13,6 +13,8 @@
  *   MEM_LEAK_LABEL=before npm run audit:memory
  *   MEM_LEAK_GAMES=hex,fiar npm run audit:memory
  *   MEM_LEAK_CYCLES=10 MEM_LEAK_PORT=5181 npm run audit:memory
+ *
+ * Options: -h, --help (exits before browser / vite server)
  */
 
 import { chromium } from '@playwright/test';
@@ -22,6 +24,21 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { dismissOwl } from './lib/dismiss-owl.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
+import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
+
+const USAGE = `Usage: node scripts/memory-leak-audit.mjs
+
+Memory-leak audit (Playwright + CDP heap snapshots) for available games.
+Prefer: npm run audit:memory
+
+Options:
+  -h, --help       Show this help and exit (no browser launch)
+
+Env:
+  MEM_LEAK_LABEL / MEM_LEAK_GAMES / MEM_LEAK_CYCLES / MEM_LEAK_PORT
+  MEM_LEAK_BASE_URL / MEM_LEAK_DATE`;
+
+applyBrowserHarnessCli(process.argv.slice(2), USAGE);
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -45,7 +62,11 @@ const BOARD3D_GAMES = new Set([
 
 /** id → menu card name + division tab */
 const ALL_GAMES = [
-  { id: 'kings-quadraphages', name: 'Kings & Quadraphages', division: 'Division I' },
+  {
+    id: 'kings-quadraphages',
+    name: 'Kings & Quadraphages',
+    division: 'Division I',
+  },
   { id: 'hex', name: 'Hex', division: 'Division I' },
   { id: 'star-track', name: 'Star Track', division: 'Division I' },
   { id: 'hex-a-gone', name: 'Hex-a-Gone!', division: 'Division I' },
@@ -61,7 +82,11 @@ const ALL_GAMES = [
   { id: 'fab-a-diffy', name: 'Fab-a-Diffy', division: 'Division III' },
   { id: 'queens-guards', name: 'Queens & Guards', division: 'Division III' },
   { id: 'prime-gold', name: 'Prime Gold', division: 'Division IV' },
-  { id: 'remainder-islands', name: 'Remainder Islands', division: 'Division IV' },
+  {
+    id: 'remainder-islands',
+    name: 'Remainder Islands',
+    division: 'Division IV',
+  },
   { id: 'pent-em-in', name: "Pent'Em In", division: 'Division IV' },
   { id: 'frac-fact', name: 'Frac Fact', division: 'Division IV' },
   { id: 'fraction-pinball', name: 'Fraction Pinball', division: 'Division IV' },
@@ -89,9 +114,7 @@ async function openDivision(page, division) {
   const tab = page.locator(`.division-tab[data-division="${division}"]`);
   await tab.click();
   await page
-    .locator(
-      `.division-accordion[data-division="${division}"].accordion-open`
-    )
+    .locator(`.division-accordion[data-division="${division}"].accordion-open`)
     .waitFor({ timeout: 10_000 });
   // Accordion max-height animation
   await page.waitForTimeout(150);

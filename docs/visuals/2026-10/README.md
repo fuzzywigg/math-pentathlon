@@ -5,10 +5,10 @@ Start-screen and mid-game human-vs-human captures for every available game at **
 Regenerate from the repo root (writes PNGs here; not run in CI):
 
 ```bash
-npx playwright test -c playwright.visuals-2026-10.config.ts
+npm run docs:visuals-2026-10
 ```
 
-Distinct from [`docs/gallery/`](../gallery/) (tablet landscape 1024×768) and from `tests/e2e/visual-baselines/` (CI report-only regression suite).
+Distinct from [`docs/gallery/`](../../gallery/) (tablet landscape 1024×768) and from `tests/e2e/visual-baselines/` (CI report-only regression suite).
 
 ## Route lifecycle visuals (`q-mp-146`)
 

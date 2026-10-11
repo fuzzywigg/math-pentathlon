@@ -100,3 +100,44 @@ describe('flake-rate loop --out validation (q-mp-871)', () => {
     expect(combined).not.toMatch(/\[flake-rate-e2e\] starting/);
   });
 });
+
+describe('flake-rate loop early --help (q-mp-893)', () => {
+  for (const [script, label] of [
+    [UNIT_LOOP, 'unit'],
+    [E2E_LOOP, 'e2e'],
+  ] as const) {
+    it(`${label} loop --help prints usage and exits 0 without spawning`, () => {
+      const result = runScript(script, ['--help']);
+      expect(result.status).toBe(0);
+      const combined = `${result.stdout}${result.stderr}`;
+      expect(combined).toMatch(/Usage:/i);
+      expect(combined).toMatch(/-h, --help/);
+      expect(combined).toMatch(/--runs/);
+      expect(combined).toMatch(/--out/);
+      expect(combined).not.toMatch(/\[flake-rate(?:-e2e)?\] starting/);
+    });
+
+    it(`${label} loop -h prints usage and exits 0 without spawning`, () => {
+      const result = runScript(script, ['-h']);
+      expect(result.status).toBe(0);
+      const combined = `${result.stdout}${result.stderr}`;
+      expect(combined).toMatch(/Usage:/i);
+      expect(combined).not.toMatch(/\[flake-rate(?:-e2e)?\] starting/);
+    });
+
+    it(`${label} loop rejects --wat with exit 2 without spawning`, () => {
+      const result = runScript(script, ['--wat']);
+      expect(result.status).toBe(2);
+      const combined = `${result.stdout}${result.stderr}`;
+      expect(combined).toMatch(/Unknown flag: --wat/);
+      expect(combined).toMatch(/Usage:/i);
+      expect(combined).not.toMatch(/\[flake-rate(?:-e2e)?\] starting/);
+    });
+  }
+
+  it('unit loop --help mentions --shuffle', () => {
+    const result = runScript(UNIT_LOOP, ['--help']);
+    expect(result.status).toBe(0);
+    expect(`${result.stdout}${result.stderr}`).toMatch(/--shuffle/);
+  });
+});

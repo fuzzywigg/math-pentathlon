@@ -4,6 +4,7 @@
  * Output: JSON report to stdout (and optionally --out path).
  *
  * Usage: node scripts/mobile-audit.mjs [--out <path>]
+ * Options: -h, --help (exits before browser launch)
  */
 import { chromium, devices } from '@playwright/test';
 import { writeFileSync, mkdirSync } from 'node:fs';
@@ -279,6 +280,16 @@ async function auditGesturesStatic() {
   };
 }
 
+/** Double-rAF paint settle (no fixed sleep). */
+async function waitDoubleRaf(page) {
+  await page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      })
+  );
+}
+
 /**
  * @param {string} outPath
  */
@@ -320,8 +331,8 @@ async function main(outPath) {
           .locator(sel)
           .first()
           .waitFor({ state: 'visible', timeout: 15_000 });
-        // Settle layout
-        await page.waitForTimeout(300);
+        // Settle layout (paint frames, not a fixed sleep)
+        await waitDoubleRaf(page);
         entry.audit = await auditPage(page, gameId);
         entry.ok = true;
       } catch (err) {
@@ -371,6 +382,10 @@ if (isMain) {
     console.error(parsed.message);
     console.error(mobileAuditOutUsage());
     process.exit(2);
+  }
+  if ('help' in parsed && parsed.help) {
+    console.log(mobileAuditOutUsage());
+    process.exit(0);
   }
   main(parsed.outPath).catch((e) => {
     console.error(e);

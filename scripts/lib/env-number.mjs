@@ -1,5 +1,5 @@
 /**
- * Env-number parsing for harness scripts (q-mp-876).
+ * Env-number parsing for harness scripts (q-mp-876 / q-mp-908).
  * Rejects non-finite / non-positive values before browser launch.
  * Kept free of Playwright so unit tests can import it hermetically.
  */

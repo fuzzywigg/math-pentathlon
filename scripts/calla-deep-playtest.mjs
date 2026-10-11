@@ -5,13 +5,31 @@
  *
  * Usage: node scripts/calla-deep-playtest.mjs
  * Requires: npm run dev on :5173 (or PLAYTEST_BASE_URL).
+ *
+ * Options: -h, --help (exits before mkdir / browser launch)
  */
 import { chromium, devices } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
+import { applyDeepPlaytestCli } from './lib/deep-playtest-cli.mjs';
+import { requireEnvNumber } from './lib/env-number.mjs';
+
+const USAGE = `Usage: node scripts/calla-deep-playtest.mjs
+
+Deep playtest for Calla (human-vs-AI, Easy/Medium/Hard, desktop + tablet).
+Requires Vite on PLAYTEST_BASE_URL (default http://localhost:5173).
+
+Env:
+  PLAYTEST_BASE_URL   Base URL (default http://localhost:5173)
+  CALLA_GAMES_PER     Games per difficulty×viewport (default 10)
+
+Options:
+  -h, --help          Show this help and exit (no browser launch)`;
+
+applyDeepPlaytestCli(process.argv.slice(2), USAGE);
 
 const BASE = process.env.PLAYTEST_BASE_URL || 'http://localhost:5173';
-const GAMES_PER = Number(process.env.CALLA_GAMES_PER || 10);
+const GAMES_PER = requireEnvNumber('CALLA_GAMES_PER', 10);
 const OUT_DIR = path.resolve('docs/playtest/calla-deep-2026-10-07');
 const ART_DIR = path.resolve('/opt/cursor/artifacts/calla-deep-playtest');
 const DIFFICULTIES = ['easy', 'medium', 'hard'];

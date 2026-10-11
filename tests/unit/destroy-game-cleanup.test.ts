@@ -3,6 +3,7 @@
  * in-flight AI generations so route leave cannot mutate a detached board.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { mountPair } from '../helpers/mount-pair';
 
 describe('destroyGame unmount cleanup', () => {
   beforeEach(() => {
@@ -60,9 +61,7 @@ describe('destroyGame unmount cleanup', () => {
   it('hex destroyGame bumps generation so stale AI timeout is ignored', async () => {
     const clearSpy = vi.spyOn(globalThis, 'clearTimeout');
     const mod = await import('../../src/games/hex/game-controller');
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     mod.initGame(board, status);
     mod.newGameVsAI('easy');
     // AI paint-delay timer should be armed in vs-AI.
@@ -75,9 +74,7 @@ describe('destroyGame unmount cleanup', () => {
 
   it('star-track destroyGame invalidates nested AI timeouts', async () => {
     const mod = await import('../../src/games/star-track/game-controller');
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     mod.initGame(board, status);
     mod.newGameVsAI('easy');
     mod.destroyGame();
