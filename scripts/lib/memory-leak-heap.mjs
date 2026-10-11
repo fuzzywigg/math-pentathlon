@@ -52,12 +52,19 @@ export function metricDelta(after, warm) {
  * Coerce non-finite / non-number self_size to 0 (q-mp-1310) — never concat.
  * Skip incomplete trailing field groups when `nodes.length` is not a multiple
  * of `fieldCount` (q-mp-1331) — never invent a phantom last node / NaN totals.
+ * Strip a leading UTF-8 BOM (U+FEFF) before parse (q-mp-1362) so CDP /
+ * editor-saved snapshots do not throw; mid-payload FEFF is left alone.
  *
  * @param {string} jsonText
  * @returns {{ detachedDomNodes: number, detachedSelfSize: number, totalSelfSize: number }}
  */
 export function analyzeHeapSnapshot(jsonText) {
-  const data = JSON.parse(jsonText);
+  let text = jsonText;
+  // Strip a single leading UTF-8 BOM (q-mp-1362). Mid-file FEFF is left alone.
+  if (typeof text === 'string' && text.charCodeAt(0) === 0xfeff) {
+    text = text.slice(1);
+  }
+  const data = JSON.parse(text);
   const nodeFields = data?.snapshot?.meta?.node_fields;
   if (!Array.isArray(nodeFields)) {
     throw new Error('heap snapshot missing snapshot.meta.node_fields');
