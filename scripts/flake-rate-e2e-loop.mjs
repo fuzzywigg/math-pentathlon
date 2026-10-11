@@ -3,15 +3,19 @@
  * Repeat Chromium e2e runs and aggregate per-test pass/fail + timings.
  * Usage: node scripts/flake-rate-e2e-loop.mjs [--runs N] [--out DIR]
  * --help/-h exit 0 without spawning playwright. Unknown flags exit 2.
+ * Default --out uses shared artifact-dir (q-mp-956).
  */
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import { artifactPath } from './lib/artifact-dir.mjs';
 
 const USAGE =
   'Usage: node scripts/flake-rate-e2e-loop.mjs [--runs N] [--out DIR]\n' +
   '  --runs N   positive integer (default 3)\n' +
-  '  --out DIR  output directory\n' +
+  '  --out DIR  output directory (default: <artifact-dir>/flake-rate;\n' +
+  '             /opt/cursor/artifacts when creatable, else\n' +
+  '             test-results/agent-artifacts; --out wins)\n' +
   '  -h, --help show this help and exit (no playwright spawn)';
 
 const VALUE_FLAGS = new Set(['--runs', '--out']);
@@ -87,7 +91,10 @@ function strFlag(name, def) {
 }
 
 const runs = flag('--runs', 3);
-const outDir = strFlag('--out', '/opt/cursor/artifacts/flake-rate');
+const outDir =
+  args.indexOf('--out') === -1
+    ? artifactPath('flake-rate')
+    : strFlag('--out', '');
 fs.mkdirSync(outDir, { recursive: true });
 
 /** @type {Map<string, { passes: number, fails: number, durations: number[], errors: string[] }>} */
