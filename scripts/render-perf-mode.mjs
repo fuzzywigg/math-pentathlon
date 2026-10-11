@@ -31,7 +31,7 @@ Not a standalone harness — run measurements with:
 Options:
   -h, --help    Show this help and exit`;
 
-export const TABLET_VIEWPORT = { width: 768, height: 1024 };
+const TABLET_VIEWPORT = { width: 768, height: 1024 };
 
 /**
  * Lazy PERF_* env (q-mp-1000): validate on first measure / accessor call, not
@@ -70,7 +70,7 @@ export function getMoveTargetRender() {
 
 const HOVER_GAMES = new Set(['juggle', 'pent-em-in']);
 
-export function renderReportPaths(root) {
+function renderReportPaths(root) {
   /** Optional stem so re-runs can avoid clobbering the Oct render baseline. */
   const stem = process.env.PERF_RENDER_STEM || 'render-perf-2026-10';
   return {
@@ -225,7 +225,7 @@ export async function measureMoveCost(page, attemptMove) {
 }
 
 /** Drive UI into a hover-relevant placing phase when possible. */
-export async function enterHoverPhase(page, gameId) {
+async function enterHoverPhase(page, gameId) {
   if (gameId === 'juggle') {
     // Roll → pick die → pick first shape → placing
     await page
