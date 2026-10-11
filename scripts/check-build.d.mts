@@ -18,6 +18,11 @@ export function listChunkNames(tree: Map<string, string>): string[];
 
 export function offlineNeededPaths(relPaths: Iterable<string>): string[];
 
+/** Retained for q-mp-1209 hermetic unit coverage (tip fold kept both helpers). */
+export function scanEnvLeakage(
+  distRoot: string
+): Array<{ path: string; finding: string }>;
+
 export function collectHtmlNonRootAssetRefs(html: string): string[];
 
 export function parseCliArgs(argv: string[]): {

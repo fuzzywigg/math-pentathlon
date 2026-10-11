@@ -268,7 +268,8 @@ function auditPrecache(distRoot) {
  * @param {string} distRoot
  * @returns {{ path: string, finding: string }[]}
  */
-function scanEnvLeakage(distRoot) {
+// Kept exported: unit helpers from q-mp-1209 import this (tip fold kept both helpers).
+export function scanEnvLeakage(distRoot) {
   /** @type {{ path: string, finding: string }[]} */
   const findings = [];
   const needles = [
