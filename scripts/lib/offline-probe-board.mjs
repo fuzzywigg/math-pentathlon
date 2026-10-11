@@ -42,13 +42,16 @@ export const OFFLINE_PROBE_LOAD_ERROR = '[data-testid="game-load-error"]';
  * True when a game-specific mount is present and load-error UI is absent.
  * Shell `#board` / `h1` counts must not be passed as `mountCount`.
  *
+ * Counts must be finite integers (`typeof === 'number'`). Boolean / string
+ * coercion via `Number(...)` is rejected (q-mp-1338: `Number(true) === 1`).
+ *
  * @param {{ mountCount?: unknown, loadErrorCount?: unknown }} counts
  * @returns {boolean}
  */
 export function isOfflineProbeMountOk(counts) {
-  const mountCount = Number(counts?.mountCount);
-  const loadErrorCount = Number(counts?.loadErrorCount);
-  if (!Number.isFinite(mountCount) || !Number.isFinite(loadErrorCount)) {
+  const mountCount = counts?.mountCount;
+  const loadErrorCount = counts?.loadErrorCount;
+  if (!Number.isInteger(mountCount) || !Number.isInteger(loadErrorCount)) {
     return false;
   }
   return mountCount > 0 && loadErrorCount === 0;

@@ -1,7 +1,9 @@
 /**
  * Full AI calibration matrix runner.
  * Usage: npx vite-node scripts/run-ai-calibration.ts
- * Env: CALIBRATION_GAMES (default 50; non-finite / non-positive / non-integer → exit 2)
+ * Env:
+ *   CALIBRATION_GAMES (default 50; non-finite / non-positive / non-integer → exit 2)
+ *   CALIBRATION_DATE (optional UTC YYYY-MM-DD OUT/title stamp; default live UTC)
  */
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -19,6 +21,7 @@ import type {
   Difficulty,
   MatchupStats,
 } from '../tests/helpers/ai-calibration/types';
+import { resolveCalibrationDate } from './lib/calibration-date.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 
 // Prefer wall-clock deadlines so deep search games finish in reasonable time.
@@ -28,12 +31,15 @@ process.env.CALIBRATION_WALL_CLOCK ??= '1';
 const GAMES = requireEnvNumber('CALIBRATION_GAMES', 50);
 const BASE_SEED = 20261007;
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const OUT = join(ROOT, 'docs', 'ai-calibration-2026-10-07.md');
+// q-mp-1352: live UTC OUT/title stamp (CALIBRATION_DATE override).
+// Historical markdown under the old fixed-date path may remain (no rewrites).
+const DATE = resolveCalibrationDate(process.env.CALIBRATION_DATE);
+const OUT = join(ROOT, 'docs', `ai-calibration-${DATE}.md`);
 
 const lines: string[] = [];
 const allFlags: CalibrationFlag[] = [];
 
-lines.push('# AI Calibration — 2026-10-07');
+lines.push(`# AI Calibration — ${DATE}`);
 lines.push('');
 lines.push(
   'Headless AI-vs-AI and AI-vs-random matrices across every game with an AI opponent.'

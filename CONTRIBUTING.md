@@ -1,6 +1,8 @@
 # Contributing
 
-PRs target **`alpha`** (trunk). Do not open new work against `main`.
+Human / trunk PRs target **`alpha`**. Do not open new work against `main`.
+
+Cloud-agent workers open **draft** PRs into the living tip (`cursor/mp-tip-*`) per [AGENTS.md](./AGENTS.md). Tip owners fold those drafts; only Grok Bot merges a tip into `alpha` / `main`. Do not treat the tip as the human PR base.
 
 ## Setup
 

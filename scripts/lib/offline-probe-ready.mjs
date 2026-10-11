@@ -2,7 +2,8 @@
  * Shared ready-checks for offline probe harnesses (q-mp-1261 / q-mp-1262).
  *
  * - HTTP ready = 2xx only (HTTP 404 must not look "ready").
- * - PROBE_BROWSERS: trim (+ lower-case) comma-separated names.
+ * - PROBE_BROWSERS: trim (+ lower-case) comma-separated names;
+ *   allowlist Playwright projects; alias chrome→chromium; reject unknown.
  *
  * This file is a library module. Direct CLI entry prints usage only:
  *   node scripts/lib/offline-probe-ready.mjs [--help]
@@ -65,8 +66,21 @@ export async function waitForUrl(url, timeoutMs = 60_000, opts = {}) {
   throw new Error(timeoutMessage(url));
 }
 
+/** Playwright project names accepted by offline probe harnesses. */
+const PROBE_BROWSER_ALLOWLIST = Object.freeze([
+  'chromium',
+  'firefox',
+  'webkit',
+]);
+
+/** Common aliases → Playwright project name (q-mp-1337). */
+const PROBE_BROWSER_ALIASES = Object.freeze({ chrome: 'chromium' });
+
+const PROBE_BROWSER_ALLOWED = new Set(PROBE_BROWSER_ALLOWLIST);
+
 /**
- * Parse `PROBE_BROWSERS` (comma-separated). Trims and lower-cases each name.
+ * Parse `PROBE_BROWSERS` (comma-separated). Trims and lower-cases each name,
+ * aliases `chrome`→`chromium`, and rejects unknown names.
  * Unset / empty / whitespace-only → `['webkit']`.
  *
  * @param {string | undefined | null} raw
@@ -78,7 +92,18 @@ export function parseProbeBrowsers(raw) {
     .split(',')
     .map((s) => s.trim().toLowerCase())
     .filter((s) => s.length > 0);
-  return parts.length > 0 ? parts : ['webkit'];
+  if (parts.length === 0) return ['webkit'];
+  const resolved = [];
+  for (const name of parts) {
+    const canonical = PROBE_BROWSER_ALIASES[name] ?? name;
+    if (!PROBE_BROWSER_ALLOWED.has(canonical)) {
+      throw new Error(
+        `Unknown PROBE_BROWSERS name: ${name}. Allowed: ${PROBE_BROWSER_ALLOWLIST.join(', ')} (alias: chrome→chromium).`
+      );
+    }
+    resolved.push(canonical);
+  }
+  return resolved;
 }
 
 /**

@@ -26,6 +26,16 @@ import { loadStarTrackBoard3DModule } from '../../src/games/star-track/board-3d-
 
 describe('burn-1008 ui-cov-r3 tablet-gl edges', () => {
   const originalWebdriver = navigator.webdriver;
+  // unit-shared uses isolate:false — unstubAllGlobals does not undo
+  // Object.defineProperty on innerWidth/innerHeight (q-mp-1348).
+  const originalInnerWidth = Object.getOwnPropertyDescriptor(
+    window,
+    'innerWidth'
+  );
+  const originalInnerHeight = Object.getOwnPropertyDescriptor(
+    window,
+    'innerHeight'
+  );
 
   beforeEach(() => {
     localStorage.clear();
@@ -45,6 +55,12 @@ describe('burn-1008 ui-cov-r3 tablet-gl edges', () => {
       configurable: true,
       get: () => originalWebdriver,
     });
+    if (originalInnerWidth) {
+      Object.defineProperty(window, 'innerWidth', originalInnerWidth);
+    }
+    if (originalInnerHeight) {
+      Object.defineProperty(window, 'innerHeight', originalInnerHeight);
+    }
     vi.restoreAllMocks();
     vi.useRealTimers();
   });

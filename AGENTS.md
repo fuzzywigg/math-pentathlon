@@ -8,7 +8,7 @@ parent_governance: github.com/fuzzywigg/agents-governance
 - Stack: TypeScript, CSS
 
 ## Purpose
-Math Pentathlon games platform — interactive educational math games and competition tools built with TypeScript. Primary branch is `alpha` (active development). Tip integration branch for stacked agent drafts is `cursor/mp-tip-postb74e`.
+Math Pentathlon games platform — interactive educational math games and competition tools built with TypeScript. Primary branch is `alpha` (active development). Tip integration branch for stacked agent drafts is `cursor/mp-tip-post38d2`.
 
 ## Safe Agent Actions
 - Update documentation and game copy
@@ -17,9 +17,10 @@ Math Pentathlon games platform — interactive educational math games and compet
 - Non-breaking dependency updates
 
 ## Draft PR into tip
-- Open **draft** PRs targeting `cursor/mp-tip-postb74e` (never `alpha` / `main` unless the tip owner asks).
+- **Agents (this file):** Open **draft** PRs targeting `cursor/mp-tip-post38d2` (never `alpha` / `main` unless the tip owner asks).
+- **Humans / trunk:** Open PRs to `alpha` per [CONTRIBUTING.md](./CONTRIBUTING.md). The tip is for stacked agent drafts only.
 - Do not merge, do not mark ready, do not push to `alpha` / `main` / the tip branch itself.
-- Tip owner folds; PR body ends with: `Next action: fold into tip by the tip owner`.
+- Tip owner folds drafts into the tip; only Grok Bot merges a tip to `alpha` / `main`. PR body ends with: `Next action: fold into tip by the tip owner`.
 - Before starting: read the live tip tree and open draft list so work is not duplicated.
 - If another open draft already covers the change, leave it open and comment `superseded` / `contained` instead of closing it.
 

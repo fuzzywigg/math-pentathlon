@@ -36,6 +36,9 @@ export function scanEnvLeakage(
 
 export function collectHtmlNonRootAssetRefs(html: string): string[];
 
+/** CI parity helper for dist/health.txt (q-mp-1336). */
+export function hasHealthTxt(distRoot: string): boolean;
+
 export function parseCliArgs(argv: string[]): {
   help: boolean;
   unknown: string | null;

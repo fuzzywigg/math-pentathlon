@@ -16,6 +16,14 @@ describe('game-prefetch', () => {
     resetGamePrefetchForTests();
     vi.useRealTimers();
     vi.restoreAllMocks();
+    // defineProperty is not undone by restoreAllMocks; drop the stub so
+    // later isolate:false suites see a clean window (q-mp-1347).
+    try {
+      delete (window as Window & { requestIdleCallback?: unknown })
+        .requestIdleCallback;
+    } catch {
+      /* ignore */
+    }
   });
 
   it('knows registered practice games and rejects unknown ids', () => {

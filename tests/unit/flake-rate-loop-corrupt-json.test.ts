@@ -135,6 +135,9 @@ describe('flake-rate loops tolerate corrupt reporter JSON (q-mp-1024)', () => {
       true
     );
     expect(summary.runSummaries.every((r) => r.ok === false)).toBe(true);
+    // All runs failed ingest → must not exit 0 (q-mp-1339).
+    expect(result.status).not.toBe(0);
+    expect(combined).toMatch(/all 2 runs failed to ingest reporter JSON/);
   });
 
   it('e2e loop records corrupt json and still writes summary (no uncaught parse)', () => {
@@ -159,6 +162,9 @@ describe('flake-rate loops tolerate corrupt reporter JSON (q-mp-1024)', () => {
     expect(summary.runSummaries).toEqual([
       { runId: 'e2e-1', ok: false, error: 'corrupt json' },
     ]);
+    // All runs failed ingest → must not exit 0 (q-mp-1339).
+    expect(result.status).not.toBe(0);
+    expect(combined).toMatch(/all 1 runs failed to ingest reporter JSON/);
   });
 
   it('e2e loop records non-object json root for JSON null (q-mp-1153)', () => {
@@ -184,6 +190,7 @@ describe('flake-rate loops tolerate corrupt reporter JSON (q-mp-1024)', () => {
     expect(summary.runSummaries).toEqual([
       { runId: 'e2e-1', ok: false, error: 'non-object json root' },
     ]);
+    expect(result.status).not.toBe(0);
   });
 
   it('unit loop missing-json path stays ok:false error missing json', () => {
@@ -198,7 +205,7 @@ exit 0
       { mode: 0o755 }
     );
     chmodSync(join(bin, 'npx'), 0o755);
-    spawnSync(
+    const result = spawnSync(
       process.execPath,
       [UNIT_LOOP, '--runs', '1', '--shuffle', '1', '--out', out],
       {
@@ -212,5 +219,31 @@ exit 0
     expect(summary.runSummaries.every((r) => r.error === 'missing json')).toBe(
       true
     );
+    expect(result.status).not.toBe(0);
+  });
+
+  it('unit loop with valid green reporter JSON still exits 0 (q-mp-1339)', () => {
+    const out = tempDir('flake-unit-green-out-');
+    const bin = tempDir('flake-unit-green-bin-');
+    writeFakeNpx(bin, 'unit', 'valid');
+    const result = spawnSync(
+      process.execPath,
+      [UNIT_LOOP, '--runs', '1', '--shuffle', '1', '--out', out],
+      {
+        encoding: 'utf8',
+        env: { ...process.env, PATH: `${bin}:${process.env.PATH}` },
+      }
+    );
+    const summary = JSON.parse(
+      readFileSync(join(out, 'unit-summary.json'), 'utf8')
+    ) as {
+      runSummaries: Array<{ ok: boolean; error?: string }>;
+      failingCount: number;
+    };
+    expect(summary.runSummaries.every((r) => r.ok === true && !r.error)).toBe(
+      true
+    );
+    expect(summary.failingCount).toBe(0);
+    expect(result.status).toBe(0);
   });
 });

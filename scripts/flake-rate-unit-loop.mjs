@@ -57,14 +57,34 @@ function applyEarlyCli(argv) {
 
 applyEarlyCli(args);
 
-function usageExit(message) {
+function usageExit(message, code = 1) {
   console.error(message);
   console.error(USAGE);
-  process.exit(1);
+  process.exit(code);
+}
+
+/**
+ * Reject duplicate value flags (q-mp-1353); indexOf first-wins is not enough.
+ * Only counts flag positions (skips value slots) so `--out --runs` still hits
+ * the flag-like --out validator (q-mp-871) instead of a false duplicate --runs.
+ */
+function rejectDuplicateFlag(name) {
+  let count = 0;
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (VALUE_FLAGS.has(a)) {
+      if (a === name) count += 1;
+      if (i + 1 < args.length) i += 1;
+    }
+  }
+  if (count > 1) {
+    usageExit(`Duplicate ${name}`, 2);
+  }
 }
 
 /** Positive integer flag; rejects missing, non-numeric, and non-positive values. */
 function flag(name, def) {
+  rejectDuplicateFlag(name);
   const i = args.indexOf(name);
   if (i === -1) return def;
   const raw = args[i + 1];
@@ -83,6 +103,7 @@ function flag(name, def) {
 
 /** Directory flag; rejects missing values and values that look like flags. */
 function strFlag(name, def) {
+  rejectDuplicateFlag(name);
   const i = args.indexOf(name);
   if (i === -1) return def;
   const raw = args[i + 1];
@@ -238,7 +259,14 @@ function ingestJson(jsonPath, runId, mode) {
   // Per-run ok keys off walked failures + numFailedTests + numFailedTestSuites
   // (and inferred suite status/message). Vitest `success: true` must not
   // override a non-zero failure count (q-mp-1034 / q-mp-1200).
-  const numFailedTests = data.numFailedTests ?? failed;
+  // Summary `failed` must not under-report when numFailedTests is 0 but walked
+  // failures exist (`??` does not coerce 0 → walked) (q-mp-1340).
+  const reportedFailed =
+    typeof data.numFailedTests === 'number' &&
+    Number.isFinite(data.numFailedTests)
+      ? data.numFailedTests
+      : 0;
+  const failedSummary = Math.max(failed, reportedFailed);
   const reportedSuiteFails =
     typeof data.numFailedTestSuites === 'number' &&
     Number.isFinite(data.numFailedTestSuites)
@@ -246,7 +274,7 @@ function ingestJson(jsonPath, runId, mode) {
       : 0;
   const ok =
     failed === 0 &&
-    numFailedTests === 0 &&
+    reportedFailed === 0 &&
     reportedSuiteFails === 0 &&
     inferredSuiteFails === 0;
   runSummaries.push({
@@ -254,7 +282,7 @@ function ingestJson(jsonPath, runId, mode) {
     mode,
     ok,
     passed: data.numPassedTests ?? passed,
-    failed: numFailedTests,
+    failed: failedSummary,
     durationMs: data.duration ?? null,
   });
 }
@@ -375,4 +403,12 @@ fs.writeFileSync(path.join(outDir, 'unit-summary.md'), lines.join('\n'));
 console.log(
   `[flake-rate] wrote ${path.join(outDir, 'unit-summary.json')} failing=${failures.length}`
 );
+// All-corrupt / zero successful parses must not look like a clean audit (q-mp-1339).
+const ingestOkCount = runSummaries.filter((r) => !r.error).length;
+if (runSummaries.length > 0 && ingestOkCount === 0) {
+  console.error(
+    `[flake-rate] all ${runSummaries.length} runs failed to ingest reporter JSON`
+  );
+  process.exit(1);
+}
 process.exit(failures.length > 0 ? 1 : 0);
