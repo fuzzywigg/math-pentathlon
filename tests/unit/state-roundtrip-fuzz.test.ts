@@ -16,6 +16,7 @@
  * - state-roundtrip-fuzz-queens-a.test.ts / -a2 / -a3 (seed A early / late mid / late final)
  * - state-roundtrip-fuzz-queens-b.test.ts / -queens-b2.test.ts (seed B early/late)
  * - state-roundtrip-fuzz-fab.test.ts / -fab-b.test.ts (fab-a-diffy seed A / B; q-mp-1344 / q-mp-1367)
+ * - state-roundtrip-fuzz-pent/fiar/juggle.test.ts (both seeds; q-mp-1368)
  * - state-roundtrip-fuzz-games.test.ts (remaining non-queens games, both seeds)
  */
 import { describe, it, expect } from 'vitest';
