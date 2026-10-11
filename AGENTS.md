@@ -17,9 +17,10 @@ Math Pentathlon games platform — interactive educational math games and compet
 - Non-breaking dependency updates
 
 ## Draft PR into tip
-- Open **draft** PRs targeting `cursor/mp-tip-post38d2` (never `alpha` / `main` unless the tip owner asks).
+- **Agents (this file):** Open **draft** PRs targeting `cursor/mp-tip-post38d2` (never `alpha` / `main` unless the tip owner asks).
+- **Humans / trunk:** Open PRs to `alpha` per [CONTRIBUTING.md](./CONTRIBUTING.md). The tip is for stacked agent drafts only.
 - Do not merge, do not mark ready, do not push to `alpha` / `main` / the tip branch itself.
-- Tip owner folds; PR body ends with: `Next action: fold into tip by the tip owner`.
+- Tip owner folds drafts into the tip; only Grok Bot merges a tip to `alpha` / `main`. PR body ends with: `Next action: fold into tip by the tip owner`.
 - Before starting: read the live tip tree and open draft list so work is not duplicated.
 - If another open draft already covers the change, leave it open and comment `superseded` / `contained` instead of closing it.
 
