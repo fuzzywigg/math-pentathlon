@@ -25,6 +25,21 @@ function restoreElementFromPoint(): void {
   }
 }
 
+// unit-shared uses isolate:false — restore document.hidden so later suites
+// do not see a stuck stub from Object.defineProperty (q-mp-1394).
+const originalDocumentHidden = Object.getOwnPropertyDescriptor(
+  document,
+  'hidden'
+);
+
+function restoreDocumentHidden(): void {
+  if (originalDocumentHidden) {
+    Object.defineProperty(document, 'hidden', originalDocumentHidden);
+  } else {
+    Reflect.deleteProperty(document, 'hidden');
+  }
+}
+
 function stubPointer(root: HTMLElement): void {
   vi.spyOn(root, 'getBoundingClientRect').mockReturnValue({
     x: 300,
@@ -189,6 +204,7 @@ describe('burn-1008 ui-cov-r2 idle-warm default imports', () => {
     document.documentElement.removeAttribute('data-mp-idle-warm');
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
+    restoreDocumentHidden();
   });
 
   it('defaultImportShell + defaultImportGame warm hex and kings', async () => {
