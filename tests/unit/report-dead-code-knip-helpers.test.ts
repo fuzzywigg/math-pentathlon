@@ -63,7 +63,14 @@ describe('report-dead-code flattenKnip (q-mp-1274)', () => {
       issues: [
         {
           file: 'a.ts',
-          exports: [null, undefined, 7, { name: null }, 'expStr', { name: 'expObj' }],
+          exports: [
+            null,
+            undefined,
+            7,
+            { name: null },
+            'expStr',
+            { name: 'expObj' },
+          ],
           types: [null, 'TypStr', { name: 'TypObj' }],
           dependencies: [null, 'depStr', { name: 'depObj' }],
           devDependencies: [null, 'devStr', { name: 'devObj' }],
