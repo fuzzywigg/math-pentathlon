@@ -71,7 +71,8 @@ export const DEMO_ROUTES: DemoRoute[] = [
 
 export const NON_DICE_DEMOS = DEMO_ROUTES.filter((d) => d.attr !== 'dice');
 
-type BoundaryInstall = typeof import('../../src/ui/game-error-boundary').installGameErrorBoundary;
+type BoundaryInstall =
+  typeof import('../../src/ui/game-error-boundary').installGameErrorBoundary;
 
 export type MainResidualMocks = {
   mountGameById: ReturnType<typeof vi.fn>;

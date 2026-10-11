@@ -90,16 +90,15 @@ vi.mock('../../src/demos/expression-demo', () => ({
 }));
 
 const { installGameErrorBoundary, boundaryState } = vi.hoisted(() => {
-  type InstallFn = typeof import('../../src/ui/game-error-boundary').installGameErrorBoundary;
+  type InstallFn =
+    typeof import('../../src/ui/game-error-boundary').installGameErrorBoundary;
   const boundaryState: { real: InstallFn | null } = { real: null };
-  const installGameErrorBoundary = vi.fn(
-    ((opts: Parameters<InstallFn>[0]) => {
-      if (!boundaryState.real) {
-        throw new Error('q-mp-685: real installGameErrorBoundary not armed');
-      }
-      return boundaryState.real(opts);
-    }) as InstallFn
-  );
+  const installGameErrorBoundary = vi.fn(((opts: Parameters<InstallFn>[0]) => {
+    if (!boundaryState.real) {
+      throw new Error('q-mp-685: real installGameErrorBoundary not armed');
+    }
+    return boundaryState.real(opts);
+  }) as InstallFn);
   return { installGameErrorBoundary, boundaryState };
 });
 
@@ -124,9 +123,8 @@ describe('q-mp-685 main.ts residual branches', () => {
   });
 
   it('stats catch-stale: bump during render aborts load-error paint', async () => {
-    const { nextRouteGeneration } = await import(
-      '../../src/core/route-generation'
-    );
+    const { nextRouteGeneration } =
+      await import('../../src/core/route-generation');
     renderStatsDashboard.mockImplementation(() => {
       nextRouteGeneration();
       throw new Error('stats boom after gen bump');
@@ -152,9 +150,8 @@ describe('q-mp-685 main.ts residual branches', () => {
   it.each(DEMO_ROUTES)(
     'demo catch-stale ($attr): bump during render aborts load-error',
     async (demo) => {
-      const { nextRouteGeneration } = await import(
-        '../../src/core/route-generation'
-      );
+      const { nextRouteGeneration } =
+        await import('../../src/core/route-generation');
       const render = await demo.load();
       render.mockImplementation(() => {
         nextRouteGeneration();
@@ -183,9 +180,8 @@ describe('q-mp-685 main.ts residual branches', () => {
   it.each(NON_DICE_DEMOS)(
     'demo success-stale ($attr): gen bump before paint skips demo',
     async (demo) => {
-      const { nextRouteGeneration } = await import(
-        '../../src/core/route-generation'
-      );
+      const { nextRouteGeneration } =
+        await import('../../src/core/route-generation');
       await demo.load();
       await import('../../src/main');
       const { handleRoute } = await import('../../src/core/router');
