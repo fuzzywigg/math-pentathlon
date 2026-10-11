@@ -168,6 +168,8 @@ const nodePureFiles = [
   'tests/unit/render-perf-mode-cli-help.test.ts',
   // check:perf early --help / unknown flags (q-mp-917); spawnSync CLI check needs node env.
   'tests/unit/check-perf-cli-args.test.ts',
+  // page-settle double-rAF helper (q-mp-920); hermetic fake page.evaluate needs node.
+  'tests/unit/page-settle.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional
