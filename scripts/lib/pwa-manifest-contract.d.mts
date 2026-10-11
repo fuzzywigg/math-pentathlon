@@ -10,6 +10,9 @@ export const REQUIRED_ICONS: ReadonlyArray<
   Readonly<{ src: string; sizes: string; purpose: string }>
 >;
 export const APPLE_TOUCH_ICON: string;
+export const PWA_MANIFEST_CONTRACT_USAGE: string;
+
+export function main(argv?: string[]): void;
 
 export function purposeTokens(purpose: string | undefined): Set<string>;
 
