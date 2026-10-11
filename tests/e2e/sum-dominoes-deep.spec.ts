@@ -13,7 +13,9 @@ const DEEP_TEST_TIMEOUT_MS = 120_000;
 const CLICK_MS = 3_000;
 
 /** Click with a short timeout; fall back to DOM click if Playwright stalls. */
-async function safeClick(locator: ReturnType<Page['locator']>): Promise<boolean> {
+async function safeClick(
+  locator: ReturnType<Page['locator']>
+): Promise<boolean> {
   if (!(await locator.isVisible().catch(() => false))) return false;
   try {
     await locator.click({ force: true, timeout: CLICK_MS });
@@ -26,12 +28,47 @@ async function safeClick(locator: ReturnType<Page['locator']>): Promise<boolean>
   }
 }
 
+/** Condition wait: post-roll affordances (pass / playable / end / AI). */
+async function waitAfterRoll(page: Page): Promise<void> {
+  await page
+    .waitForFunction(
+      () => {
+        const status =
+          document.querySelector('.sd-status')?.textContent?.trim() ?? '';
+        if (/wins!|draw|tie/i.test(status)) return true;
+        if (document.querySelector('.sd-pass-btn')) return true;
+        if (document.querySelectorAll('.sd-hand-domino-playable').length > 0)
+          return true;
+        if (document.querySelector('.sd-computer-thinking')) return true;
+        if (/computer/i.test(status)) return true;
+        return false;
+      },
+      { timeout: 5_000 }
+    )
+    .catch(() => undefined);
+}
+
+/** Condition wait: AI thinking flash or computer/end status after human move. */
+async function waitForAiThinkOrProgress(page: Page): Promise<void> {
+  await page
+    .waitForFunction(
+      () => {
+        const status =
+          document.querySelector('.sd-status')?.textContent?.trim() ?? '';
+        if (/wins!|draw|tie|computer|thinking/i.test(status)) return true;
+        return !!document.querySelector('.sd-computer-thinking');
+      },
+      { timeout: 5_000 }
+    )
+    .catch(() => undefined);
+}
+
 async function playHumanTurn(page: Page) {
   const roll = page.locator('.sd-roll-btn');
   if (await roll.isVisible().catch(() => false)) {
     if (!(await roll.isDisabled().catch(() => true))) {
       await safeClick(roll);
-      await page.waitForTimeout(100);
+      await waitAfterRoll(page);
     }
   }
   const pass = page.locator('.sd-pass-btn');
@@ -54,40 +91,47 @@ async function playHumanTurn(page: Page) {
 }
 
 async function waitHumanOrEnd(page: Page) {
-  const deadline = Date.now() + STALL_MS;
-  while (Date.now() < deadline) {
-    const info = await page.evaluate(() => {
-      const status =
-        document.querySelector('.sd-status')?.textContent?.trim() ?? '';
-      const thinking = !!document.querySelector('.sd-computer-thinking');
-      const roll = document.querySelector(
-        '.sd-roll-btn'
-      ) as HTMLButtonElement | null;
-      const canRoll = !!roll && !roll.disabled;
-      const pass = !!document.querySelector('.sd-pass-btn');
-      const playable = document.querySelectorAll(
-        '.sd-hand-domino-playable'
-      ).length;
-      const computer = /computer/i.test(status);
-      return { status, thinking, canRoll, pass, playable, computer };
-    });
-    if (/wins!|draw|tie/i.test(info.status)) {
+  try {
+    const handle = await page.waitForFunction(
+      () => {
+        const status =
+          document.querySelector('.sd-status')?.textContent?.trim() ?? '';
+        const thinking = !!document.querySelector('.sd-computer-thinking');
+        const roll = document.querySelector(
+          '.sd-roll-btn'
+        ) as HTMLButtonElement | null;
+        const canRoll = !!roll && !roll.disabled;
+        const pass = !!document.querySelector('.sd-pass-btn');
+        const playable = document.querySelectorAll(
+          '.sd-hand-domino-playable'
+        ).length;
+        const computer = /computer/i.test(status);
+        const ended = /wins!|draw|tie/i.test(status);
+        const humanReady =
+          !computer && !thinking && (canRoll || pass || playable > 0);
+        if (ended || humanReady) {
+          return { status, thinking, canRoll, pass, playable, computer, ended };
+        }
+        return false;
+      },
+      { timeout: STALL_MS }
+    );
+    const info = await handle.jsonValue();
+    if (info.ended) {
       return { kind: 'ended' as const, ...info };
     }
-    if (
-      !info.computer &&
-      !info.thinking &&
-      (info.canRoll || info.pass || info.playable > 0)
-    ) {
-      return { kind: 'human' as const, ...info };
-    }
-    await page.waitForTimeout(120);
+    return { kind: 'human' as const, ...info };
+  } catch {
+    const status =
+      (await page.locator('.sd-status').textContent())?.trim() ?? '';
+    return { kind: 'stall' as const, status };
   }
-  const status = (await page.locator('.sd-status').textContent())?.trim() ?? '';
-  return { kind: 'stall' as const, status };
 }
 
-async function playFullGame(page: Page, difficulty: 'easy' | 'medium' | 'hard') {
+async function playFullGame(
+  page: Page,
+  difficulty: 'easy' | 'medium' | 'hard'
+) {
   await startVsAiAt(page, 'sum-dominoes', difficulty);
   let sawThinking = false;
   let turns = 0;
@@ -113,8 +157,9 @@ async function playFullGame(page: Page, difficulty: 'easy' | 'medium' | 'hard') 
     if (gate.thinking || /computer/i.test(gate.status)) sawThinking = true;
 
     await playHumanTurn(page);
-    await page.waitForTimeout(80);
-    const flash = (await page.locator('.sd-status').textContent())?.trim() ?? '';
+    await waitForAiThinkOrProgress(page);
+    const flash =
+      (await page.locator('.sd-status').textContent())?.trim() ?? '';
     if (/computer|thinking/i.test(flash)) sawThinking = true;
     if (/wins!|draw|tie/i.test(flash)) {
       return {
