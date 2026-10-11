@@ -162,16 +162,22 @@ export function emptyPackagesMessage(lockPath = LOCK_PATH) {
 
 /** Strong copyleft / source-available terms that fail the report if present. */
 const DENIED_LICENSE_PATTERNS = [
-  /\bAGPL(-|\b)/i,
+  // `\bAGPL` covers SPDX (AGPL-3.0) and legacy AGPLv3 (q-mp-1079).
+  /\bAGPL/i,
   /\bGPL-2\.0\b/i,
   /\bGPL-3\.0\b/i,
-  // Legacy npm spellings (q-mp-1054); long-form "GNU General Public License …" left to 1079.
+  // Legacy npm spellings (q-mp-1054).
   /\bGPLv2\b/i,
   /\bGPLv3\b/i,
   /\bGNU\s+GPL\b/i,
   /\bGPL\b/i,
+  // Long-form GPL prose beyond short tokens (q-mp-1079).
+  /\bGNU\s+General\s+Public\s+License\b/i,
   /\bSSPL\b/i,
   /\bBUSL\b/i,
+  // SSPL / BUSL prose forms (q-mp-1079); source-available families left to 1081.
+  /\bServer\s+Side\s+Public\s+License\b/i,
+  /\bBusiness\s+Source\s+License\b/i,
   /\bCommons\s*Clause\b/i,
   /\bCPAL\b/i,
 ];
@@ -181,8 +187,11 @@ const DENIED_LICENSE_PATTERNS = [
  * do not fail the report.
  */
 const COPYLEFT_OR_REVIEW_PATTERNS = [
-  /\bMPL-2\.0\b/i,
-  /\bLGPL\b/i,
+  // `\bMPL` covers MPL-2.0; `\bMPLv` covers legacy MPLv2 (q-mp-1079).
+  /\bMPL(?:-|\b|v)/i,
+  /\bMozilla\s+Public\s+License\b/i,
+  // `\bLGPL` covers SPDX LGPL-2.1 and legacy LGPLv2.1 / LGPLv3 (q-mp-1079).
+  /\bLGPL/i,
   /\bEPL\b/i,
   /\bCDDL\b/i,
   /\bEUPL\b/i,
@@ -190,6 +199,11 @@ const COPYLEFT_OR_REVIEW_PATTERNS = [
   /\bPython-2\.0\b/i,
 ];
 
+/**
+ * Unknown / proprietary tokens (full-string on the whole expression or on
+ * each OR/AND alternative — see `hasUnknownLicenseToken`, q-mp-1080).
+ * Source-available / proprietary prose policy is HOLD-CHECK q-mp-1081.
+ */
 const UNKNOWN_LICENSE_PATTERNS = [
   /^$/i,
   /^UNKNOWN$/i,
@@ -321,6 +335,21 @@ function matchesAny(expression, patterns) {
 }
 
 /**
+ * True when an SPDX-style OR/AND expression includes an unknown/proprietary
+ * alternative (q-mp-1080). Bare `LicenseRef-Proprietary` is left to q-mp-1081.
+ * @param {string} expression
+ * @returns {boolean}
+ */
+function hasUnknownLicenseToken(expression) {
+  if (!/\b(?:OR|AND)\b/i.test(expression)) return false;
+  const tokens = expression
+    .split(/\b(?:OR|AND)\b/i)
+    .map((part) => part.replace(/[()]/g, '').trim())
+    .filter(Boolean);
+  return tokens.some((token) => matchesAny(token, UNKNOWN_LICENSE_PATTERNS));
+}
+
+/**
  * @param {string} expression
  * @returns {'denied'|'copyleft_or_review'|'unknown'|'ok'}
  */
@@ -328,6 +357,8 @@ export function classifyLicense(expression) {
   const lic = normalizeLicense(expression);
   if (matchesAny(lic, DENIED_LICENSE_PATTERNS)) return 'denied';
   if (!lic || matchesAny(lic, UNKNOWN_LICENSE_PATTERNS)) return 'unknown';
+  // Dual licenses with UNLICENSED / PROPRIETARY / NONE / UNKNOWN must not be ok.
+  if (hasUnknownLicenseToken(lic)) return 'unknown';
   if (matchesAny(lic, COPYLEFT_OR_REVIEW_PATTERNS)) return 'copyleft_or_review';
   return 'ok';
 }
