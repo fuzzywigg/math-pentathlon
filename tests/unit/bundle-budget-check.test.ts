@@ -31,6 +31,46 @@ describe('bundle budget helpers', () => {
     ]);
   });
 
+  // q-mp-1132: only real src/href attributes (not data-src / ng-src / xsrc)
+  it('ignores data-src, ng-src, and xsrc attribute names (q-mp-1132)', () => {
+    expect(parseMenuCriticalRefs('<div data-src="/assets/x.js">')).toEqual([]);
+    expect(parseMenuCriticalRefs('<img ng-src="/assets/x.js">')).toEqual([]);
+    expect(parseMenuCriticalRefs('<x xsrc="/assets/x.js">')).toEqual([]);
+    expect(parseMenuCriticalRefs('<script src="/assets/x.js">')).toEqual([
+      'assets/x.js',
+    ]);
+  });
+
+  // q-mp-1150: single-quoted src/href values
+  it('accepts single-quoted src and href asset refs (q-mp-1150)', () => {
+    expect(parseMenuCriticalRefs("<script src='/assets/x.js'>")).toEqual([
+      'assets/x.js',
+    ]);
+    expect(parseMenuCriticalRefs("<link href='/assets/x.css'>")).toEqual([
+      'assets/x.css',
+    ]);
+    expect(
+      parseMenuCriticalRefs(
+        "<script src='/assets/a.js'><link href=\"/assets/b.css\">"
+      )
+    ).toEqual(['assets/a.js', 'assets/b.css']);
+  });
+
+  // q-mp-1151: case-insensitive SRC/HREF
+  it('accepts case-insensitive SRC and HREF attribute names (q-mp-1151)', () => {
+    expect(parseMenuCriticalRefs('<script SRC="/assets/x.js">')).toEqual([
+      'assets/x.js',
+    ]);
+    expect(parseMenuCriticalRefs('<link HREF="/assets/x.css">')).toEqual([
+      'assets/x.css',
+    ]);
+    expect(parseMenuCriticalRefs('<link Href="/assets/x.css">')).toEqual([
+      'assets/x.css',
+    ]);
+    // Word boundary still required with case folding (1132 + 1151)
+    expect(parseMenuCriticalRefs('<div data-SRC="/assets/x.js">')).toEqual([]);
+  });
+
   it('maps game chunks without short-id stealing longer names', () => {
     const files = [
       'game-hex-aaaaaaaa.js',
