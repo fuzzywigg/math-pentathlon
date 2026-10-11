@@ -69,7 +69,9 @@ export const OFFLINE_EXTS = new Set([
  * Accepts url/revision in either key order and ' or " quotes (q-mp-1058).
  * Also accepts JSON-quoted keys `"url"` / `"revision"` (q-mp-1087).
  * Optional trailing commas (q-mp-1098) and whitespace around bare/JSON keys
- * and colons (q-mp-1099).
+ * and colons (q-mp-1099 / q-mp-1125).
+ * Optional Workbox `integrity` (q-mp-1126) and `size` (q-mp-1149) fields
+ * after url/revision are ignored (do not drop the entry).
  * @param {string} swSource
  * @returns {{ url: string, revision: string | null }[]}
  */
@@ -77,10 +79,12 @@ export function parsePrecacheManifest(swSource) {
   const entries = [];
   // Optional " or ' around keys (JSON or bare identifiers).
   // url-first or revision-first; string values may use ' or "; revision may be null.
-  // Optional WS around keys/colons; optional trailing comma before `}`.
+  // Optional WS around keys/colons; optional integrity/size; optional trailing `,`.
   const key = (name) => `(?:["']${name}["']|${name})`;
+  // PrecacheEntry may include integrity (string|null) and/or size (number|null).
+  const optExtra = `(?:\\s*,\\s*(?:["'](?:integrity|size)["']|(?:integrity|size))\\s*:\\s*(?:null|["'][^"']*["']|\\d+))*`;
   const re = new RegExp(
-    `\\{\\s*(?:${key('url')}\\s*:\\s*(["'])([^"']+)\\1\\s*,\\s*${key('revision')}\\s*:\\s*(?:(["'])([^"']*)\\3|null)|${key('revision')}\\s*:\\s*(?:(["'])([^"']*)\\5|null)\\s*,\\s*${key('url')}\\s*:\\s*(["'])([^"']+)\\7)\\s*,?\\s*\\}`,
+    `\\{\\s*(?:${key('url')}\\s*:\\s*(["'])([^"']+)\\1\\s*,\\s*${key('revision')}\\s*:\\s*(?:(["'])([^"']*)\\3|null)|${key('revision')}\\s*:\\s*(?:(["'])([^"']*)\\5|null)\\s*,\\s*${key('url')}\\s*:\\s*(["'])([^"']+)\\7)${optExtra}\\s*,?\\s*\\}`,
     'g'
   );
   for (const match of swSource.matchAll(re)) {
