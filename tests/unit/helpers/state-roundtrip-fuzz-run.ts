@@ -1,9 +1,10 @@
 /**
  * Shared runner for state round-trip fuzz shards
- * (q-mp-1108 / q-mp-1291 / q-mp-1325 / q-mp-1343).
+ * (q-mp-1108 / q-mp-1291 / q-mp-1325 / q-mp-1343 / q-mp-1367).
  * Same seeds, move caps, and assertion schedule as the pre-shard suite.
  * Optional assert-move windows let expensive queens seed-A / seed-B work split
  * across files without dropping serialize / AI checkpoints when all shards run.
+ * Fab seed-A / seed-B live in separate files (same both-seed coverage).
  */
 import { expect } from 'vitest';
 
