@@ -21,6 +21,10 @@ import {
   runEmitIdentityCheck,
   isMissingOrFlagLikeRef,
   refOptionErrorMessage,
+  duplicateFlagErrorMessage,
+  resolveDefaultMergeBase,
+  DEFAULT_TIP_REMOTE,
+  DEFAULT_TIP_FALLBACK_REMOTE,
 } from '../../scripts/check-emit-identity.mjs';
 
 const EMIT_SCRIPT = resolve(process.cwd(), 'scripts/check-emit-identity.mjs');
@@ -261,6 +265,116 @@ export const n: N = 1;
     expect(opts.head).toBe('def');
     expect(opts.normalize).toBe(true);
     expect(opts.json).toBe(true);
+  });
+
+  it('default merge-base uses living tip, not retired wave5 (q-mp-1357/1377)', () => {
+    expect(DEFAULT_TIP_REMOTE).toBe('origin/cursor/mp-tip-post38d2');
+    expect(DEFAULT_TIP_FALLBACK_REMOTE).toBe('origin/alpha');
+    expect(DEFAULT_TIP_REMOTE).not.toMatch(/integration-fold-wave5/);
+    const living = spawnSync(
+      'git',
+      ['merge-base', 'HEAD', DEFAULT_TIP_REMOTE],
+      { encoding: 'utf8' }
+    );
+    expect(living.status).toBe(0);
+    const expected = living.stdout.trim();
+    expect(resolveDefaultMergeBase()).toBe(expected);
+    const opts = parseArgs([]);
+    expect(opts.base).toBe(expected);
+    // Retired wave5 merge-base must not be the default on a clean tip WT.
+    const wave5 = spawnSync(
+      'git',
+      ['merge-base', 'HEAD', 'origin/cursor/integration-fold-wave5-tip-4af0'],
+      { encoding: 'utf8' }
+    );
+    if (wave5.status === 0 && wave5.stdout.trim()) {
+      expect(opts.base).not.toBe(wave5.stdout.trim());
+    }
+    const listed = listAiTouchedFiles(opts.base, 'WORKING_TREE');
+    expect(listed.ok).toBe(true);
+    if (listed.ok) {
+      expect(listed.files.length).toBe(0);
+    }
+  });
+
+  it('resolveDefaultMergeBase falls back to alpha then HEAD (q-mp-1357)', () => {
+    const calls: string[][] = [];
+    const spawn = (
+      _cmd: string,
+      args: string[],
+      _opts?: { encoding?: string; cwd?: string }
+    ) => {
+      calls.push(args);
+      const key = args.join(' ');
+      if (key === 'merge-base HEAD origin/cursor/mp-tip-post38d2') {
+        return { status: 128, stdout: '', stderr: 'missing tip\n' };
+      }
+      if (key === 'merge-base HEAD origin/alpha') {
+        return { status: 0, stdout: 'alpha-mb\n', stderr: '' };
+      }
+      return { status: 0, stdout: 'HEADSHA\n', stderr: '' };
+    };
+    expect(resolveDefaultMergeBase({ spawnSync: spawn as never })).toBe(
+      'alpha-mb'
+    );
+    expect(calls[0]).toEqual([
+      'merge-base',
+      'HEAD',
+      'origin/cursor/mp-tip-post38d2',
+    ]);
+    expect(calls[1]).toEqual(['merge-base', 'HEAD', 'origin/alpha']);
+
+    const spawnHeadOnly = (
+      _cmd: string,
+      args: string[],
+      _opts?: { encoding?: string; cwd?: string }
+    ) => {
+      if (args[0] === 'rev-parse') {
+        return { status: 0, stdout: 'only-head\n', stderr: '' };
+      }
+      return { status: 128, stdout: '', stderr: 'no tip\n' };
+    };
+    expect(resolveDefaultMergeBase({ spawnSync: spawnHeadOnly as never })).toBe(
+      'only-head'
+    );
+  });
+
+  it('duplicateFlagErrorMessage names the flag (q-mp-1373)', () => {
+    const msg = duplicateFlagErrorMessage('--base');
+    expect(msg).toMatch(/^error: Duplicate --base/);
+    expect(msg).toContain(USAGE);
+  });
+
+  it('CLI rejects duplicate --base / --head (q-mp-1373)', () => {
+    const dupBase = spawnSync(
+      process.execPath,
+      [EMIT_SCRIPT, '--base', 'aaa', '--base', 'bbb'],
+      { encoding: 'utf8' }
+    );
+    expect(dupBase.status).toBe(2);
+    const baseText = `${dupBase.stdout}\n${dupBase.stderr}`;
+    expect(baseText).toMatch(/error: Duplicate --base/);
+    expect(baseText).toContain(USAGE);
+
+    const dupHead = spawnSync(
+      process.execPath,
+      [EMIT_SCRIPT, '--base', 'aaa', '--head', 'h1', '--head', 'h2'],
+      { encoding: 'utf8' }
+    );
+    expect(dupHead.status).toBe(2);
+    const headText = `${dupHead.stdout}\n${dupHead.stderr}`;
+    expect(headText).toMatch(/error: Duplicate --head/);
+    expect(headText).toContain(USAGE);
+  });
+
+  it('CLI rejects duplicate boolean flags (q-mp-1373)', () => {
+    const r = spawnSync(
+      process.execPath,
+      [EMIT_SCRIPT, '--base', 'aaa', '--normalize', '--normalize'],
+      { encoding: 'utf8' }
+    );
+    expect(r.status).toBe(2);
+    expect(`${r.stdout}\n${r.stderr}`).toMatch(/error: Duplicate --normalize/);
   });
 
   it('minify mode treats brace-only curly wraps as identical', async () => {

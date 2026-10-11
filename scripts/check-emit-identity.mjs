@@ -16,9 +16,9 @@
  * Exit codes:
  *   0 — every compared file emits identically
  *   1 — any emit mismatch
- *   2 — usage / git-ref error (unknown flag, missing/flag-like --base/--head
- *       value, bad --files-from path, non-zero `git diff` for an invalid
- *       --base/--head; no stack)
+ *   2 — usage / git-ref error (unknown flag, duplicate --base/--head/boolean
+ *       flags, missing/flag-like --base/--head value, bad --files-from path,
+ *       non-zero `git diff` for an invalid --base/--head; no stack)
  */
 
 import { spawnSync } from 'node:child_process';
@@ -33,6 +33,11 @@ const ROOT = path.resolve(__dirname, '..');
 
 export const USAGE =
   'Usage: node scripts/check-emit-identity.mjs [options] [files...]';
+
+/** Living tip remote (AGENTS.md). Dead wave5 tip must not invent AI DIFFs (q-mp-1357). */
+export const DEFAULT_TIP_REMOTE = 'origin/cursor/mp-tip-post38d2';
+/** Fallback when the living tip ref is missing locally (q-mp-1357). */
+export const DEFAULT_TIP_FALLBACK_REMOTE = 'origin/alpha';
 
 /** Match tsconfig.json compilerOptions that affect emit. */
 export const EMIT_TSCONFIG_RAW = {
@@ -652,6 +657,47 @@ export function refOptionErrorMessage(flag) {
 }
 
 /**
+ * Usage text for a repeated value/boolean flag (q-mp-1373).
+ * @param {string} flag
+ */
+export function duplicateFlagErrorMessage(flag) {
+  return `error: Duplicate ${flag}\n${USAGE}`;
+}
+
+/**
+ * Default --base when omitted: merge-base with living tip (AGENTS.md), then
+ * origin/alpha, then HEAD. Must not use retired wave5 tip (q-mp-1357 / q-mp-1377).
+ * @param {{
+ *   spawnSync?: typeof spawnSync,
+ *   cwd?: string,
+ *   tipRemote?: string,
+ *   tipFallbackRemote?: string,
+ * }} [deps]
+ * @returns {string}
+ */
+export function resolveDefaultMergeBase(deps = {}) {
+  const spawn = deps.spawnSync ?? spawnSync;
+  const cwd = deps.cwd ?? ROOT;
+  const tipRemote = deps.tipRemote ?? DEFAULT_TIP_REMOTE;
+  const tipFallbackRemote =
+    deps.tipFallbackRemote ?? DEFAULT_TIP_FALLBACK_REMOTE;
+  for (const tip of [tipRemote, tipFallbackRemote]) {
+    const mb = spawn('git', ['merge-base', 'HEAD', tip], {
+      cwd,
+      encoding: 'utf8',
+    });
+    if (mb.status === 0 && mb.stdout.trim()) {
+      return mb.stdout.trim();
+    }
+  }
+  const head = spawn('git', ['rev-parse', 'HEAD'], {
+    cwd,
+    encoding: 'utf8',
+  });
+  return (head.stdout || '').trim();
+}
+
+/**
  * @param {string[]} argv
  * @returns {{ base: string, head: string, files: string[], normalize: boolean, minify: boolean, json: boolean }}
  */
@@ -661,6 +707,11 @@ export function parseArgs(argv) {
   /** @type {string | undefined} */
   let filesFrom;
   let sawFilesFrom = false;
+  let sawBase = false;
+  let sawHead = false;
+  let sawNormalize = false;
+  let sawMinify = false;
+  let sawJson = false;
   /** @type {string[]} */
   const files = [];
   let normalize = false;
@@ -669,6 +720,12 @@ export function parseArgs(argv) {
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--base') {
+      // Duplicate value flags must not silently last-win (q-mp-1373).
+      if (sawBase) {
+        console.error(duplicateFlagErrorMessage('--base'));
+        process.exit(2);
+      }
+      sawBase = true;
       // Bare `--base` must not fall through to silent merge-base (q-mp-1333).
       const value = argv[++i];
       if (isMissingOrFlagLikeRef(value)) {
@@ -677,6 +734,11 @@ export function parseArgs(argv) {
       }
       base = value;
     } else if (a === '--head') {
+      if (sawHead) {
+        console.error(duplicateFlagErrorMessage('--head'));
+        process.exit(2);
+      }
+      sawHead = true;
       const value = argv[++i];
       // Omitting the value (argv end) keeps default WORKING_TREE; flag-like /
       // empty tokens must not be eaten as refs (q-mp-1333).
@@ -686,13 +748,32 @@ export function parseArgs(argv) {
       }
       head = value ?? 'WORKING_TREE';
     } else if (a === '--files-from') {
+      if (sawFilesFrom) {
+        console.error(duplicateFlagErrorMessage('--files-from'));
+        process.exit(2);
+      }
       sawFilesFrom = true;
       filesFrom = argv[++i];
     } else if (a === '--normalize') {
+      if (sawNormalize) {
+        console.error(duplicateFlagErrorMessage('--normalize'));
+        process.exit(2);
+      }
+      sawNormalize = true;
       normalize = true;
     } else if (a === '--minify') {
+      if (sawMinify) {
+        console.error(duplicateFlagErrorMessage('--minify'));
+        process.exit(2);
+      }
+      sawMinify = true;
       minify = true;
     } else if (a === '--json') {
+      if (sawJson) {
+        console.error(duplicateFlagErrorMessage('--json'));
+        process.exit(2);
+      }
+      sawJson = true;
       json = true;
     } else if (a === '--help' || a === '-h') {
       printHelp();
@@ -705,21 +786,9 @@ export function parseArgs(argv) {
     }
   }
   if (!base) {
-    // Prefer merge-base with preferred tip branch name; fall back to HEAD~ if alone.
-    const mb = spawnSync(
-      'git',
-      ['merge-base', 'HEAD', 'origin/cursor/integration-fold-wave5-tip-4af0'],
-      { cwd: ROOT, encoding: 'utf8' }
-    );
-    if (mb.status === 0 && mb.stdout.trim()) {
-      base = mb.stdout.trim();
-    } else {
-      const tip = spawnSync('git', ['rev-parse', 'HEAD'], {
-        cwd: ROOT,
-        encoding: 'utf8',
-      });
-      base = tip.stdout.trim();
-    }
+    // Living tip from AGENTS.md (cursor/mp-tip-post38d2); fall back to
+    // origin/alpha, then HEAD — never retired wave5 (q-mp-1357 / q-mp-1377).
+    base = resolveDefaultMergeBase();
   }
   if (sawFilesFrom) {
     const loaded = loadFilesFromList(filesFrom ?? '');
