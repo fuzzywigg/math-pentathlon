@@ -21,6 +21,9 @@
  * fake score `0`). Present numeric `0` stays representable. Process exit for
  * measurement paths stays report-only exit 0 when `dist/` exists.
  *
+ * Preview ready (q-mp-1287): `waitForUrl` treats only HTTP 2xx as ready
+ * (shared `offline-probe-ready`); bare 404 is not ready.
+ *
  * Usage:
  *   npm run build && npm run check:perf
  *   PERF_SKIP_LIGHTHOUSE=1 npm run check:perf   # bundles only
@@ -41,6 +44,7 @@ import {
 } from './check-bundle-budgets.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { parseHelpOnlyArgv } from './lib/help-only-cli.mjs';
+import { waitForUrl as waitForUrlReady } from './lib/offline-probe-ready.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -142,21 +146,16 @@ function getFreePort() {
 }
 
 /**
+ * Poll until preview returns HTTP 2xx. Bare 404 is not ready (q-mp-1287;
+ * shared with offline probes via offline-probe-ready).
+ *
  * @param {string} url
- * @param {number} timeoutMs
+ * @param {number} [timeoutMs=30_000]
  */
 async function waitForUrl(url, timeoutMs = 30_000) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(url);
-      if (res.ok || res.status === 404) return;
-    } catch {
-      // booting
-    }
-    await new Promise((r) => setTimeout(r, 200));
-  }
-  throw new Error(`Timed out waiting for ${url}`);
+  return waitForUrlReady(url, timeoutMs, {
+    timeoutMessage: (u) => `Timed out waiting for ${u}`,
+  });
 }
 
 /** Default grace between SIGTERM and SIGKILL for timed-out LH children. */
