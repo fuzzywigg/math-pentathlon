@@ -8,7 +8,8 @@
  * q-mp-1084 pct-only rows must not invent 0/0 counts;
  * q-mp-1133 clamp pct-only values to [0,100];
  * q-mp-1222 reject missing/null istanbul metrics (no fake 0/0);
- * q-mp-1223 formatRankOutput per-game label matches engine kind).
+ * q-mp-1223 formatRankOutput per-game label matches engine kind;
+ * q-mp-1389 accept UTF-8 BOM on coverage-summary.json).
  */
 import { describe, it, expect, vi } from 'vitest';
 import {
@@ -644,9 +645,7 @@ describe('engine-coverage-rank pct-only counts (q-mp-1084)', () => {
     expect(rows[0].branchCov).toBeNull();
     expect(rows[0].branchTot).toBeNull();
     const out = formatRankOutput(rows);
-    expect(out).toContain(
-      '1\tsrc/games/calla/rules.ts\t88.50\t—\t70.00\t—'
-    );
+    expect(out).toContain('1\tsrc/games/calla/rules.ts\t88.50\t—\t70.00\t—');
     expect(out).toContain('rules-branch 70.00% (—)\tline 88.50% (—)');
     expect(out).not.toMatch(/88\.50\t0\/0/);
     expect(out).not.toMatch(/70\.00\t0\/0/);
@@ -893,5 +892,71 @@ describe('engine-coverage-rank last src/games + dedupe (q-mp-1207)', () => {
     expect(formatRankOutput(rows)).toContain(
       '2\tsrc/games/hex/rules.ts\t90.00\t9/10\t80.00\t8/10'
     );
+  });
+});
+
+describe('engine-coverage-rank UTF-8 BOM summary (q-mp-1389)', () => {
+  const summaryBody = JSON.stringify({
+    total: { lines: { pct: 50 } },
+    '/abs/src/games/hex/rules.ts': {
+      lines: { pct: 90, covered: 9, total: 10 },
+      branches: { pct: 80, covered: 8, total: 10 },
+    },
+    '/abs/src/games/hex/board.ts': {
+      lines: { pct: 70, covered: 7, total: 10 },
+      branches: { pct: 60, covered: 6, total: 10 },
+    },
+  });
+
+  function runMain(text: string) {
+    const logs: string[] = [];
+    const errors: string[] = [];
+    const code = main(['/tmp/summary.json'], {
+      cwd: '/repo',
+      existsSync: () => true,
+      readFileSync: () => text,
+      log: (s) => logs.push(s),
+      error: (s) => errors.push(s),
+    });
+    return { code, logs, errors };
+  }
+
+  it('accepts a leading U+FEFF and ranks the same as non-BOM', () => {
+    const plain = runMain(summaryBody);
+    const bom = runMain(`\uFEFF${summaryBody}`);
+    expect(plain.code).toBe(0);
+    expect(bom.code).toBe(0);
+    expect(bom.errors).toEqual([]);
+    expect(bom.logs.join('\n')).toBe(plain.logs.join('\n'));
+    expect(bom.logs.join('\n')).toContain('src/games/hex/board.ts');
+    expect(bom.logs.join('\n')).toContain('src/games/hex/rules.ts');
+  });
+
+  it('non-BOM input is unchanged (byte-identical stdout vs peer)', () => {
+    const a = runMain(summaryBody);
+    const b = runMain(summaryBody);
+    expect(a.code).toBe(0);
+    expect(a.logs.join('\n')).toBe(b.logs.join('\n'));
+    expect(
+      Buffer.from(a.logs.join('\n'), 'utf8').equals(
+        Buffer.from(b.logs.join('\n'), 'utf8')
+      )
+    ).toBe(true);
+  });
+
+  it('truly malformed JSON still exits 2 (BOM does not salvage)', () => {
+    const { code, logs, errors } = runMain('\uFEFF{not-json');
+    expect(code).toBe(2);
+    expect(logs).toEqual([]);
+    expect(errors.join('\n')).toMatch(/failed to read coverage summary/);
+    expect(errors.join('\n')).toContain(USAGE);
+  });
+
+  it('mid-payload FEFF is not treated as a leading BOM strip', () => {
+    // Leading char is '{', not BOM — FEFF inside remains and JSON.parse fails.
+    const { code, logs, errors } = runMain(`{\uFEFF"total":{}}`);
+    expect(code).toBe(2);
+    expect(logs).toEqual([]);
+    expect(errors.join('\n')).toMatch(/failed to read coverage summary/);
   });
 });
