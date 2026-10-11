@@ -184,7 +184,15 @@ test.describe('Queens & Guards playability', () => {
           }
           return 'stuck';
         });
-        await page.waitForTimeout(60);
+        // Paint settle after click/re-query (replaces fixed 60ms sleep).
+        await page.evaluate(
+          () =>
+            new Promise<void>((resolve) => {
+              requestAnimationFrame(() =>
+                requestAnimationFrame(() => resolve())
+              );
+            })
+        );
         if (phase === 'done' || phase === 'ai' || phase === 'moved' || phase === 'restore-place') {
           break;
         }
