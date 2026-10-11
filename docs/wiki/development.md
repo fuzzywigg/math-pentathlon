@@ -44,9 +44,9 @@ npm run format:check
 npm run typecheck                # tsc --noEmit (same as CI)
 npm run typecheck:ratchet        # ui/core shell + Phase-2 out-of-scope ceiling
 npm run check:boundaries         # engine→UI import-graph ceilings (engine_imports_ui = 0)
-npm run verify                   # lint → lint:ratchet → format:check → typecheck → typecheck:ratchet → check:boundaries (CI lint job)
+npm run verify                   # lint → lint:ratchet → format:check → typecheck → typecheck:ratchet → check:boundaries (blocking half of CI lint job; verify ⊆ lint)
 npm run size:check               # gzip budgets (needs dist/; missing dist/ → exit 2; soft budgets report-only exit 0)
-npm run check:copy-pins          # flag tests pinning player-facing copy (report-only; docs/dev/check-copy-pins.md)
+npm run check:copy-pins          # flag tests pinning player-facing copy (report-only; CI lint also runs --fail + continue-on-error after verify; docs/dev/check-copy-pins.md)
 npm run check:emit-identity      # type-only / brace-only emit proof (docs/dev/ai-typeonly-option.md; tip FAIL inventory: docs/dev/emit-identity-fail-inventory-post865-2026-10-10.md)
 npm run check:perf               # perf summary (+ optional Lighthouse); missing dist/ → exit 2; with dist/ report-only exit 0
 npm run check:build              # build reproducibility probe

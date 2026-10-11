@@ -57,6 +57,7 @@ Notes from the live workflow:
 - `lint` and `unit` have **no** `needs:` — they run in parallel with `audit`.
 - `build` `needs: audit`. All browser jobs except `visual-baseline` `needs: build`.
 - `knip` and `visual-baseline` have **no** `needs:` (run in parallel with lint/audit/unit).
+- Inside **blocking** `lint`, `npm run verify` is required; then soft `check:copy-pins -- --fail` (`continue-on-error: true`) surfaces copy-pin findings without failing the job. Copy-pins stays outside `package.json` `verify`.
 - Inside **blocking** `build`, two steps are soft: `size:check` and `check:pwa-manifest` (`continue-on-error: true`). The job still fails on `npm run build`, missing `dist/`, or JS chunks over **250 kB**.
 
 ## Per-job: what it catches + local reproduce
@@ -67,7 +68,7 @@ Commands match the npm scripts / invocations in `.github/workflows/ci.yml` (plus
 
 | Job | Catches | Local reproduce |
 | --- | --- | --- |
-| `lint` | ESLint on `src`; curly `all` ratchet ceiling; Prettier drift; `tsc --noEmit`; type-ratchet Phase-2 ceiling; module-boundary import graph (`engine_imports_ui` must stay 0) | `npm run lint` · `npm run lint:ratchet` · `npm run format:check` · `npm run typecheck` · `npm run typecheck:ratchet` · `npm run check:boundaries` |
+| `lint` | ESLint on `src`; curly `all` ratchet ceiling; Prettier drift; `tsc --noEmit`; type-ratchet Phase-2 ceiling; module-boundary import graph (`engine_imports_ui` must stay 0); (soft) player-facing copy-pin scan | `npm run verify` (= blocking chain); soft: `npm run check:copy-pins` |
 | `audit` | High+ npm advisory holes in the lockfile | `npm audit --audit-level=high` |
 | `build` | Production compile (`tsc && vite build`); `dist/` + `dist/health.txt`; hard **250 kB** per JS chunk under `dist/assets`; (soft) gzip budgets + PWA manifest contract | `npm run build` then confirm `dist/` + `dist/health.txt`; soft: `npm run size:check` · `npm run check:pwa-manifest` |
 | `unit` | Vitest unit suite under `tests/unit` (excl. `_tokenmaxx_archive`) — rules/state/shell regressions | `npm run test:unit` |
