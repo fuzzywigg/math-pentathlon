@@ -24,6 +24,7 @@ import { getPathParams } from '../../src/core/router';
 import type { TutorialConfig } from '../../src/core/tutorial';
 import { canPrefetchGame } from '../../src/ui/game-prefetch';
 import { renderGameSelector } from '../../src/ui/game-selector';
+import { mountPair } from '../helpers/mount-pair';
 
 const ROOT = process.cwd();
 const GAMES_ROOT = join(ROOT, 'src', 'games');
@@ -287,9 +288,7 @@ function callInit(mod: Record<string, unknown>, gameId: string): void {
   expect(family, `missing INIT_FAMILY for ${gameId}`).toBeTruthy();
 
   if (family === 'board-status') {
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
     return;
   }
