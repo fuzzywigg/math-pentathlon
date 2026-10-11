@@ -2,8 +2,9 @@
  * @vitest-environment node
  *
  * Hermetic argv / write-guard coverage for report-coverage-map
- * (q-mp-906 unknown flags; q-mp-977 --dry-run).
- * Spawns the script only for help/unknown/dry-run — no doc writes on those paths.
+ * (q-mp-906 unknown flags; q-mp-977 --dry-run; q-mp-993 empty/invalid shape;
+ * q-mp-1005 malformed JSON — no stack).
+ * Spawns the script only for help/unknown/dry-run/garbage — no doc writes on those paths.
  */
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -11,10 +12,13 @@ import os from 'node:os';
 import path, { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
+  invalidSummaryMessage,
+  malformedJsonMessage,
   OUT_MD,
   OUT_SVG,
   parseArgs,
   USAGE,
+  validateCoverageSummary,
   writeReport,
 } from '../../scripts/report-coverage-map.mjs';
 
@@ -175,6 +179,136 @@ describe('report-coverage-map CLI argv (q-mp-906 / q-mp-977)', () => {
     expect(result.stdout).toMatch(/would write/);
     expect(result.stdout).toMatch(/director/);
     expect(result.stdout).not.toMatch(/^\s*wrote /m);
+    expect(fs.statSync(MD_PATH).mtimeMs).toBe(mdBefore);
+    expect(fs.statSync(SVG_PATH).mtimeMs).toBe(svgBefore);
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+});
+
+describe('report-coverage-map invalid / malformed summaries (q-mp-993 / q-mp-1005)', () => {
+  it('validateCoverageSummary rejects empty object, array, and zero-directory', () => {
+    expect(validateCoverageSummary({})).toEqual({
+      ok: false,
+      reason: 'zero directories under src/',
+    });
+    expect(validateCoverageSummary([])).toEqual({
+      ok: false,
+      reason: 'array-shaped summary',
+    });
+    expect(validateCoverageSummary(null)).toEqual({
+      ok: false,
+      reason: 'expected a non-null object',
+    });
+    expect(
+      validateCoverageSummary(
+        {
+          total: {
+            lines: { total: 1, covered: 0, pct: 0 },
+          },
+          '/workspace/README.md': {
+            lines: { total: 1, covered: 0, pct: 0 },
+          },
+        },
+        { root: '/workspace' }
+      )
+    ).toEqual({ ok: false, reason: 'zero directories under src/' });
+    const ok = validateCoverageSummary(
+      {
+        '/workspace/src/games/hex/rules.ts': {
+          lines: { total: 10, covered: 5, pct: 50 },
+          branches: { total: 4, covered: 2, pct: 50 },
+          functions: { total: 2, covered: 1, pct: 50 },
+          statements: { total: 10, covered: 5, pct: 50 },
+        },
+      },
+      { root: '/workspace' }
+    );
+    expect(ok.ok).toBe(true);
+    if (ok.ok) {
+      expect(ok.rows).toHaveLength(1);
+      expect(ok.rows[0]?.dir).toBe('src/games/hex');
+    }
+  });
+
+  it('invalidSummaryMessage / malformedJsonMessage are stack-free', () => {
+    const invalid = invalidSummaryMessage('tmp/c.json', 'zero directories under src/');
+    expect(invalid).toMatch(/invalid coverage summary at tmp\/c\.json/);
+    expect(invalid).toMatch(/zero directories under src\//);
+    expect(invalid).toMatch(/no doc writes/);
+    expect(invalid).not.toMatch(/at Object\.|SyntaxError|stack/i);
+
+    const malformed = malformedJsonMessage(
+      'tmp/bad.json',
+      "Expected property name or '}' in JSON at position 1"
+    );
+    expect(malformed).toMatch(/malformed JSON in tmp\/bad\.json/);
+    expect(malformed).toMatch(/Expected property name/);
+    expect(malformed).toMatch(/npm run test:unit:coverage/);
+    expect(malformed).not.toMatch(/at writeReport|at ModuleJob/);
+  });
+
+  it('writeReport rejects {} / [] without writing docs', () => {
+    const mdBefore = fs.statSync(MD_PATH).mtimeMs;
+    const svgBefore = fs.statSync(SVG_PATH).mtimeMs;
+    for (const summary of [{}, []] as const) {
+      try {
+        writeReport({
+          summary: summary as never,
+          dryRun: false,
+          now: '2026-10-11T00:00:00.000Z',
+          root: '/workspace',
+        });
+        expect.fail('expected writeReport to throw');
+      } catch (err) {
+        expect(err).toMatchObject({ code: 'INVALID_SUMMARY' });
+        expect((err as Error).message).toMatch(/invalid coverage summary/);
+        expect((err as Error).message).not.toMatch(/at Object\.writeFileSync/);
+      }
+    }
+    expect(fs.statSync(MD_PATH).mtimeMs).toBe(mdBefore);
+    expect(fs.statSync(SVG_PATH).mtimeMs).toBe(svgBefore);
+  });
+
+  it('CLI rejects {} and [] with exit 1 and no doc writes', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cov-map-empty-'));
+    const emptyObj = path.join(tmpDir, 'empty.json');
+    const emptyArr = path.join(tmpDir, 'array.json');
+    fs.writeFileSync(emptyObj, '{}', 'utf8');
+    fs.writeFileSync(emptyArr, '[]', 'utf8');
+    const mdBefore = fs.statSync(MD_PATH).mtimeMs;
+    const svgBefore = fs.statSync(SVG_PATH).mtimeMs;
+
+    for (const summaryPath of [emptyObj, emptyArr]) {
+      const result = runScript([summaryPath]);
+      expect(result.status).toBe(1);
+      const combined = `${result.stdout}${result.stderr}`;
+      expect(combined).toMatch(/invalid coverage summary/);
+      expect(combined).toMatch(/no doc writes/);
+      expect(combined).not.toMatch(/wrote /);
+      expect(combined).not.toMatch(/at writeReport|at ModuleJob/);
+    }
+
+    expect(fs.statSync(MD_PATH).mtimeMs).toBe(mdBefore);
+    expect(fs.statSync(SVG_PATH).mtimeMs).toBe(svgBefore);
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  it('CLI malformed JSON exits 1 with short message and no stack', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cov-map-bad-'));
+    const badPath = path.join(tmpDir, 'bad.json');
+    fs.writeFileSync(badPath, '{', 'utf8');
+    const mdBefore = fs.statSync(MD_PATH).mtimeMs;
+    const svgBefore = fs.statSync(SVG_PATH).mtimeMs;
+
+    const result = runScript([badPath]);
+    expect(result.status).toBe(1);
+    const combined = `${result.stdout}${result.stderr}`;
+    expect(combined).toMatch(/malformed JSON/);
+    expect(combined).toMatch(/npm run test:unit:coverage/);
+    expect(combined).not.toMatch(/at writeReport/);
+    expect(combined).not.toMatch(/at ModuleJob/);
+    expect(combined).not.toMatch(/report:coverage-map error:\s*SyntaxError/);
+    expect(combined).not.toMatch(/wrote /);
     expect(fs.statSync(MD_PATH).mtimeMs).toBe(mdBefore);
     expect(fs.statSync(SVG_PATH).mtimeMs).toBe(svgBefore);
     fs.rmSync(tmpDir, { recursive: true, force: true });
