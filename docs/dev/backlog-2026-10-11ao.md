@@ -453,7 +453,7 @@ Baselines also captured under `/opt/cursor/artifacts/q-mp-090ao-baselines.log` a
 - **base:** `{MP_TIP}` (`cursor/mp-tip-post1239`)
 - **depends-on:** none (leave folded `#1284`/`1072` renamed-path hygiene alone)
 - **series:** script-tooling
-- **verdict:** **SAFE** — latent false broken-md-link for `](path.md "title")`; **0** titled links in live docs today
+- **verdict:** **SAFE** — latent false broken-md-link for a titled markdown href (`path.md` plus optional `"title"` / `'title'`); **0** titled links in live docs today
 - **CI / package.json callers:** `package.json` → `check:dev-docs`; **not** a blocking CI job
 - **target files:** `scripts/check-dev-doc-links.mjs` (`resolveMdLink`); hermetic unit / `--self-test` if present
 - **measured baseline:** `resolveMdLink` uses `href.split('#')[0].split('?')[0]` only — `"../dev/foo.md \"title\""` remains in the path segment → false missing file when titles appear.
