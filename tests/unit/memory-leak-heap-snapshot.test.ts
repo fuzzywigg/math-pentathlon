@@ -1,11 +1,12 @@
 /**
  * @vitest-environment node
  *
- * Hermetic coverage for q-mp-1215 + q-mp-1216 + q-mp-1310 + q-mp-1331:
+ * Hermetic coverage for q-mp-1215 + q-mp-1216 + q-mp-1310 + q-mp-1331 + q-mp-1362:
  *  - analyzeHeapSnapshot fail-closed when self_size (or name) is missing
  *  - metricDelta never coerces null heap metrics to 0
  *  - non-finite / non-number self_size coerced to 0 (no concat / NaN)
  *  - truncated trailing field groups skipped (finite totals; no phantom node)
+ *  - leading UTF-8 BOM accepted; empty valid snapshot still finite zeros
  *  - fmtMb returns n/a for non-finite
  * Fixture JSON only — no Playwright / CDP / vite.
  */
@@ -211,5 +212,40 @@ describe('analyzeHeapSnapshot truncated nodes (q-mp-1331)', () => {
     const exact = analyzeHeapSnapshot(JSON.stringify(WELL_FORMED));
     expect(exact.totalSelfSize).toBe(56);
     expect(exact.detachedDomNodes).toBe(1);
+  });
+});
+
+describe('analyzeHeapSnapshot UTF-8 BOM (q-mp-1362)', () => {
+  it('accepts a leading U+FEFF on a well-formed snapshot', () => {
+    const r = analyzeHeapSnapshot('\uFEFF' + JSON.stringify(WELL_FORMED));
+    expect(r).toEqual({
+      detachedDomNodes: 1,
+      detachedSelfSize: 32,
+      totalSelfSize: 56,
+    });
+  });
+
+  it('empty valid snapshot with BOM still returns finite zeros', () => {
+    const empty = {
+      snapshot: { meta: { node_fields: ['name', 'self_size'] } },
+      strings: [],
+      nodes: [],
+    };
+    const r = analyzeHeapSnapshot('\uFEFF' + JSON.stringify(empty));
+    expect(r).toEqual({
+      detachedDomNodes: 0,
+      detachedSelfSize: 0,
+      totalSelfSize: 0,
+    });
+    expect(Number.isFinite(r.totalSelfSize)).toBe(true);
+  });
+
+  it('does not salvage corrupt JSON via a mid-payload FEFF', () => {
+    // Leading char is '{', not BOM — FEFF inside remains and JSON.parse throws.
+    expect(() =>
+      analyzeHeapSnapshot(
+        '{\uFEFF"snapshot":{"meta":{"node_fields":["name","self_size"]}},"strings":[],"nodes":[]}'
+      )
+    ).toThrow();
   });
 });
