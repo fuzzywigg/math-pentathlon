@@ -17,8 +17,25 @@ import {
   scheduleBoard3dMountPaint,
 } from '../../src/ui/three/tablet-gl';
 
+// unit-shared uses isolate:false — unstubAllGlobals does not undo
+// Object.defineProperty on innerWidth/innerHeight (q-mp-1348).
+const originalInnerWidth = Object.getOwnPropertyDescriptor(
+  window,
+  'innerWidth'
+);
+const originalInnerHeight = Object.getOwnPropertyDescriptor(
+  window,
+  'innerHeight'
+);
+
 describe('q-mp-705 tablet-gl residual branches', () => {
   afterEach(() => {
+    if (originalInnerWidth) {
+      Object.defineProperty(window, 'innerWidth', originalInnerWidth);
+    }
+    if (originalInnerHeight) {
+      Object.defineProperty(window, 'innerHeight', originalInnerHeight);
+    }
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });

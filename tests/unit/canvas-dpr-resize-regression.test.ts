@@ -24,6 +24,26 @@ import {
 
 type LayoutVv = EventTarget & { width: number; height: number };
 
+// unit-shared uses isolate:false — unstubAllGlobals does not undo
+// Object.defineProperty on innerWidth/innerHeight (q-mp-1348).
+const originalInnerWidth = Object.getOwnPropertyDescriptor(
+  window,
+  'innerWidth'
+);
+const originalInnerHeight = Object.getOwnPropertyDescriptor(
+  window,
+  'innerHeight'
+);
+
+function restoreWindowInnerDimensions(): void {
+  if (originalInnerWidth) {
+    Object.defineProperty(window, 'innerWidth', originalInnerWidth);
+  }
+  if (originalInnerHeight) {
+    Object.defineProperty(window, 'innerHeight', originalInnerHeight);
+  }
+}
+
 function stubVisualViewport(width: number, height: number): LayoutVv {
   const vv = new EventTarget() as LayoutVv;
   vv.width = width;
@@ -34,6 +54,7 @@ function stubVisualViewport(width: number, height: number): LayoutVv {
 
 describe('q-mp-258 canvas DPR/resize regression — coord-map', () => {
   afterEach(() => {
+    restoreWindowInnerDimensions();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
@@ -119,6 +140,7 @@ describe('q-mp-258 canvas DPR/resize regression — tablet-gl layout binders', (
   });
 
   afterEach(() => {
+    restoreWindowInnerDimensions();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
