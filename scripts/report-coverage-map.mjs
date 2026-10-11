@@ -166,12 +166,23 @@ function metricFromCounts(covered, total) {
 }
 
 /**
+ * Clamp a percentage into the display/rank range [0, 100] (q-mp-1085).
+ * @param {number} pct
+ * @returns {number}
+ */
+function clampPct(pct) {
+  if (!Number.isFinite(pct)) return 0;
+  return Math.min(100, Math.max(0, pct));
+}
+
+/**
  * Pct-only metric: honor numeric pct; covered/total unknown (q-mp-1017).
+ * Display/rank pct clamped to [0, 100] (q-mp-1085).
  * @param {number} pct
  * @returns {CovMetric}
  */
 function metricFromPct(pct) {
-  return { total: null, covered: null, pct };
+  return { total: null, covered: null, pct: clampPct(pct) };
 }
 
 /**
@@ -216,7 +227,8 @@ function accumulateMetric(bucket, key, parsed) {
     return;
   }
   if (parsed.kind === 'pct') {
-    bucket[`${key}PctSum`] += parsed.pct;
+    // Clamp per-file pct before averaging (q-mp-1085).
+    bucket[`${key}PctSum`] += clampPct(parsed.pct);
     bucket[`${key}PctFiles`] += 1;
   }
 }
@@ -245,7 +257,7 @@ function finalizeMetric(bucket, key) {
     const combined =
       (countsPct * countFiles + pctOnlyAvg * pctFiles) /
       (countFiles + pctFiles);
-    return { total: null, covered: null, pct: combined };
+    return { total: null, covered: null, pct: clampPct(combined) };
   }
   // Totals absent and no pct — do not invent 100% from 0/0 (q-mp-1017).
   return { total: null, covered: null, pct: 0 };
