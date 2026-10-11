@@ -2,8 +2,10 @@
  * @vitest-environment node
  *
  * Hermetic coverage for q-mp-1208: check-perf fails closed when Lighthouse JSON
- * lacks a finite performance category score. Fixture JSON only — no network,
- * no real Lighthouse, no Chrome. Leave q-mp-1090 child-kill paths alone.
+ * lacks a finite performance category score. Also q-mp-1375: finite numeric
+ * strings in [0, 1] are coerced (non-numeric still missing). Fixture JSON
+ * only — no network, no real Lighthouse, no Chrome. Leave q-mp-1090
+ * child-kill paths alone.
  */
 import { EventEmitter } from 'node:events';
 import { describe, expect, it } from 'vitest';
@@ -100,6 +102,43 @@ describe('shapeLhPerformanceScore (q-mp-1208)', () => {
         categories: { performance: { score: 0.91 } },
       })
     ).toEqual({ ok: true, score: 91 });
+  });
+
+  it('coerces finite numeric string scores in [0, 1] (q-mp-1375)', () => {
+    expect(
+      shapeLhPerformanceScore({
+        categories: { performance: { score: '0.91' } },
+      })
+    ).toEqual({ ok: true, score: 91 });
+    expect(
+      shapeLhPerformanceScore({
+        categories: { performance: { score: ' 0.85 ' } },
+      })
+    ).toEqual({ ok: true, score: 85 });
+    expect(
+      shapeLhPerformanceScore({
+        categories: { performance: { score: '0' } },
+      })
+    ).toEqual({ ok: true, score: 0 });
+  });
+
+  it('still reports non-numeric strings as missing (q-mp-1375)', () => {
+    expect(
+      shapeLhPerformanceScore({
+        categories: { performance: { score: 'n/a' } },
+      })
+    ).toEqual({
+      ok: false,
+      error: 'missing Lighthouse performance score',
+    });
+    expect(
+      shapeLhPerformanceScore({
+        categories: { performance: { score: '' } },
+      })
+    ).toEqual({
+      ok: false,
+      error: 'missing Lighthouse performance score',
+    });
   });
 });
 
