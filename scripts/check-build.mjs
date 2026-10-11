@@ -67,14 +67,19 @@ export const OFFLINE_EXTS = new Set([
 /**
  * Parse Workbox precache entries from generated sw.js.
  * Accepts url/revision in either key order and ' or " quotes (q-mp-1058).
+ * Also accepts JSON-quoted keys `"url"` / `"revision"` (q-mp-1087).
  * @param {string} swSource
  * @returns {{ url: string, revision: string | null }[]}
  */
 export function parsePrecacheManifest(swSource) {
   const entries = [];
+  // Optional " or ' around keys (JSON or bare identifiers).
   // url-first or revision-first; string values may use ' or "; revision may be null.
-  const re =
-    /\{\s*(?:url:\s*(["'])([^"']+)\1\s*,\s*revision:\s*(?:(["'])([^"']*)\3|null)|revision:\s*(?:(["'])([^"']*)\5|null)\s*,\s*url:\s*(["'])([^"']+)\7)\s*\}/g;
+  const key = (name) => `(?:["']${name}["']|${name})`;
+  const re = new RegExp(
+    `\\{\\s*(?:${key('url')}:\\s*(["'])([^"']+)\\1\\s*,\\s*${key('revision')}:\\s*(?:(["'])([^"']*)\\3|null)|${key('revision')}:\\s*(?:(["'])([^"']*)\\5|null)\\s*,\\s*${key('url')}:\\s*(["'])([^"']+)\\7)\\s*\\}`,
+    'g'
+  );
   for (const match of swSource.matchAll(re)) {
     if (match[2] !== undefined) {
       entries.push({

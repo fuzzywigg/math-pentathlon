@@ -34,6 +34,28 @@ describe('check-build helpers', () => {
     ]);
   });
 
+  it('accepts JSON-quoted "url" / "revision" keys (q-mp-1087)', () => {
+    expect(parsePrecacheManifest('{"url":"/a.js","revision":"1"}')).toEqual([
+      { url: '/a.js', revision: '1' },
+    ]);
+    expect(
+      parsePrecacheManifest('{ "url": "/a.js", "revision": "1" }')
+    ).toEqual([{ url: '/a.js', revision: '1' }]);
+    expect(parsePrecacheManifest('{"revision":"1","url":"/a.js"}')).toEqual([
+      { url: '/a.js', revision: '1' },
+    ]);
+    expect(parsePrecacheManifest('{"url":"/a.js","revision":null}')).toEqual([
+      { url: '/a.js', revision: null },
+    ]);
+    expect(parsePrecacheManifest("{'url':'/a.js','revision':'1'}")).toEqual([
+      { url: '/a.js', revision: '1' },
+    ]);
+    // Bare identifier path from q-mp-1058 still works alongside JSON keys.
+    expect(parsePrecacheManifest('{url:"/b.js",revision:"2"}')).toEqual([
+      { url: '/b.js', revision: '2' },
+    ]);
+  });
+
   it('diffs hash trees for only-A / only-B / content', () => {
     const a = new Map([
       ['a.js', '111'],
