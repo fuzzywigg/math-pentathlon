@@ -12,6 +12,14 @@ import {
 
 export { mulberry32, pickIndex, pickOne };
 
+function isThenable(value: unknown): value is PromiseLike<unknown> {
+  return (
+    value !== null &&
+    (typeof value === 'object' || typeof value === 'function') &&
+    typeof (value as { then?: unknown }).then === 'function'
+  );
+}
+
 /** Deep-serialize game state including Map entries (stable key order). */
 export function serializeState(value: unknown): string {
   return JSON.stringify(value, (_key, v) => {
@@ -29,12 +37,26 @@ export function serializeState(value: unknown): string {
   });
 }
 
+/**
+ * Install mulberry32Uint as Math.random for a **sync** `fn`, then restore.
+ * Same thenable-reject contract as `tests/helpers/rng.ts` `withSeededRandom`
+ * (q-mp-1302 / q-mp-1349): async callbacks must not hold the global RNG across
+ * an await that races the `finally` restore. Stream stays uint32-forced —
+ * do not re-export the canonical helper (different mulberry32 body).
+ */
 export function withSeededRandom<T>(seed: number, fn: () => T): T {
   const rng = mulberry32(seed);
   const original = Math.random;
   Math.random = rng;
   try {
-    return fn();
+    const result = fn();
+    if (isThenable(result)) {
+      throw new TypeError(
+        'withSeededRandom does not support async callbacks (thenables); ' +
+          'use a sync fn, or seed via createSeededRng / an explicit rng argument'
+      );
+    }
+    return result;
   } finally {
     Math.random = original;
   }
