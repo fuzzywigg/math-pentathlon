@@ -9,6 +9,7 @@
  */
 import { describe, it, expect, afterEach } from 'vitest';
 import { writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { createSeededRng } from '../../src/core/ai-worker/seeded-rng';
 
 import { createInitialState as createCalla } from '../../src/games/calla/types';
@@ -564,7 +565,10 @@ function writeReport(rows: StatRow[]): void {
   lines.push('| others | opening hand / supply (stable mid chooser) |');
   lines.push('');
 
-  writeFileSync('/workspace/docs/ai-move-time-2026-10-07.md', lines.join('\n'));
+  writeFileSync(
+    resolve(process.cwd(), 'docs/ai-move-time-2026-10-07.md'),
+    lines.join('\n')
+  );
 }
 
 afterEach(() => {
