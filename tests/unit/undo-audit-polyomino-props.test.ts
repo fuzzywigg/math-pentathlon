@@ -1,6 +1,9 @@
 /**
  * Undo/redo property tests for polyomino Board (only product undo surface).
  * Random legal place → N undos restore earlier board; redo re-places identically.
+ *
+ * q-mp-1366: early shard of the former ~605–715ms random-legal-places case
+ * (trials 0..15). Late trials live in undo-audit-polyomino-props-late.test.ts.
  */
 import { describe, it, expect } from 'vitest';
 import {
@@ -9,110 +12,33 @@ import {
   removeLastPolyomino,
   findValidPlacements,
 } from '../../src/core/polyomino/placement';
+import { mulberry32, pickOne } from './undo-audit-helpers';
 import {
+  POLYOMINO_RANDOM_LEGAL_EARLY_TRIALS,
+  POLYOMINO_RANDOM_LEGAL_LATE_OFFSET,
+  POLYOMINO_RANDOM_LEGAL_LATE_TRIALS,
+  POLYOMINO_RANDOM_LEGAL_TOTAL_TRIALS,
   SIMPLE_SHAPES,
-  TETROMINOES,
-  Rotation,
-} from '../../src/core/polyomino/types';
-import {
-  assertUndoRedoMoveLog,
-  mulberry32,
-  pickOne,
-  serializeState,
-} from './undo-audit-helpers';
+  SHAPES,
+  boardFingerprint,
+  runPolyominoRandomLegalPlacesAudit,
+  type Applied,
+} from './helpers/undo-audit-polyomino-props';
 
-const SHAPES = [...SIMPLE_SHAPES, ...TETROMINOES];
-const ROTATIONS: Rotation[] = [0, 90, 180, 270];
-
-type Applied = {
-  shapeId: string;
-  position: { row: number; col: number };
-  rotation: Rotation;
-  flipped: boolean;
-};
-
-function boardFingerprint(board: ReturnType<typeof createBoard>): string {
-  return serializeState({
-    cells: board.cells,
-    placements: board.placements,
+describe('Undo audit — polyomino removeLast / place redo (early)', () => {
+  it('shards partition the pre-shard 32 random-legal trials', () => {
+    expect(
+      POLYOMINO_RANDOM_LEGAL_EARLY_TRIALS + POLYOMINO_RANDOM_LEGAL_LATE_TRIALS
+    ).toBe(POLYOMINO_RANDOM_LEGAL_TOTAL_TRIALS);
+    expect(POLYOMINO_RANDOM_LEGAL_LATE_OFFSET).toBe(
+      POLYOMINO_RANDOM_LEGAL_EARLY_TRIALS
+    );
   });
-}
 
-describe('Undo audit — polyomino removeLast / place redo', () => {
-  it('random legal places: undo N restores; redo replays; placements log matches', () => {
-    assertUndoRedoMoveLog({
-      label: 'polyomino',
-      trials: 32,
-      maxPlies: 12,
-      create: () => createBoard(10, 10),
-      step: (board, rng) => {
-        const candidates: Applied[] = [];
-        for (const shape of SHAPES) {
-          const rotations = shape.canRotate ? ROTATIONS : ([0] as Rotation[]);
-          const flips = shape.canFlip ? [false, true] : [false];
-          for (const rotation of rotations) {
-            for (const flipped of flips) {
-              for (const position of findValidPlacements(
-                board,
-                shape,
-                rotation,
-                flipped
-              )) {
-                candidates.push({
-                  shapeId: shape.id,
-                  position,
-                  rotation,
-                  flipped,
-                });
-              }
-            }
-          }
-        }
-        if (candidates.length === 0) return null;
-        // Cap candidate scan cost: sample among first 200 + random tail
-        const pool =
-          candidates.length > 200
-            ? [
-                ...candidates.slice(0, 100),
-                ...Array.from({ length: 100 }, () =>
-                  pickOne(rng, candidates)
-                ),
-              ]
-            : candidates;
-        const applied = pickOne(rng, pool);
-        const shape = SHAPES.find((s) => s.id === applied.shapeId)!;
-        const next = placePolyomino(
-          board,
-          shape,
-          applied.position,
-          applied.rotation,
-          applied.flipped
-        );
-        const logEntry = next.placements[next.placements.length - 1];
-        return { state: next, applied, logEntry };
-      },
-      reapply: (board, applied) => {
-        const shape = SHAPES.find((s) => s.id === applied.shapeId)!;
-        return placePolyomino(
-          board,
-          shape,
-          applied.position,
-          applied.rotation,
-          applied.flipped
-        );
-      },
-      getHistory: (board) => board.placements,
-      historyMatches: (entry, applied) => {
-        const e = entry as Applied;
-        return (
-          e.shapeId === applied.shapeId &&
-          e.position.row === applied.position.row &&
-          e.position.col === applied.position.col &&
-          e.rotation === applied.rotation &&
-          e.flipped === applied.flipped
-        );
-      },
-      fingerprint: boardFingerprint,
+  it('random legal places early: undo N restores; redo replays; placements log matches', () => {
+    runPolyominoRandomLegalPlacesAudit({
+      trials: POLYOMINO_RANDOM_LEGAL_EARLY_TRIALS,
+      trialOffset: 0,
     });
   });
 

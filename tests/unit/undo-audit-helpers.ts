@@ -69,6 +69,11 @@ export function withSeededRandom<T>(seed: number, fn: () => T): T {
 export function assertUndoRedoMoveLog<S, A>(opts: {
   label: string;
   trials?: number;
+  /**
+   * First trial index (default 0). Pair with `trials` to shard a suite without
+   * changing seeds: seed stays `(trial + 1) * 97_531 + 17` for absolute trial.
+   */
+  trialOffset?: number;
   maxPlies?: number;
   create: (rng: () => number) => S;
   /** Advance one legal ply. Return null when no legal play / terminal. */
@@ -85,10 +90,12 @@ export function assertUndoRedoMoveLog<S, A>(opts: {
   fingerprint?: (state: S) => string;
 }): void {
   const trials = opts.trials ?? 24;
+  const trialOffset = opts.trialOffset ?? 0;
   const maxPlies = opts.maxPlies ?? 16;
   const fingerprint = opts.fingerprint ?? ((s: S) => serializeState(s));
 
-  for (let trial = 0; trial < trials; trial++) {
+  for (let i = 0; i < trials; i++) {
+    const trial = trialOffset + i;
     const seed = (trial + 1) * 97_531 + 17;
     const rng = mulberry32(seed);
 
