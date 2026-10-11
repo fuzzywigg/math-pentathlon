@@ -289,6 +289,55 @@ describe('report-ratchet-history helpers (q-mp-074 / q-mp-236 / q-mp-290)', () =
     expect(latest.typeOutOfScope).toBe(216);
     expect(latest.boundarySum).toBe(17);
   });
+
+  it('collectHistory --first-parent forwards --first-parent to every git log (q-mp-1035)', () => {
+    const logArgv: string[][] = [];
+    const runGit = (args: string[]) => {
+      if (args[0] === 'log') {
+        logArgv.push(args.slice());
+        return { status: 0, stdout: '', stderr: '' };
+      }
+      if (args[0] === 'show') {
+        return { status: 0, stdout: '{}', stderr: '' };
+      }
+      if (args[0] === 'rev-parse') {
+        return { status: 0, stdout: 'deadbeef\n', stderr: '' };
+      }
+      return { status: 1, stdout: '', stderr: `unexpected ${args.join(' ')}` };
+    };
+
+    collectHistory(runGit, { firstParent: true });
+    expect(logArgv.length).toBe(3);
+    for (const args of logArgv) {
+      expect(args).toContain('--first-parent');
+      expect(args).not.toContain('--all');
+    }
+
+    logArgv.length = 0;
+    collectHistory(runGit, { firstParent: false });
+    expect(logArgv.length).toBe(3);
+    for (const args of logArgv) {
+      expect(args).toContain('--all');
+      expect(args).not.toContain('--first-parent');
+    }
+
+    const written = writeReport({
+      firstParent: true,
+      dryRun: true,
+      runGit,
+      now: '2026-10-11T00:00:00.000Z',
+      liveLint: {
+        curly: 1,
+        voidExpression: 1,
+        nnnull: 1,
+        dupImports: 1,
+        nullish: null,
+      },
+    });
+    expect(written.gitMode).toBe('git log --first-parent');
+    expect(USAGE).toMatch(/--first-parent/);
+    expect(USAGE).toMatch(/first-parent history/);
+  });
 });
 
 describe('report-ratchet-history parseArgs / CLI (q-mp-872)', () => {
