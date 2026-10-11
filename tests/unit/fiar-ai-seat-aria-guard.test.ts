@@ -12,6 +12,7 @@ import {
   applyGameModeChrome,
   clearGameModeChrome,
 } from '../../src/ui/player-colors';
+import { mountPair } from '../helpers/mount-pair';
 
 function forgeMovementState(currentPlayer: 'player1' | 'player2' = 'player1') {
   const base = createInitialState();
@@ -161,9 +162,8 @@ describe('FIAR AI-turn input guard', () => {
 
     const app = document.createElement('div');
     app.id = 'app';
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(app, board, status);
+    document.body.appendChild(app);
+    const { board, status } = mountPair();
 
     initGame(board, status);
     newGameVsAI('easy');
