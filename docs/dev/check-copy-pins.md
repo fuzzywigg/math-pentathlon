@@ -20,7 +20,7 @@ Those pins break (or freeze) restore surfaces when seat labels / status copy cha
 
 Scans `tests/**/*.{test,spec}.{ts,tsx,js,mjs}` (skips `_tokenmaxx_archive`) for:
 
-1. **message-api** — `expect(...getPhaseMessage(...)...)` / `getCurrentPhaseMessage` (including `import { getPhaseMessage as alias }`) with `toBe` / `toEqual` / `toStrictEqual` / `toMatch` / `toContain` (and `.not.` variants).
+1. **message-api** — `expect(...getPhaseMessage(...)...)` / `getCurrentPhaseMessage` (including `import { getPhaseMessage as alias }`) with `toBe` / `toEqual` / `toStrictEqual` / `toMatch` / `toContain` / `toHaveTextContent` / `toHaveAccessibleName` / `toHaveText` (and `.not.` variants).
 2. **coming-soon** — matcher args that pin the literal `"Coming Soon"` or `/Coming Soon/`.
 3. **registry-string** — matcher args that pin distinctive string literals harvested from `getPhaseMessage` / `getCurrentPhaseMessage` bodies under `src/games/*/rules.ts` + `game-state.ts`, plus the menu badge string from `src/ui/game-selector.ts`.
 

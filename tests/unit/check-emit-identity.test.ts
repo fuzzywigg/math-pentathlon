@@ -61,6 +61,49 @@ export const n: N = 1;
     expect(stripCommentsAndCollapseWhitespace('a  \n\n  b\n')).toBe('a\nb\n');
   });
 
+  it('stripCommentsAndCollapseWhitespace keeps whitespace inside strings (q-mp-1053)', () => {
+    const doubleSpaced = 'export const s = "hello  world";';
+    const singleSpaced = 'export const s = "hello world";';
+    expect(stripCommentsAndCollapseWhitespace(doubleSpaced)).not.toBe(
+      stripCommentsAndCollapseWhitespace(singleSpaced)
+    );
+    expect(stripCommentsAndCollapseWhitespace(doubleSpaced)).toContain(
+      '"hello  world"'
+    );
+    expect(stripCommentsAndCollapseWhitespace(singleSpaced)).toContain(
+      '"hello world"'
+    );
+
+    const singleQuotes = "export const s = 'a  b';";
+    expect(stripCommentsAndCollapseWhitespace(singleQuotes)).toContain("'a  b'");
+  });
+
+  it('stripCommentsAndCollapseWhitespace keeps whitespace inside templates (q-mp-1053)', () => {
+    const a = 'export const s = `hello  world`;';
+    const b = 'export const s = `hello world`;';
+    expect(stripCommentsAndCollapseWhitespace(a)).not.toBe(
+      stripCommentsAndCollapseWhitespace(b)
+    );
+    expect(stripCommentsAndCollapseWhitespace(a)).toContain('`hello  world`');
+
+    // Expression whitespace inside ${…} still collapses; cooked text does not.
+    const exprWs = 'export const s = `x${  a  +  b  }y`;';
+    const exprTight = 'export const s = `x${a + b}y`;';
+    expect(stripCommentsAndCollapseWhitespace(exprWs)).toBe(
+      stripCommentsAndCollapseWhitespace(exprTight)
+    );
+  });
+
+  it('compareFileEmit --normalize differs when only string contents differ (q-mp-1053)', async () => {
+    const result = await compareFileEmit({
+      file: 'sample.ts',
+      baseSource: 'export const s = "hello  world";\n',
+      headSource: 'export const s = "hello world";\n',
+      normalize: true,
+    });
+    expect(result.status).toBe('differ');
+  });
+
   it('parseArgs reads --base/--head/--normalize/--minify', () => {
     const opts = parseArgs([
       '--base',

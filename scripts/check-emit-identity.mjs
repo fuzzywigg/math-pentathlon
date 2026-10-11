@@ -138,18 +138,177 @@ export async function transpileToJs(
  * Optional normalize: collapse runs of whitespace outside string/template
  * literals. Default comparison is raw byte equality of esbuild output; this
  * helper exists for callers that need whitespace-insensitive checks only.
+ *
+ * String (`'` / `"`) and template (`\``) contents are preserved byte-for-byte
+ * (including internal spaces). Whitespace inside `${…}` template expressions
+ * is collapsed recursively. Regex literals are not special-cased here.
  * @param {string} js
  * @returns {string}
  */
 export function stripCommentsAndCollapseWhitespace(js) {
   // esbuild already stripped TS comments; only collapse insignificant WS.
-  return (
-    js
-      .replace(/[ \t]+/g, ' ')
-      .replace(/ ?\n ?/g, '\n')
-      .replace(/\n{2,}/g, '\n')
-      .trim() + '\n'
-  );
+  return collapseWhitespaceOutsideLiterals(js).trim() + '\n';
+}
+
+/**
+ * @param {string} js
+ * @param {number} i index of opening quote
+ * @returns {number} index after closing quote
+ */
+function skipQuotedLiteral(js, i) {
+  const quote = js[i];
+  i++;
+  while (i < js.length) {
+    const c = js[i];
+    i++;
+    if (c === '\\' && i < js.length) {
+      i++;
+      continue;
+    }
+    if (c === quote) break;
+  }
+  return i;
+}
+
+/**
+ * @param {string} js
+ * @param {number} i index of opening backtick
+ * @returns {number} index after closing backtick
+ */
+function skipTemplateLiteral(js, i) {
+  i++; // past `
+  while (i < js.length) {
+    const c = js[i];
+    if (c === '\\' && i + 1 < js.length) {
+      i += 2;
+      continue;
+    }
+    if (c === '`') return i + 1;
+    if (c === '$' && js[i + 1] === '{') {
+      i += 2;
+      i = findTemplateExprClosingBrace(js, i) + 1;
+      continue;
+    }
+    i++;
+  }
+  return i;
+}
+
+/**
+ * @param {string} js
+ * @param {number} i index of first char inside `${`
+ * @returns {number} index of the matching `}`
+ */
+function findTemplateExprClosingBrace(js, i) {
+  let depth = 1;
+  while (i < js.length && depth > 0) {
+    const ch = js[i];
+    if (ch === "'" || ch === '"') {
+      i = skipQuotedLiteral(js, i);
+      continue;
+    }
+    if (ch === '`') {
+      i = skipTemplateLiteral(js, i);
+      continue;
+    }
+    if (ch === '{') depth++;
+    else if (ch === '}') {
+      depth--;
+      if (depth === 0) return i;
+    }
+    i++;
+  }
+  return i;
+}
+
+/**
+ * Collapse insignificant whitespace outside string/template literals.
+ * Mirrors prior global replaces: `[ \t]+` → space, trim spaces beside `\n`,
+ * collapse runs of newlines — but only in code regions.
+ * @param {string} js
+ * @returns {string}
+ */
+function collapseWhitespaceOutsideLiterals(js) {
+  let out = '';
+  let i = 0;
+  /** @type {'code' | 'space' | 'newline'} */
+  let ws = 'code';
+
+  function flushWs() {
+    if (ws === 'newline') {
+      out += '\n';
+    } else if (ws === 'space') {
+      out += ' ';
+    }
+    ws = 'code';
+  }
+
+  /**
+   * @param {string} c
+   */
+  function emitCodeChar(c) {
+    if (c === ' ' || c === '\t') {
+      if (ws !== 'newline') ws = 'space';
+      return;
+    }
+    if (c === '\n' || c === '\r') {
+      ws = 'newline';
+      return;
+    }
+    flushWs();
+    out += c;
+  }
+
+  while (i < js.length) {
+    const c = js[i];
+    if (c === "'" || c === '"') {
+      flushWs();
+      const end = skipQuotedLiteral(js, i);
+      out += js.slice(i, end);
+      i = end;
+      continue;
+    }
+    if (c === '`') {
+      flushWs();
+      out += '`';
+      i++;
+      while (i < js.length) {
+        const t = js[i];
+        if (t === '\\' && i + 1 < js.length) {
+          out += t + js[i + 1];
+          i += 2;
+          continue;
+        }
+        if (t === '`') {
+          out += t;
+          i++;
+          break;
+        }
+        if (t === '$' && js[i + 1] === '{') {
+          out += '${';
+          i += 2;
+          const close = findTemplateExprClosingBrace(js, i);
+          const expr = js.slice(i, close);
+          // Spaces beside `${` / `}` are insignificant; trim after collapse.
+          out += collapseWhitespaceOutsideLiterals(expr).trim();
+          if (close < js.length) {
+            out += '}';
+            i = close + 1;
+          } else {
+            i = close;
+          }
+          continue;
+        }
+        out += t;
+        i++;
+      }
+      continue;
+    }
+    emitCodeChar(c);
+    i++;
+  }
+  flushWs();
+  return out;
 }
 
 /**

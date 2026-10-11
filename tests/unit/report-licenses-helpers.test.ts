@@ -25,15 +25,26 @@ describe('report-licenses helpers', () => {
 
   it('classifies denied, copyleft/review, unknown, and ok licenses', () => {
     expect(classifyLicense('GPL-3.0')).toBe('denied');
+    expect(classifyLicense('GPL-2.0')).toBe('denied');
+    // Legacy npm spellings (q-mp-1054)
+    expect(classifyLicense('GPLv2')).toBe('denied');
+    expect(classifyLicense('GPLv3')).toBe('denied');
+    expect(classifyLicense('GPL')).toBe('denied');
+    expect(classifyLicense('GNU GPL')).toBe('denied');
     expect(classifyLicense('AGPL-3.0-only')).toBe('denied');
     expect(classifyLicense('SSPL-1.0')).toBe('denied');
     expect(classifyLicense('MPL-2.0')).toBe('copyleft_or_review');
+    expect(classifyLicense('LGPL-2.1')).toBe('copyleft_or_review');
     expect(classifyLicense('Python-2.0')).toBe('copyleft_or_review');
     expect(classifyLicense('')).toBe('unknown');
     expect(classifyLicense('UNLICENSED')).toBe('unknown');
     expect(classifyLicense('MIT')).toBe('ok');
     expect(classifyLicense('Apache-2.0')).toBe('ok');
     expect(classifyLicense('(MIT OR CC0-1.0)')).toBe('ok');
+    // Long-form prose left to q-mp-1079; short legacy forms only here
+    expect(classifyLicense('GNU General Public License v3.0')).toBe('ok');
+    expect(classifyLicense('AGPLv3')).toBe('ok');
+    expect(classifyLicense('LGPLv2.1')).toBe('ok');
   });
 
   it('extracts npm names from lock paths including nested scoped packages', () => {
