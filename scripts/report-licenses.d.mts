@@ -98,10 +98,10 @@ export function malformedLockMessage(
 ): string;
 
 /**
- * True when lock.packages has ≥1 non-root entry
- * (q-mp-1037 empty/null; q-mp-1233 root-only).
+ * True when lock.packages has ≥1 usable non-root object entry
+ * (q-mp-1037 empty/null; q-mp-1233 root-only; q-mp-1299 null/non-object).
  */
 export function isUsableLockPackages(packages: unknown): boolean;
 
-/** Stable empty/missing/root-only packages message (q-mp-1037, q-mp-1233). */
+/** Stable empty/missing/root-only/null-entry packages message (q-mp-1037, q-mp-1233, q-mp-1299). */
 export function emptyPackagesMessage(lockPath?: string): string;

@@ -210,6 +210,36 @@ describe('report-licenses helpers', () => {
     expect(counts['(missing)']).toBe(1);
   });
 
+  // q-mp-1298: plain `{}` corrupts `__proto__` / `constructor` license keys
+  it('counts __proto__ and constructor license keys without prototype pollution (q-mp-1298)', () => {
+    const protoOnly = countByLicense([
+      { license: '__proto__' } as never,
+    ]);
+    // Object literal `{ __proto__: 1 }` would set the prototype — assert own key.
+    expect(Object.getOwnPropertyDescriptor(protoOnly, '__proto__')?.value).toBe(
+      1
+    );
+    expect(Object.keys(protoOnly)).toEqual(['__proto__']);
+    expect(Object.getPrototypeOf(protoOnly)).toBe(Object.prototype);
+
+    const ctorOnly = countByLicense([
+      { license: 'constructor' } as never,
+      { license: 'constructor' } as never,
+    ]);
+    expect(ctorOnly.constructor).toBe(2);
+    expect(typeof ctorOnly.constructor).toBe('number');
+
+    const mixed = countByLicense([
+      { license: 'MIT' } as never,
+      { license: '__proto__' } as never,
+      { license: 'MIT' } as never,
+      { license: 'constructor' } as never,
+    ]);
+    expect(mixed.MIT).toBe(2);
+    expect(Object.getOwnPropertyDescriptor(mixed, '__proto__')?.value).toBe(1);
+    expect(mixed.constructor).toBe(1);
+  });
+
   it('builds a CycloneDX 1.5 document with npm + asset components', () => {
     const packages = collectPackagesFromLock({
       packages: {
