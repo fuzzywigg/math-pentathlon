@@ -90,9 +90,13 @@ import {
 import { createInitialState as createFiar } from '../../src/games/fiar/types';
 import { renderBoard as renderFiarBoard } from '../../src/games/fiar/board-ui';
 
+// Direct prototype assign is not undone by vi.restoreAllMocks (q-mp-1181).
+const originalGetContext = HTMLCanvasElement.prototype.getContext;
+
 afterEach(() => {
   document.body.innerHTML = '';
   vi.restoreAllMocks();
+  HTMLCanvasElement.prototype.getContext = originalGetContext;
 });
 
 describe('Burn wave 13 — Contig board + inject styles', () => {

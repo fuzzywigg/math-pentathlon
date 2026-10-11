@@ -8,6 +8,12 @@ import * as router from '../../src/core/router';
 
 describe('Wave 44 UI — selector disabled', () => {
   let container: HTMLElement;
+  // Direct prototype assign is not undone by vi.restoreAllMocks (q-mp-1180).
+  const hadScrollIntoView = Object.prototype.hasOwnProperty.call(
+    Element.prototype,
+    'scrollIntoView'
+  );
+  const originalScrollIntoView = Element.prototype.scrollIntoView;
   beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
@@ -16,6 +22,11 @@ describe('Wave 44 UI — selector disabled', () => {
   afterEach(() => {
     container.remove();
     vi.restoreAllMocks();
+    if (hadScrollIntoView) {
+      Element.prototype.scrollIntoView = originalScrollIntoView;
+    } else {
+      Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
+    }
   });
 
   it('coming-soon card has badge and tabindex -1', () => {
