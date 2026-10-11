@@ -14,10 +14,26 @@ import { installDomHooks, mountRoot } from './helpers/dom';
 
 installDomHooks({ fakeTimers: true });
 
+// unit-shared uses isolate:false — restore navigator.serviceWorker so later
+// suites do not see a stuck stub from Object.defineProperty (q-mp-1365).
+const originalServiceWorker = Object.getOwnPropertyDescriptor(
+  navigator,
+  'serviceWorker'
+);
+
+function restoreServiceWorker(): void {
+  if (originalServiceWorker) {
+    Object.defineProperty(navigator, 'serviceWorker', originalServiceWorker);
+  } else {
+    Reflect.deleteProperty(navigator, 'serviceWorker');
+  }
+}
+
 afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
   setUserReducedMotionFlag(false);
+  restoreServiceWorker();
 });
 
 describe('burn-1009 ui-cov-r6 dice-demo poly callbacks', () => {
