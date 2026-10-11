@@ -20,21 +20,93 @@
  *
  * Usage:
  *   npm run report:licenses
- *   node scripts/report-licenses.mjs [--help]
+ *   node scripts/report-licenses.mjs [--dry-run] [--help]
  *
  * Unknown flags exit 2. --help/-h exit 0 without scanning or writing reports.
+ * --dry-run scans and prints the summary but does not write under
+ * test-results/licenses (q-mp-979).
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
-import { helpOnlyUsage, parseHelpOnlyArgv } from './lib/help-only-cli.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const LOCK_PATH = path.join(ROOT, 'package-lock.json');
-const OUT_DIR = path.join(ROOT, 'test-results', 'licenses');
+export const OUT_DIR = path.join(ROOT, 'test-results', 'licenses');
+export const OUT_DIR_REL = 'test-results/licenses';
+
+export const USAGE = `Usage: node scripts/report-licenses.mjs [options]
+
+Options:
+  --dry-run        Scan and print summary without writing test-results/licenses
+  -h, --help       Show this help
+
+Default (no --dry-run) writes test-results/licenses/{sbom.cdx.json,summary.md,summary.json}.
+`;
+
+/**
+ * Parse CLI argv (slice(2) form). Hermetic — no I/O, no process.exit (q-mp-979).
+ *
+ * @param {string[]} argv
+ * @returns {{
+ *   ok: true,
+ *   help: boolean,
+ *   dryRun: boolean,
+ * } | {
+ *   ok: false,
+ *   message: string,
+ * }}
+ */
+export function parseArgs(argv) {
+  let help = false;
+  let dryRun = false;
+  for (const a of argv) {
+    if (a === '--help' || a === '-h') {
+      help = true;
+    } else if (a === '--dry-run') {
+      dryRun = true;
+    } else if (a.startsWith('-')) {
+      return { ok: false, message: `Unknown flag: ${a}` };
+    } else {
+      return { ok: false, message: `Unexpected argument: ${a}` };
+    }
+  }
+  return { ok: true, help, dryRun };
+}
+
+/**
+ * Write license report artifacts unless dry-run. Hermetic aside from fs writes.
+ *
+ * @param {{
+ *   sbomText: string,
+ *   summaryMd: string,
+ *   summaryJsonText: string,
+ *   dryRun?: boolean,
+ * }} opts
+ * @returns {{
+ *   wrote: boolean,
+ *   outDir: string,
+ *   paths: { sbom: string, summaryMd: string, summaryJson: string },
+ * }}
+ */
+export function writeLicenseArtifacts(opts) {
+  const dryRun = opts.dryRun === true;
+  const paths = {
+    sbom: path.join(OUT_DIR, 'sbom.cdx.json'),
+    summaryMd: path.join(OUT_DIR, 'summary.md'),
+    summaryJson: path.join(OUT_DIR, 'summary.json'),
+  };
+  if (!dryRun) {
+    fs.mkdirSync(OUT_DIR, { recursive: true });
+    fs.writeFileSync(paths.sbom, opts.sbomText);
+    fs.writeFileSync(paths.summaryMd, opts.summaryMd);
+    fs.writeFileSync(paths.summaryJson, opts.summaryJsonText);
+  }
+  return { wrote: !dryRun, outDir: OUT_DIR, paths };
+}
 
 /** Strong copyleft / source-available terms that fail the report if present. */
 export const DENIED_LICENSE_PATTERNS = [
@@ -619,15 +691,15 @@ export function formatSummaryMarkdown(report) {
 }
 
 function main(argv = process.argv.slice(2)) {
-  const parsed = parseHelpOnlyArgv(argv);
-  if (parsed.kind === 'help') {
-    console.log(helpOnlyUsage('scripts/report-licenses.mjs'));
-    process.exit(0);
-  }
-  if (parsed.kind === 'error') {
-    console.error(`Unknown flag: ${parsed.flag}`);
-    console.error(helpOnlyUsage('scripts/report-licenses.mjs'));
+  const parsed = parseArgs(argv);
+  if (!parsed.ok) {
+    console.error(parsed.message);
+    console.error(USAGE.trimEnd());
     process.exit(2);
+  }
+  if (parsed.help) {
+    console.log(USAGE.trimEnd());
+    process.exit(0);
   }
 
   if (!fs.existsSync(LOCK_PATH)) {
@@ -687,64 +759,65 @@ function main(argv = process.argv.slice(2)) {
     assets,
   });
   const summary = formatSummaryMarkdown(report);
+  const summaryJsonText = `${JSON.stringify(
+    {
+      packageCount: packages.length,
+      productionCount: packages.filter((p) => p.production).length,
+      developmentCount: packages.filter((p) => !p.production).length,
+      licenseCounts,
+      prodLicenseCounts,
+      denied: denied.map((p) => ({
+        name: p.name,
+        version: p.version,
+        license: p.license,
+      })),
+      copyleftOrReview: copyleftOrReview.map((p) => ({
+        name: p.name,
+        version: p.version,
+        license: p.license,
+        production: p.production,
+      })),
+      unknown: unknown.map((p) => ({
+        name: p.name,
+        version: p.version,
+        license: p.license,
+      })),
+      installScripts: installScripts.map((p) => ({
+        name: p.name,
+        version: p.version,
+        license: p.license,
+        optional: p.optional,
+      })),
+      assets: assets.map((a) => ({
+        path: a.path,
+        kind: a.kind,
+        license: a.license,
+        thirdParty: a.thirdParty,
+        exists: a.exists,
+        bytes: a.bytes,
+      })),
+      uncatalogued,
+    },
+    null,
+    2
+  )}\n`;
 
-  fs.mkdirSync(OUT_DIR, { recursive: true });
-  fs.writeFileSync(
-    path.join(OUT_DIR, 'sbom.cdx.json'),
-    `${JSON.stringify(bom, null, 2)}\n`
-  );
-  fs.writeFileSync(path.join(OUT_DIR, 'summary.md'), summary);
-  fs.writeFileSync(
-    path.join(OUT_DIR, 'summary.json'),
-    `${JSON.stringify(
-      {
-        packageCount: packages.length,
-        productionCount: packages.filter((p) => p.production).length,
-        developmentCount: packages.filter((p) => !p.production).length,
-        licenseCounts,
-        prodLicenseCounts,
-        denied: denied.map((p) => ({
-          name: p.name,
-          version: p.version,
-          license: p.license,
-        })),
-        copyleftOrReview: copyleftOrReview.map((p) => ({
-          name: p.name,
-          version: p.version,
-          license: p.license,
-          production: p.production,
-        })),
-        unknown: unknown.map((p) => ({
-          name: p.name,
-          version: p.version,
-          license: p.license,
-        })),
-        installScripts: installScripts.map((p) => ({
-          name: p.name,
-          version: p.version,
-          license: p.license,
-          optional: p.optional,
-        })),
-        assets: assets.map((a) => ({
-          path: a.path,
-          kind: a.kind,
-          license: a.license,
-          thirdParty: a.thirdParty,
-          exists: a.exists,
-          bytes: a.bytes,
-        })),
-        uncatalogued,
-      },
-      null,
-      2
-    )}\n`
-  );
+  const dryRun = parsed.dryRun === true;
+  writeLicenseArtifacts({
+    sbomText: `${JSON.stringify(bom, null, 2)}\n`,
+    summaryMd: summary,
+    summaryJsonText,
+    dryRun,
+  });
 
+  const verb = dryRun ? 'Would write' : 'Wrote';
+  const suffix = dryRun ? ' (dry-run; not writing)' : '';
+  const outRel = path.relative(ROOT, OUT_DIR);
   console.log(summary);
   console.log('');
-  console.log(`Wrote ${path.relative(ROOT, OUT_DIR)}/sbom.cdx.json`);
-  console.log(`Wrote ${path.relative(ROOT, OUT_DIR)}/summary.md`);
-  console.log(`Wrote ${path.relative(ROOT, OUT_DIR)}/summary.json`);
+  console.log(`${verb} ${outRel}/sbom.cdx.json${suffix}`);
+  console.log(`${verb} ${outRel}/summary.md${suffix}`);
+  console.log(`${verb} ${outRel}/summary.json${suffix}`);
 
   if (denied.length > 0) {
     console.error(

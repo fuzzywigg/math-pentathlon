@@ -4,10 +4,7 @@
  */
 
 export type LicenseClassification =
-  | 'denied'
-  | 'copyleft_or_review'
-  | 'unknown'
-  | 'ok';
+  'denied' | 'copyleft_or_review' | 'unknown' | 'ok';
 
 export type BundledAssetCatalogEntry = {
   path: string;
@@ -80,3 +77,23 @@ export function buildCycloneDxBom(opts: {
 };
 
 export function formatSummaryMarkdown(report: unknown): string;
+
+export const OUT_DIR: string;
+export const OUT_DIR_REL: string;
+export const USAGE: string;
+
+export function parseArgs(
+  argv: string[]
+):
+  { ok: true; help: boolean; dryRun: boolean } | { ok: false; message: string };
+
+export function writeLicenseArtifacts(opts: {
+  sbomText: string;
+  summaryMd: string;
+  summaryJsonText: string;
+  dryRun?: boolean;
+}): {
+  wrote: boolean;
+  outDir: string;
+  paths: { sbom: string; summaryMd: string; summaryJson: string };
+};
