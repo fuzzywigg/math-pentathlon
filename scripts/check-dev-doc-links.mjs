@@ -27,7 +27,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -53,9 +53,7 @@ function symbolInFile(fileRel, symbol) {
   const text = fs.readFileSync(abs, 'utf8');
   const escaped = symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const patterns = [
-    new RegExp(
-      String.raw`export\s+(?:async\s+)?function\s+${escaped}\b`
-    ),
+    new RegExp(String.raw`export\s+(?:async\s+)?function\s+${escaped}\b`),
     new RegExp(
       String.raw`export\s+(?:type|interface|enum|class|const)\s+${escaped}\b`
     ),
@@ -69,10 +67,21 @@ function symbolInFile(fileRel, symbol) {
 }
 
 /**
+ * Strip an optional CommonMark link title (`"title"` / `'title'`) after the
+ * destination. Leaves the path (and any `#fragment` / `?query`) intact.
+ * @param {string} href
+ * @returns {string}
+ */
+export function stripMdLinkTitle(href) {
+  const m = /^(.*?)\s+("[^"]*"|'[^']*')\s*$/.exec(href);
+  return m ? m[1] : href;
+}
+
+/**
  * @param {string} fromDocAbs
  * @param {string} href
  */
-function resolveMdLink(fromDocAbs, href) {
+export function resolveMdLink(fromDocAbs, href) {
   if (
     href.startsWith('http://') ||
     href.startsWith('https://') ||
@@ -83,7 +92,10 @@ function resolveMdLink(fromDocAbs, href) {
   ) {
     return { skip: true };
   }
-  const clean = href.split('#')[0].split('?')[0];
+  // Titles must be stripped before #/? splits — otherwise `"title"` stays in
+  // the path segment and yields a false broken-md-link (q-mp-1095).
+  const withoutTitle = stripMdLinkTitle(href);
+  const clean = withoutTitle.split('#')[0].split('?')[0];
   if (!clean) return { skip: true };
   const abs = path.resolve(path.dirname(fromDocAbs), clean);
   return { abs, rel: path.relative(ROOT, abs) };
@@ -252,4 +264,10 @@ function main() {
   console.log('Report-only: exit 0');
 }
 
-main();
+const isMain =
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+
+if (isMain) {
+  main();
+}
