@@ -12,6 +12,7 @@ import { chromium, devices } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import { artifactPath } from './lib/artifact-dir.mjs';
+import { latchBlueDuringHva } from './lib/calla-blue-during-hva.mjs';
 import {
   CALLA_END_STATUS_RE_SOURCE,
   isCallaEndStatus,
@@ -160,6 +161,8 @@ async function playOneGame(page, { viewport, difficulty, gameIndex }) {
   let stallReason = '';
   let winner = null;
   let turns = 0;
+  // q-mp-1459: latch mid-game "Blue's turn …"; end banner never matches.
+  let blueDuringHva = false;
 
   try {
     await startVsAi(page, difficulty);
@@ -174,6 +177,7 @@ async function playOneGame(page, { viewport, difficulty, gameIndex }) {
 
     for (let step = 0; step < 120; step++) {
       const st = await statusText(page);
+      blueDuringHva = latchBlueDuringHva(blueDuringHva, st);
       // Word-boundary win/wins/tie — not substring (Drawing / patience)
       if (isCallaEndStatus(st)) {
         winner = st;
@@ -209,6 +213,7 @@ async function playOneGame(page, { viewport, difficulty, gameIndex }) {
         // Wait briefly for AI / render / end banner
         await page.waitForTimeout(250);
         const st2 = await statusText(page);
+        blueDuringHva = latchBlueDuringHva(blueDuringHva, st2);
         // "You Wins!" / "AI Wins!" / "It's a Tie!" — word-boundary match
         if (isCallaEndStatus(st2)) {
           winner = st2;
@@ -219,6 +224,7 @@ async function playOneGame(page, { viewport, difficulty, gameIndex }) {
         // retry once more
         await page.waitForTimeout(600);
         const st3 = await statusText(page);
+        blueDuringHva = latchBlueDuringHva(blueDuringHva, st3);
         if (isCallaEndStatus(st3)) {
           winner = st3;
           turns = step;
@@ -292,8 +298,10 @@ async function playOneGame(page, { viewport, difficulty, gameIndex }) {
       pitSizes,
       finalStatus: await statusText(page),
       uxFlags: {
+        // End-only grammar flag (unchanged) — not latched mid-game.
         youWinsGrammar: /You Wins/i.test(winner || ''),
-        blueDuringHva: /Blue's turn/i.test(await statusText(page)),
+        // Latched during the play loop (q-mp-1459); not re-sampled at end.
+        blueDuringHva,
       },
     };
   } finally {
