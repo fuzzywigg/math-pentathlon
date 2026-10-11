@@ -1,13 +1,15 @@
 /**
  * One-off Playwright console sweep: load each available game, play a few
  * human moves (vs-AI when possible), capture console + unhandled rejections.
- * Writes JSON to /opt/cursor/artifacts/console-sweep-raw.json
+ * Writes JSON under the shared artifact-dir root (q-mp-956).
  *
  * Options: -h, --help (exits before browser launch)
  */
 import { chromium } from '@playwright/test';
 import { createRequire } from 'module';
 import { writeFileSync, mkdirSync } from 'fs';
+import { dirname } from 'node:path';
+import { artifactPath } from './lib/artifact-dir.mjs';
 import { dismissOwl } from './lib/dismiss-owl.mjs';
 import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
@@ -16,14 +18,16 @@ import { waitDoubleRaf } from './lib/page-settle.mjs';
 const USAGE = `Usage: node scripts/console-sweep.mjs
 
 One-off Playwright console sweep across available games.
-Writes JSON to SWEEP_OUT (default /opt/cursor/artifacts/console-sweep-raw.json).
+Writes JSON to SWEEP_OUT when set; otherwise <artifact-dir>/console-sweep-raw.json
+(artifact-dir: /opt/cursor/artifacts when creatable, else test-results/agent-artifacts).
 
 Options:
   -h, --help       Show this help and exit (no browser launch)
 
 Env:
   BASE_URL         Dev server URL (default http://localhost:5173)
-  SWEEP_OUT        Output JSON path`;
+  SWEEP_OUT        Output JSON path (overrides artifact-dir default)
+  MP_ARTIFACT_DIR  Artifact root override when SWEEP_OUT is unset`;
 
 applyBrowserHarnessCli(process.argv.slice(2), USAGE);
 
@@ -54,8 +58,7 @@ const GAMES = [
 ];
 
 const BASE = process.env.BASE_URL || 'http://localhost:5173';
-const OUT =
-  process.env.SWEEP_OUT || '/opt/cursor/artifacts/console-sweep-raw.json';
+const OUT = process.env.SWEEP_OUT || artifactPath('console-sweep-raw.json');
 
 /**
  * After a human move vs AI: wait for thinking chrome to appear (soft) then
@@ -412,7 +415,7 @@ async function main() {
     );
   }
   await browser.close();
-  mkdirSync('/opt/cursor/artifacts', { recursive: true });
+  mkdirSync(dirname(OUT), { recursive: true });
   writeFileSync(
     OUT,
     JSON.stringify({ at: new Date().toISOString(), results }, null, 2)
