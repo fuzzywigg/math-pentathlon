@@ -9,6 +9,21 @@ import {
   scheduleIdleGameWarm,
 } from '../../src/pwa/idle-warm';
 
+// unit-shared uses isolate:false — restore document.hidden so later suites
+// do not see a stuck stub from Object.defineProperty (q-mp-1364).
+const originalDocumentHidden = Object.getOwnPropertyDescriptor(
+  document,
+  'hidden'
+);
+
+function restoreDocumentHidden(): void {
+  if (originalDocumentHidden) {
+    Object.defineProperty(document, 'hidden', originalDocumentHidden);
+  } else {
+    Reflect.deleteProperty(document, 'hidden');
+  }
+}
+
 describe('mutation-ui13 idle-warm', () => {
   const hadRic = Object.prototype.hasOwnProperty.call(
     window,
@@ -27,10 +42,7 @@ describe('mutation-ui13 idle-warm', () => {
   afterEach(() => {
     vi.restoreAllMocks();
     document.documentElement.removeAttribute(IDLE_WARM_DONE_ATTR);
-    Object.defineProperty(document, 'hidden', {
-      configurable: true,
-      get: () => false,
-    });
+    restoreDocumentHidden();
     try {
       delete (navigator as Navigator & { connection?: unknown }).connection;
     } catch {

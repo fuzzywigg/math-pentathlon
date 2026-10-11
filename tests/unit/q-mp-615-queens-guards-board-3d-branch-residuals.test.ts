@@ -61,6 +61,21 @@ vi.mock('../../src/ui/player-colors', () => ({
   }),
 }));
 
+// unit-shared uses isolate:false — restore document.hidden so later suites
+// do not see a stuck stub from Object.defineProperty (q-mp-1364).
+const originalDocumentHidden = Object.getOwnPropertyDescriptor(
+  document,
+  'hidden'
+);
+
+function restoreDocumentHidden(): void {
+  if (originalDocumentHidden) {
+    Object.defineProperty(document, 'hidden', originalDocumentHidden);
+  } else {
+    Reflect.deleteProperty(document, 'hidden');
+  }
+}
+
 beforeEach(() => {
   vi.resetModules();
   document.body.innerHTML = '';
@@ -72,6 +87,7 @@ afterEach(() => {
   vi.restoreAllMocks();
   delete (window as Window & { __mp3dQueensGuards?: unknown })
     .__mp3dQueensGuards;
+  restoreDocumentHidden();
 });
 
 async function mountBoard(
