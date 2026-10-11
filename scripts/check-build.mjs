@@ -53,6 +53,9 @@ export const PRECACHE_FONT_IGNORES = new Set([
 /** Extensions Workbox globPatterns cover for offline play. */
 const OFFLINE_EXTS = new Set([
   '.js',
+  // Module workers / ESM chunks shipped under dist/ (q-mp-1226).
+  // .wasm / .webp left out until a build actually ships them.
+  '.mjs',
   '.css',
   '.html',
   '.ico',
@@ -248,10 +251,14 @@ function auditPrecache(distRoot) {
     duplicates.length === 0 &&
     JSON.stringify(body) === JSON.stringify(sortedBody);
   return {
-    ok:
-      missingFromDist.length === 0 &&
-      notPrecached.length === 0 &&
-      duplicates.length === 0,
+    // Precache OK requires glob sort too (q-mp-1225); file-local auditPrecache
+    // stays demoted (#1213) — composition helper is the testable seam.
+    ok: isPrecacheAuditOk({
+      missingFromDist,
+      notPrecached,
+      duplicates,
+      orderOk,
+    }),
     error: null,
     entries,
     missingFromDist,
@@ -261,6 +268,27 @@ function auditPrecache(distRoot) {
     urls: sortedByUrl,
     urlsInSwOrder: urls,
   };
+}
+
+/**
+ * Precache audit green only when coverage, uniqueness, and glob sort pass
+ * (q-mp-1225). Kept exported so hermetic unit tests can lock the composition
+ * without re-exporting demoted `auditPrecache` (#1213).
+ * @param {{
+ *   missingFromDist: readonly unknown[],
+ *   notPrecached: readonly unknown[],
+ *   duplicates: readonly unknown[],
+ *   orderOk: boolean,
+ * }} parts
+ * @returns {boolean}
+ */
+export function isPrecacheAuditOk(parts) {
+  return (
+    parts.missingFromDist.length === 0 &&
+    parts.notPrecached.length === 0 &&
+    parts.duplicates.length === 0 &&
+    parts.orderOk === true
+  );
 }
 
 /**
@@ -304,14 +332,17 @@ export function collectHtmlNonRootAssetRefs(html) {
   const htmlAssetRefs = [
     ...html.matchAll(/(?:src|href)=(?:"([^"]+)"|'([^']+)')/g),
   ].map((m) => m[1] ?? m[2]);
-  return htmlAssetRefs.filter(
-    (href) =>
-      href.startsWith('/') === false &&
-      !href.startsWith('#') &&
-      !href.startsWith('data:') &&
-      // skip-link / in-page only; module scripts must be root-absolute with base /
-      /\.(js|css|webmanifest|ico|svg|png|woff2?)$/.test(href)
-  );
+  return htmlAssetRefs.filter((href) => {
+    // Protocol-relative `//host/…` is not root-absolute (q-mp-1228).
+    const isRootAbsolute = href.startsWith('/') && !href.startsWith('//');
+    if (isRootAbsolute) return false;
+    if (href.startsWith('#')) return false;
+    if (href.startsWith('data:')) return false;
+    // Strip ?query / #hash before the extension test (q-mp-1227).
+    const pathOnly = href.split(/[?#]/, 1)[0];
+    // skip-link / in-page only; module scripts must be root-absolute with base /
+    return /\.(js|css|webmanifest|ico|svg|png|woff2?)$/.test(pathOnly);
+  });
 }
 
 /**

@@ -9,6 +9,7 @@ import {
   listChunkNames,
   PRECACHE_FONT_IGNORES,
   collectHtmlNonRootAssetRefs,
+  isPrecacheAuditOk,
   scanEnvLeakage,
 } from '../../scripts/check-build.mjs';
 
@@ -249,6 +250,13 @@ describe('check-build helpers', () => {
     ]);
   });
 
+  it('requires shipped .mjs under dist for offline precache (q-mp-1226)', () => {
+    // Hermetic path list: .mjs must join .js; .wasm/.webp stay out until shipped.
+    expect(
+      offlineNeededPaths(['assets/worker.mjs', 'assets/app.js', 'assets/x.wasm'])
+    ).toEqual(['assets/app.js', 'assets/worker.mjs']);
+  });
+
   it('surfaces duplicate precache URLs when includeAssets overlaps globs', () => {
     const sw = `s.precacheAndRoute([{url:"favicon.ico",revision:"a"},{url:"index.html",revision:"b"},{url:"favicon.ico",revision:"a"}],{})`;
     const urls = parsePrecacheManifest(sw).map((e) => e.url);
@@ -256,6 +264,26 @@ describe('check-build helpers', () => {
     for (const u of urls) counts.set(u, (counts.get(u) || 0) + 1);
     const duplicates = [...counts.entries()].filter(([, n]) => n > 1);
     expect(duplicates).toEqual([['favicon.ico', 2]]);
+  });
+
+  it('precache ok requires orderOk (q-mp-1225)', () => {
+    // Hermetic composition: unsorted glob (orderOk false) must fail Precache OK
+    // even when missing/notPrecached/duplicates are clean.
+    const clean = {
+      missingFromDist: [] as string[],
+      notPrecached: [] as string[],
+      duplicates: [] as string[],
+    };
+    expect(isPrecacheAuditOk({ ...clean, orderOk: true })).toBe(true);
+    expect(isPrecacheAuditOk({ ...clean, orderOk: false })).toBe(false);
+    expect(
+      isPrecacheAuditOk({
+        missingFromDist: ['gone.js'],
+        notPrecached: [],
+        duplicates: [],
+        orderOk: true,
+      })
+    ).toBe(false);
   });
 
   it('collects single-quoted and double-quoted non-root asset refs (q-mp-1179)', () => {
@@ -274,6 +302,32 @@ describe('check-build helpers', () => {
       './b.js',
       './c.css',
       './d.css',
+    ]);
+  });
+
+  it('honors ?query/#hash on relative asset refs (q-mp-1227)', () => {
+    const html = [
+      '<script src="assets/app.js?v=1"></script>',
+      '<script src="assets/app.js#x"></script>',
+      '<script src="assets/app.js"></script>',
+      '<script src="/assets/root.js?v=1"></script>',
+    ].join('');
+    expect(collectHtmlNonRootAssetRefs(html)).toEqual([
+      'assets/app.js?v=1',
+      'assets/app.js#x',
+      'assets/app.js',
+    ]);
+  });
+
+  it('flags protocol-relative // URLs as non-root (q-mp-1228)', () => {
+    const html = [
+      '<script src="//cdn.example/app.js"></script>',
+      '<script src="/assets/app.js"></script>',
+      '<script src="assets/local.js"></script>',
+    ].join('');
+    expect(collectHtmlNonRootAssetRefs(html)).toEqual([
+      '//cdn.example/app.js',
+      'assets/local.js',
     ]);
   });
 
