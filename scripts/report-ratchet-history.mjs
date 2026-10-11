@@ -696,7 +696,7 @@ export function runGit(args) {
  *   nullish: number | null,
  * }}
  */
-export function readLiveLintSnapshot() {
+function readLiveLintSnapshot() {
   const filePath = path.join(ROOT, TRACKED.lintCeilings);
   try {
     const json = JSON.parse(fs.readFileSync(filePath, 'utf8'));
