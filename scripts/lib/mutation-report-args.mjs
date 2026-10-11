@@ -1,5 +1,6 @@
 /**
- * Argv parsing for scripts/mutation-report.mjs (q-mp-867 / q-mp-868 / q-mp-892).
+ * Argv parsing for scripts/mutation-report.mjs
+ * (q-mp-867 / q-mp-868 / q-mp-892 / q-mp-967).
  * Kept free of TypeScript AST / vitest so unit tests can import hermetically.
  */
 
@@ -27,9 +28,11 @@ export const MUTATION_REPORT_USAGE =
  */
 
 /**
- * Parse CLI flags. Rejects non-numeric / negative `--max`, non-numeric /
- * `<5000` `--timeout`, and unknown flags instead of silently coercing or
- * ignoring them. `--help` / `-h` and `--dry-run` never mutate product trees.
+ * Parse CLI flags. Rejects empty / whitespace-only `--max=` / `--games=` /
+ * `--json=`, non-numeric / negative `--max`, non-numeric / `<5000`
+ * `--timeout`, and unknown flags instead of silently coercing or ignoring
+ * them. `--max=0` remains intentional “all”. `--help` / `-h` and `--dry-run`
+ * never mutate product trees.
  *
  * @param {string[]} argv
  * @param {{ defaultJsonOut: string, resolveJson?: (p: string) => string }} defaults
@@ -49,8 +52,12 @@ export function parseMutationReportArgs(argv, defaults) {
   };
   let maxProvided = false;
   let timeoutProvided = false;
+  let gamesProvided = false;
+  let jsonProvided = false;
   let maxRaw = '';
   let timeoutRaw = '';
+  let gamesRaw = '';
+  let jsonRaw = '';
 
   for (const arg of argv) {
     if (arg === '--help' || arg === '-h') {
@@ -58,8 +65,9 @@ export function parseMutationReportArgs(argv, defaults) {
     } else if (arg === '--dry-run') {
       opts.dryRun = true;
     } else if (arg.startsWith('--games=')) {
-      opts.games = arg
-        .slice(8)
+      gamesProvided = true;
+      gamesRaw = arg.slice(8);
+      opts.games = gamesRaw
         .split(',')
         .map((s) => s.trim())
         .filter(Boolean);
@@ -72,7 +80,9 @@ export function parseMutationReportArgs(argv, defaults) {
       timeoutRaw = arg.slice(10);
       opts.timeoutMs = Number(timeoutRaw);
     } else if (arg.startsWith('--json=')) {
-      opts.jsonOut = resolveJson(arg.slice(7));
+      jsonProvided = true;
+      jsonRaw = arg.slice(7);
+      opts.jsonOut = resolveJson(jsonRaw);
     } else if (arg === '--verbose-tests') {
       opts.quietTests = false;
     } else if (arg.startsWith('-')) {
@@ -84,6 +94,15 @@ export function parseMutationReportArgs(argv, defaults) {
 
   if (opts.help) {
     return { ok: true, opts };
+  }
+
+  // q-mp-967: empty / whitespace-only --max= must not coerce via Number('')===0
+  // (that sentinel is reserved for intentional --max=0 “all”).
+  if (maxProvided && maxRaw.trim() === '') {
+    return {
+      ok: false,
+      message: `Invalid --max value (need number >= 0): ${maxRaw}`,
+    };
   }
 
   if (maxProvided && (!Number.isFinite(opts.max) || opts.max < 0)) {
@@ -100,6 +119,26 @@ export function parseMutationReportArgs(argv, defaults) {
     return {
       ok: false,
       message: `Invalid --timeout value (need number >= 5000): ${timeoutRaw}`,
+    };
+  }
+
+  // q-mp-967: empty / whitespace-only / comma-only --games= must not resolve
+  // to a zero-game plan.
+  if (
+    gamesProvided &&
+    (gamesRaw.trim() === '' || (opts.games != null && opts.games.length === 0))
+  ) {
+    return {
+      ok: false,
+      message: 'Invalid --games value (need non-empty game id list)',
+    };
+  }
+
+  // q-mp-967: empty / whitespace-only --json= must not accept empty jsonOut.
+  if (jsonProvided && jsonRaw.trim() === '') {
+    return {
+      ok: false,
+      message: 'Invalid --json value (need non-empty path)',
     };
   }
 
