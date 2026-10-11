@@ -12,7 +12,7 @@
  * Usage:
  *   npm run report:knip
  *   npm run report:knip -- --json
- *   npm run report:knip -- --fail          # opt-in exit 1 on growth (not CI default)
+ *   npm run report:knip -- --fail          # opt-in exit 1 on growth or knip.error (not CI default)
  *   npm run report:knip -- --write-baseline  # refresh docs/dev/knip-baseline.json
  *   npm run report:knip -- --help          # usage; unknown flags exit 2
  *
@@ -161,6 +161,22 @@ export function validateBaselineMetrics(metrics) {
     }
   }
   return { ok: true, metrics: /** @type {Record<string, number>} */ (record) };
+}
+
+/**
+ * Exit code when the knip runner returns an `.error` payload (q-mp-1313).
+ *
+ * Report-only default (CI `npm run report:knip`) stays exit 0 so a runner
+ * failure cannot flake the report-only job. Opt-in `--fail` or baseline
+ * `enforce: true` must not green-wash the same failure as success.
+ *
+ * Pure helper for hermetic unit tests — does not spawn knip / touch FS.
+ *
+ * @param {{ fail?: boolean, enforce?: boolean }} [opts]
+ * @returns {0 | 1}
+ */
+export function exitCodeForKnipRunnerError(opts = {}) {
+  return opts.fail || opts.enforce ? 1 : 0;
 }
 
 /**
@@ -383,14 +399,36 @@ function main() {
   const args = parseArgs(process.argv.slice(2));
   console.log(`report:knip — running knip@${KNIP_VERSION} (knip.json)…`);
   const knip = runKnip();
+  const loaded = loadBaseline();
+  const baselineDoc =
+    loaded.kind === 'ok' || loaded.kind === 'absent-metrics'
+      ? loaded.doc
+      : null;
+  const enforce = Boolean(args.fail || baselineDoc?.enforce);
+
   if (knip.error) {
-    annotate('warning', `knip report failed (report-only): ${knip.error}`);
+    // q-mp-1313: --fail / baseline.enforce must not exit 0 on runner failure.
+    // Default report-only (CI) still warns + exits 0.
+    const level = enforce ? 'error' : 'warning';
+    annotate(
+      level,
+      `knip report failed${enforce ? '' : ' (report-only)'}: ${knip.error}`
+    );
     if (args.json) {
       console.log(
         JSON.stringify({ error: knip.error, metrics: null }, null, 2)
       );
     }
-    process.exit(0);
+    const code = exitCodeForKnipRunnerError({
+      fail: args.fail,
+      enforce: Boolean(baselineDoc?.enforce),
+    });
+    if (code !== 0) {
+      console.error(
+        `report:knip — knip runner failed while enforce/fail is on: ${knip.error}`
+      );
+    }
+    process.exit(code);
   }
 
   const summarized = summarizeKnip(knip);
@@ -400,7 +438,6 @@ function main() {
     process.exit(1);
   }
   const metrics = summarized.metrics;
-  const loaded = loadBaseline();
   // Corrupt / incomplete baselines must fail before any fake growth WARNING (q-mp-1036).
   // --write-baseline may still refresh a broken file; validate only when comparing.
   if (
@@ -410,12 +447,7 @@ function main() {
     console.error(loaded.message);
     process.exit(1);
   }
-  const baselineDoc =
-    loaded.kind === 'ok' || loaded.kind === 'absent-metrics'
-      ? loaded.doc
-      : null;
   const baselineMetrics = loaded.kind === 'ok' ? loaded.metrics : null;
-  const enforce = Boolean(args.fail || baselineDoc?.enforce);
 
   if (args.writeBaseline) {
     writeBaseline(metrics, Boolean(baselineDoc?.enforce));
