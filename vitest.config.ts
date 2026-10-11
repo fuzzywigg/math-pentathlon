@@ -162,6 +162,8 @@ const nodePureFiles = [
   'tests/unit/report-coverage-map-cli-args.test.ts',
   // browser harness early --help (q-mp-900); spawnSync CLI check needs node env.
   'tests/unit/browser-harness-cli-help.test.ts',
+  // check:perf early --help / unknown flags (q-mp-917); spawnSync CLI check needs node env.
+  'tests/unit/check-perf-cli-args.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional

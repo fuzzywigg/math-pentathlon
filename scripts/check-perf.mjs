@@ -8,10 +8,14 @@
  * When `dist/` exists, measurement paths always exit 0 (not wired into CI fail
  * paths). Missing `dist/` is a usage error (exit 2).
  *
+ * CLI (q-mp-917): `--help` / `-h` exit 0 before the `dist/` check and before
+ * any summary writes. Unknown flags exit 2. Valid default path unchanged.
+ *
  * Usage:
  *   npm run build && npm run check:perf
  *   PERF_SKIP_LIGHTHOUSE=1 npm run check:perf   # bundles only
  *   PERF_BASE_URL=http://127.0.0.1:4173 npm run check:perf
+ *   node scripts/check-perf.mjs --help
  */
 
 import { spawn } from 'node:child_process';
@@ -26,6 +30,7 @@ import {
   measureMenuCriticalPath,
 } from './check-bundle-budgets.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
+import { parseHelpOnlyArgv } from './lib/help-only-cli.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -33,6 +38,23 @@ const DIST = path.join(ROOT, 'dist');
 const OUT_DIR = path.join(ROOT, 'test-results', 'perf');
 const SUMMARY_MD = path.join(OUT_DIR, 'summary.md');
 const SUMMARY_JSON = path.join(OUT_DIR, 'summary.json');
+
+const USAGE = `Usage: node scripts/check-perf.mjs [--help]
+
+Report-only load-performance check (bundle sizes + optional Lighthouse).
+Writes test-results/perf/summary.md when run with a built dist/.
+
+Options:
+  -h, --help    Show this help and exit 0 (before dist/ check; no summary writes)
+
+Exit codes:
+  0  --help / -h; or report written when dist/ exists (report-only)
+  2  unknown flag, or missing dist/ (usage error: exit 2 — run npm run build first)
+
+Env:
+  PERF_SKIP_LIGHTHOUSE=1              bundles only (skip Lighthouse)
+  PERF_BASE_URL=http://127.0.0.1:…    reuse an existing preview
+  PERF_LH_TIMEOUT_MS=<ms>             Lighthouse timeout (default 120000)`;
 
 const SKIP_LH = process.env.PERF_SKIP_LIGHTHOUSE === '1';
 const LH_TIMEOUT_MS = requireEnvNumber('PERF_LH_TIMEOUT_MS', 120_000);
@@ -260,9 +282,7 @@ function renderMarkdown(data) {
   lines.push('| Game | File | Gzip |');
   lines.push('| --- | --- | ---: |');
   for (const g of data.games) {
-    lines.push(
-      `| \`${g.id}\` | \`${g.file}\` | ${formatBytes(g.gzipBytes)} |`
-    );
+    lines.push(`| \`${g.id}\` | \`${g.file}\` | ${formatBytes(g.gzipBytes)} |`);
   }
   lines.push('');
 
@@ -271,7 +291,9 @@ function renderMarkdown(data) {
   if (data.lighthouse.skipped) {
     lines.push(`Skipped: ${data.lighthouse.reason}`);
   } else {
-    lines.push('| Target | Form | Score | FCP | LCP | TBT | SI | TTI | Bytes |');
+    lines.push(
+      '| Target | Form | Score | FCP | LCP | TBT | SI | TTI | Bytes |'
+    );
     lines.push('| --- | --- | ---: | --- | --- | --- | --- | --- | --- |');
     for (const row of data.lighthouse.results) {
       if (!row.ok) {
@@ -398,6 +420,17 @@ async function main() {
     `Menu critical gzip: ${formatBytes(menu.totalGzipBytes)} (JS ${formatBytes(firstLoadJs)})`
   );
   console.log('(report-only: exiting 0)');
+}
+
+const cli = parseHelpOnlyArgv(process.argv.slice(2));
+if (cli.kind === 'help') {
+  console.log(USAGE);
+  process.exit(0);
+}
+if (cli.kind === 'error') {
+  console.error(`Unknown flag: ${cli.flag}`);
+  console.error(USAGE);
+  process.exit(2);
 }
 
 try {
