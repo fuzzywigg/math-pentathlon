@@ -9,6 +9,7 @@ import {
   listChunkNames,
   PRECACHE_FONT_IGNORES,
   collectHtmlNonRootAssetRefs,
+  parseWebmanifestJson,
   isPrecacheAuditOk,
   scanEnvLeakage,
   hasHealthTxt,
@@ -372,6 +373,47 @@ describe('check-build helpers', () => {
       '//cdn.example/app.js',
       'assets/local.js',
     ]);
+  });
+
+  it('ignores data-src / ng-src / xsrc (word-boundary; q-mp-1383)', () => {
+    const html = [
+      '<img data-src="assets/x.png" src="assets/y.png">',
+      '<img ng-src="assets/x.png" src="assets/y.png">',
+      '<img xsrc="assets/x.png" src="assets/z.png">',
+      '<script src="assets/keep.js"></script>',
+    ].join('');
+    expect(collectHtmlNonRootAssetRefs(html)).toEqual([
+      'assets/y.png',
+      'assets/y.png',
+      'assets/z.png',
+      'assets/keep.js',
+    ]);
+  });
+
+  it('collects .mjs / .cjs module script refs (q-mp-1384)', () => {
+    const html = [
+      '<script src="assets/a.mjs"></script>',
+      '<script src="assets/b.cjs"></script>',
+      '<script src="assets/c.js"></script>',
+      '<script src="/assets/root.mjs"></script>',
+      '<link href="assets/d.css">',
+    ].join('');
+    expect(collectHtmlNonRootAssetRefs(html)).toEqual([
+      'assets/a.mjs',
+      'assets/b.cjs',
+      'assets/c.js',
+      'assets/d.css',
+    ]);
+  });
+
+  it('parseWebmanifestJson accepts leading UTF-8 BOM (q-mp-1401)', () => {
+    const body = '{"start_url":"/","scope":"/"}';
+    expect(parseWebmanifestJson('\uFEFF' + body)).toEqual(JSON.parse(body));
+    // Non-BOM input must match JSON.parse(raw || '{}') exactly.
+    expect(parseWebmanifestJson(body)).toEqual(JSON.parse(body));
+    expect(parseWebmanifestJson('')).toEqual({});
+    expect(parseWebmanifestJson('\uFEFF')).toEqual({});
+    expect(() => parseWebmanifestJson('{\uFEFF"start_url":"/"}')).toThrow();
   });
 
   it('scanEnvLeakage requires a real file:/// URL token, not substring theater (q-mp-1209)', () => {
