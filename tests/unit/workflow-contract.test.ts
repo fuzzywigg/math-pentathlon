@@ -220,6 +220,17 @@ describe('live .github/workflows contract', () => {
     );
   });
 
+  it('build job keeps soft size:check --fail-on-new-over (q-mp-1041)', () => {
+    const ci = readFileSync(
+      join(process.cwd(), '.github/workflows/ci.yml'),
+      'utf8'
+    );
+    // Soft gzip ratchet: novel OVER exits 1; continue-on-error keeps build green.
+    expect(ci).toMatch(
+      /continue-on-error:\s*true[\s\S]*?size:check -- --fail-on-new-over/
+    );
+  });
+
   it('fails a temp workflow that drops persist-credentials', () => {
     const dir = mkdtempSync(join(tmpdir(), 'wf-contract-'));
     try {

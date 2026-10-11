@@ -45,7 +45,7 @@ npm run typecheck                # tsc --noEmit (same as CI)
 npm run typecheck:ratchet        # ui/core shell + Phase-2 out-of-scope ceiling
 npm run check:boundaries         # engine→UI import-graph ceilings (engine_imports_ui = 0)
 npm run verify                   # lint → lint:ratchet → format:check → typecheck → typecheck:ratchet → check:boundaries (blocking half of CI lint job; verify ⊆ lint)
-npm run size:check               # gzip budgets (needs dist/; missing dist/ → exit 2; soft budgets report-only exit 0)
+npm run size:check               # gzip budgets (needs dist/; missing dist/ → exit 2; local default report-only exit 0; CI: --fail-on-new-over → exit 1 on novel OVER, soft via continue-on-error)
 npm run check:copy-pins          # flag tests pinning player-facing copy (report-only; CI lint also runs --fail + continue-on-error after verify; docs/dev/check-copy-pins.md)
 npm run check:emit-identity      # type-only / brace-only emit proof (docs/dev/ai-typeonly-option.md; tip FAIL inventory: docs/dev/emit-identity-fail-inventory-post865-2026-10-10.md)
 npm run check:perf               # perf summary (+ optional Lighthouse); missing dist/ → exit 2; with dist/ report-only exit 0
@@ -127,7 +127,7 @@ Job `visual-baseline` in `.github/workflows/ci.yml` is **report-only** (`continu
 
 Workflows under `.github/workflows/`:
 
-- **CI** (`ci.yml`) — lint, `lint:ratchet`, Prettier `format:check`, `typecheck`, `typecheck:ratchet`, `check:boundaries`, `npm audit --audit-level=high`, build (hard 250 kB JS chunk budget + report-only `size:check`), unit, Chromium e2e; report-only `knip` (unused-export drift vs `docs/dev/knip-baseline.json`), `mobile-touch`, `zoom-reflow`, `forced-colors`, `e2e-cross-browser` (Firefox + WebKit), `e2e-fullgame`, and `visual-baseline` (`continue-on-error`)
+- **CI** (`ci.yml`) — lint, `lint:ratchet`, Prettier `format:check`, `typecheck`, `typecheck:ratchet`, `check:boundaries`, `npm audit --audit-level=high`, build (hard 250 kB JS chunk budget + soft `size:check -- --fail-on-new-over` via `continue-on-error`), unit, Chromium e2e; report-only `knip` (unused-export drift vs `docs/dev/knip-baseline.json`), `mobile-touch`, `zoom-reflow`, `forced-colors`, `e2e-cross-browser` (Firefox + WebKit), `e2e-fullgame`, and `visual-baseline` (`continue-on-error`)
 - **Deploy** (`deploy.yml`) — build and publish to Cloudflare Pages on `alpha` pushes (trunk; not `main`)
 
 ### Menu shell / offline load notes
