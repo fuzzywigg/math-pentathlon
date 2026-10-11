@@ -185,8 +185,17 @@ export function extractMetric(kind, json) {
     case 'dupImports':
       return extractLintMetrics(json).dupImports;
     case 'typePhase2': {
-      const n = obj.outOfScopeErrors;
-      return typeof n === 'number' && Number.isFinite(n) ? n : null;
+      // Match check-type-ratchet: top-level outOfScopeErrors, else nested totals.
+      const top = obj.outOfScopeErrors;
+      if (typeof top === 'number' && Number.isFinite(top)) return top;
+      const totals = obj.totals;
+      if (totals != null && typeof totals === 'object') {
+        const nested = /** @type {Record<string, unknown>} */ (totals)
+          .outOfScopeErrors;
+        if (typeof nested === 'number' && Number.isFinite(nested))
+          return nested;
+      }
+      return null;
     }
     case 'boundaries': {
       const ceilings = obj.ceilings;
@@ -254,7 +263,8 @@ function emptyRow(meta) {
 
 /**
  * Merge per-file commit lists into chronological rows (oldest → newest).
- * Later commits overwrite earlier metric values for the same sha.
+ * Later non-null metric values overwrite earlier ones for the same sha;
+ * null never wipes a prior numeric value (q-mp-1248).
  *
  * @param {{
  *   lint: Array<GitCommitMeta & {
@@ -272,14 +282,26 @@ export function mergeHistory(byKind) {
   /** @type {Map<string, HistoryRow>} */
   const bySha = new Map();
 
+  /**
+   * @param {number | null} prev
+   * @param {number | null} next
+   * @returns {number | null}
+   */
+  function keepUnlessNull(prev, next) {
+    return next != null ? next : prev;
+  }
+
   for (const c of byKind.lint) {
     const existing = bySha.get(c.sha) ?? emptyRow(c);
     existing.date = c.date;
     existing.subject = c.subject;
-    existing.curly = c.curly;
-    existing.voidExpression = c.voidExpression;
-    existing.nnnull = c.nnnull;
-    existing.dupImports = c.dupImports;
+    existing.curly = keepUnlessNull(existing.curly, c.curly);
+    existing.voidExpression = keepUnlessNull(
+      existing.voidExpression,
+      c.voidExpression
+    );
+    existing.nnnull = keepUnlessNull(existing.nnnull, c.nnnull);
+    existing.dupImports = keepUnlessNull(existing.dupImports, c.dupImports);
     bySha.set(c.sha, existing);
   }
 
@@ -292,7 +314,7 @@ export function mergeHistory(byKind) {
       const existing = bySha.get(c.sha) ?? emptyRow(c);
       existing.date = c.date;
       existing.subject = c.subject;
-      existing[field] = c.value;
+      existing[field] = keepUnlessNull(existing[field], c.value);
       bySha.set(c.sha, existing);
     }
   }
