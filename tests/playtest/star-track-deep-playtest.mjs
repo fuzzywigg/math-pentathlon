@@ -40,8 +40,13 @@ const DIFFICULTIES = ['easy', 'medium', 'hard'];
 const GAMES_PER_CELL = 10;
 
 async function waitGameReady(page) {
-  await page.getByTestId('game-loading').waitFor({ state: 'hidden', timeout: 15_000 }).catch(() => {});
-  await page.locator('#new-game-btn').waitFor({ state: 'visible', timeout: 15_000 });
+  await page
+    .getByTestId('game-loading')
+    .waitFor({ state: 'hidden', timeout: 15_000 })
+    .catch(() => {});
+  await page
+    .locator('#new-game-btn')
+    .waitFor({ state: 'visible', timeout: 15_000 });
 }
 
 async function startVsAi(page, difficulty) {
@@ -58,14 +63,19 @@ async function startVsAi(page, difficulty) {
 }
 
 async function expectHidden(locator) {
-  await locator.waitFor({ state: 'hidden', timeout: 10_000 }).catch(async () => {
-    // Modal uses .hidden class rather than display:none in some builds
-    const cls = await locator.getAttribute('class');
-    if (!cls?.includes('hidden')) throw new Error('modal still open');
-  });
+  await locator
+    .waitFor({ state: 'hidden', timeout: 10_000 })
+    .catch(async () => {
+      // Modal uses .hidden class rather than display:none in some builds
+      const cls = await locator.getAttribute('class');
+      if (!cls?.includes('hidden')) throw new Error('modal still open');
+    });
 }
 
-async function playOneGame(page, { viewport, difficulty, index, consoleErrors }) {
+async function playOneGame(
+  page,
+  { viewport, difficulty, index, consoleErrors }
+) {
   const started = Date.now();
   const findings = [];
   let moves = 0;
@@ -100,9 +110,11 @@ async function playOneGame(page, { viewport, difficulty, index, consoleErrors })
       const progress = [...document.querySelectorAll('.progress-value')].map(
         (e) => e.textContent
       );
-      const targets = [...document.querySelectorAll(
-        '.star-track-draw-btn, .star-track-chain-btn'
-      )].map((el) => {
+      const targets = [
+        ...document.querySelectorAll(
+          '.star-track-draw-btn, .star-track-chain-btn'
+        ),
+      ].map((el) => {
         const r = el.getBoundingClientRect();
         return {
           w: Math.round(r.width * 10) / 10,
@@ -116,8 +128,12 @@ async function playOneGame(page, { viewport, difficulty, index, consoleErrors })
         thinking,
         winner,
         progress,
-        drawDisabled: draw ? /** @type {HTMLButtonElement} */ (draw).disabled : null,
-        chainDisabled: chains.map((c) => /** @type {HTMLButtonElement} */ (c).disabled),
+        drawDisabled: draw
+          ? /** @type {HTMLButtonElement} */ (draw).disabled
+          : null,
+        chainDisabled: chains.map(
+          (c) => /** @type {HTMLButtonElement} */ (c).disabled
+        ),
         targets,
         area: document.querySelector('.star-track-chain-area')?.innerText || '',
       };
@@ -134,7 +150,10 @@ async function playOneGame(page, { viewport, difficulty, index, consoleErrors })
       break;
     }
 
-    if (/Blue's turn|Red's turn|^Blue:|^Red:/.test(snap.status) && !snap.thinking) {
+    if (
+      /Blue's turn|Red's turn|^Blue:|^Red:/.test(snap.status) &&
+      !snap.thinking
+    ) {
       turnCopySamples.push(snap.status.trim());
       findings.push({ type: 'confusing_turn_copy', text: snap.status.trim() });
     }
@@ -147,17 +166,17 @@ async function playOneGame(page, { viewport, difficulty, index, consoleErrors })
 
     if (snap.thinking) {
       const thinkStart = Date.now();
-      while (true) {
-        const still = await page.locator('.status-ai-thinking').count();
-        if (!still) break;
-        if (Date.now() - thinkStart > STALL_MS) {
-          stalled = true;
-          findings.push({ type: 'ai_stall', ms: Date.now() - thinkStart });
-          break;
-        }
-        await page.waitForTimeout(50);
+      try {
+        await page.waitForFunction(
+          () => !document.querySelector('.status-ai-thinking'),
+          null,
+          { timeout: STALL_MS }
+        );
+      } catch {
+        stalled = true;
+        findings.push({ type: 'ai_stall', ms: Date.now() - thinkStart });
+        break;
       }
-      if (stalled) break;
       lastProgressAt = Date.now();
       continue;
     }
@@ -196,7 +215,9 @@ async function playOneGame(page, { viewport, difficulty, index, consoleErrors })
         let best = 0;
         let bestLen = -1;
         btns.forEach((b, i) => {
-          const len = Number(b.querySelector('.chain-length')?.textContent || 0);
+          const len = Number(
+            b.querySelector('.chain-length')?.textContent || 0
+          );
           if (len > bestLen) {
             bestLen = len;
             best = i;
@@ -235,7 +256,48 @@ async function playOneGame(page, { viewport, difficulty, index, consoleErrors })
       });
       break;
     }
-    await page.waitForTimeout(40);
+    // Wake on board/status progress instead of a fixed 40ms poll sleep.
+    const remainingStall = Math.max(
+      1,
+      STALL_MS - (Date.now() - lastProgressAt)
+    );
+    const remainingGame = Math.max(1, deadline - Date.now());
+    await page
+      .waitForFunction(
+        (prevFp) => {
+          const status =
+            document.querySelector('.status-turn')?.textContent || '';
+          const progress = [
+            ...document.querySelectorAll('.progress-value'),
+          ].map((e) => e.textContent);
+          const area =
+            document.querySelector('.star-track-chain-area')?.innerText || '';
+          const fp = `${status}|${progress}|${area}`;
+          if (fp !== prevFp) return true;
+          if (document.querySelector('.status-ai-thinking')) return true;
+          if (document.querySelector('.star-track-draw-btn:not([disabled])')) {
+            return true;
+          }
+          if (document.querySelector('.star-track-chain-btn:not([disabled])')) {
+            return true;
+          }
+          if (
+            /(You Win!|AI Wins!|Blue Wins!|Red Wins!)/i.test(status) ||
+            /It's a draw!/i.test(status)
+          ) {
+            return true;
+          }
+          const winner =
+            document.querySelector('.star-track-winner')?.textContent || '';
+          return (
+            /reaches the star/i.test(winner) ||
+            /draw — chains exhausted/i.test(winner)
+          );
+        },
+        fingerprint,
+        { timeout: Math.min(remainingStall, remainingGame) }
+      )
+      .catch(() => {});
   }
 
   if (!winnerText && !stalled && !softLock) {
@@ -321,9 +383,12 @@ async function runViewport(viewportName) {
     for (let i = 1; i <= GAMES_PER_CELL; i++) {
       const page = await context.newPage();
       const consoleErrors = [];
-      page.on('pageerror', (err) => consoleErrors.push(`pageerror: ${err.message}`));
+      page.on('pageerror', (err) =>
+        consoleErrors.push(`pageerror: ${err.message}`)
+      );
       page.on('console', (msg) => {
-        if (msg.type() === 'error') consoleErrors.push(`console: ${msg.text()}`);
+        if (msg.type() === 'error')
+          consoleErrors.push(`console: ${msg.text()}`);
       });
 
       process.stdout.write(
@@ -337,10 +402,13 @@ async function runViewport(viewportName) {
           consoleErrors,
         });
         results.push(result);
-        const flag = result.stalled || result.softLock || result.findings.length
-          ? `FINDINGS=${result.findings.length}`
-          : 'ok';
-        console.log(`${result.winnerText.slice(0, 40) || 'NO_END'} ${result.ms}ms ${flag}`);
+        const flag =
+          result.stalled || result.softLock || result.findings.length
+            ? `FINDINGS=${result.findings.length}`
+            : 'ok';
+        console.log(
+          `${result.winnerText.slice(0, 40) || 'NO_END'} ${result.ms}ms ${flag}`
+        );
       } catch (err) {
         console.log(`FAIL ${err.message}`);
         results.push({
@@ -389,8 +457,14 @@ async function main() {
   }
 
   const out = { summary, results: all };
-  writeFileSync(join(DOCS, 'star-track-deep-results.json'), JSON.stringify(out, null, 2));
-  writeFileSync(join(ARTIFACTS, 'star-track-deep-results.json'), JSON.stringify(out, null, 2));
+  writeFileSync(
+    join(DOCS, 'star-track-deep-results.json'),
+    JSON.stringify(out, null, 2)
+  );
+  writeFileSync(
+    join(ARTIFACTS, 'star-track-deep-results.json'),
+    JSON.stringify(out, null, 2)
+  );
   console.log('\nSummary:', JSON.stringify(summary, null, 2));
 }
 
