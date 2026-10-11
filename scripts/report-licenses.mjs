@@ -683,7 +683,7 @@ export function buildCycloneDxBom(opts) {
  *   installScripts: ReturnType<typeof collectPackagesFromLock>
  * }} report
  */
-export function formatSummaryMarkdown(report) {
+function formatSummaryMarkdown(report) {
   const lines = [];
   lines.push('# License & provenance report');
   lines.push('');
