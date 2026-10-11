@@ -5,11 +5,13 @@ import { DIVISIONS } from '../../src/core/game-registry';
 describe('game-selector division tabs', () => {
   let container: HTMLElement;
   // Direct prototype assign is not undone by vi.restoreAllMocks (q-mp-1180).
-  const hadScrollIntoView = Object.prototype.hasOwnProperty.call(
-    Element.prototype,
-    'scrollIntoView'
-  );
-  const originalScrollIntoView = Element.prototype.scrollIntoView;
+  // Prefer a plain noop over delete: game-selector defers scrollIntoView via
+  // setTimeout, and deleting the method races those callbacks under jsdom.
+  const originalScrollIntoView =
+    typeof Element.prototype.scrollIntoView === 'function' &&
+    !vi.isMockFunction(Element.prototype.scrollIntoView)
+      ? Element.prototype.scrollIntoView
+      : function scrollIntoView() {};
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -20,11 +22,7 @@ describe('game-selector division tabs', () => {
   afterEach(() => {
     container.remove();
     vi.restoreAllMocks();
-    if (hadScrollIntoView) {
-      Element.prototype.scrollIntoView = originalScrollIntoView;
-    } else {
-      Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
-    }
+    Element.prototype.scrollIntoView = originalScrollIntoView;
   });
 
   it('opens the matching accordion when a Division II+ tab is clicked', () => {
