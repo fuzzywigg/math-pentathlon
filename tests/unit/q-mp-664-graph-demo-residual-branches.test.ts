@@ -24,6 +24,7 @@ vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 import * as algorithms from '../../src/core/graph/algorithms';
 import * as graphUi from '../../src/core/graph/graph-ui';
 import { renderGraphDemo } from '../../src/demos/graph-demo';
+import { click } from '../helpers/dom-click';
 import { mountRoot } from './helpers/dom';
 
 let getIdSpy: ReturnType<typeof vi.spyOn> | undefined;
@@ -67,11 +68,6 @@ function pathNodes(root: HTMLElement): SVGElement[] {
 
 function gameNodes(root: HTMLElement): SVGElement[] {
   return [...root.querySelectorAll('#game-graph .graph-node')] as SVGElement[];
-}
-
-function clickEl(el: Element | null): void {
-  expect(el).toBeTruthy();
-  (el as HTMLElement).dispatchEvent(new Event('click', { bubbles: true }));
 }
 
 describe('q-mp-664 graph-demo — residual missing-host arms', () => {
@@ -138,7 +134,7 @@ describe('q-mp-664 graph-demo — residual missing-host arms', () => {
     const nodes = pathNodes(root);
     const orphan = nodes.find((n) => !n.dataset.nodeId);
     expect(orphan).toBeTruthy();
-    expect(() => clickEl(orphan!)).not.toThrow();
+    expect(() => click(orphan!)).not.toThrow();
     // Orphan has no handler — status host stays at idle chrome length > 0
     expect(
       (root.querySelector('#path-status')?.textContent ?? '').length
@@ -155,14 +151,14 @@ describe('q-mp-664 graph-demo — residual missing-host arms', () => {
     expect(nodes.length).toBeGreaterThanOrEqual(3);
 
     // First click → L424 false; second → L429 false + found path L402 false
-    clickEl(nodes[0]);
-    clickEl(nodes[1]);
+    click(nodes[0]);
+    click(nodes[1]);
     expect(
       root.querySelector('#pathfinding-graph .graph-node.highlighted')
     ).toBeTruthy();
 
     // Third click resets → L436/L439 false
-    clickEl(nodes[2]);
+    click(nodes[2]);
     expect(root.querySelector('#pathfinding-graph svg')).toBeTruthy();
 
     // Clear → L450/L453 false
@@ -181,8 +177,8 @@ describe('q-mp-664 graph-demo — residual missing-host arms', () => {
     const root = mountDemo();
     const nodes = pathNodes(root);
     expect(nodes.length).toBeGreaterThanOrEqual(2);
-    clickEl(nodes[0]);
-    clickEl(nodes[1]);
+    click(nodes[0]);
+    click(nodes[1]);
     expect(document.getElementById('path-result')).toBeNull();
     expect(
       root.querySelectorAll('#pathfinding-graph .graph-node.highlighted').length
@@ -218,7 +214,7 @@ describe('q-mp-664 graph-demo — residual missing-host arms', () => {
     const nodes = gameNodes(root);
     expect(nodes.length).toBeGreaterThanOrEqual(1);
     expect(() => {
-      clickEl(nodes[0]);
+      click(nodes[0]);
       (root.querySelector('#clear-game-btn') as HTMLButtonElement).click();
     }).not.toThrow();
     expect(root.querySelector('#game-graph .graph-container')).toBeTruthy();
