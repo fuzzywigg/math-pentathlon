@@ -1,8 +1,7 @@
 /**
- * @vitest-environment node
- *
  * Hermetic coverage for mobile-audit small-tap shaping (q-mp-1240).
  * Count must match the deduped listed targets (not raw pre-dedupe length).
+ * Runs under unit-shared (no vitest.config nodePureFiles edit — out of task path scope).
  */
 import { describe, it, expect } from 'vitest';
 import {
