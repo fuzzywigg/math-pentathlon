@@ -45,10 +45,11 @@ Options:
 
 /**
  * Parse CLI flags. Rejects empty / whitespace-only `--max=` / `--games=` /
- * `--json=`, non-numeric / negative `--max`, non-numeric / `<5000`
+ * `--json=`, non-integer / negative `--max`, non-integer / `<5000`
  * `--timeout`, and unknown flags instead of silently coercing or ignoring
  * them. `--max=0` remains intentional “all”. `--help` / `-h` and `--dry-run`
- * never mutate product trees.
+ * never mutate product trees. Floats like `--max=2.9` / `--timeout=5000.5`
+ * are rejected (q-mp-1217).
  *
  * @param {string[]} argv
  * @param {{ defaultJsonOut: string, resolveJson?: (p: string) => string }} defaults
@@ -121,20 +122,23 @@ export function parseMutationReportArgs(argv, defaults) {
     };
   }
 
-  if (maxProvided && (!Number.isFinite(opts.max) || opts.max < 0)) {
+  // q-mp-1217: require integer --max (Number("2.9") is finite but truncates
+  // later via slice); keep --max=0 as intentional “all”.
+  if (maxProvided && (!Number.isInteger(opts.max) || opts.max < 0)) {
     return {
       ok: false,
-      message: `Invalid --max value (need number >= 0): ${maxRaw}`,
+      message: `Invalid --max value (need integer >= 0): ${maxRaw}`,
     };
   }
 
+  // q-mp-1217: require integer --timeout (reject e.g. --timeout=5000.5).
   if (
     timeoutProvided &&
-    (!Number.isFinite(opts.timeoutMs) || opts.timeoutMs < 5_000)
+    (!Number.isInteger(opts.timeoutMs) || opts.timeoutMs < 5_000)
   ) {
     return {
       ok: false,
-      message: `Invalid --timeout value (need number >= 5000): ${timeoutRaw}`,
+      message: `Invalid --timeout value (need integer >= 5000): ${timeoutRaw}`,
     };
   }
 

@@ -2,7 +2,7 @@
  * @vitest-environment node
  *
  * Hermetic coverage for mutation-report argv validation
- * (q-mp-867 / q-mp-868 / q-mp-892 / q-mp-967 / q-mp-1064).
+ * (q-mp-867 / q-mp-868 / q-mp-892 / q-mp-967 / q-mp-1064 / q-mp-1217).
  *
  * Argv reject paths assert via parseMutationReportArgs /
  * resolveMutationReportGames in-process (q-mp-1064 wall-time cut).
@@ -94,6 +94,26 @@ describe('parseMutationReportArgs (q-mp-867)', () => {
     expect(got.ok).toBe(false);
     if (!got.ok) {
       expect(got.message).toMatch(/Invalid --timeout/);
+    }
+  });
+
+  it('rejects non-integer --max (q-mp-1217)', () => {
+    const got = parse(['--max=2.9']);
+    expect(got.ok).toBe(false);
+    if (!got.ok) {
+      expect(got.message).toMatch(/Invalid --max/);
+      expect(got.message).toMatch(/integer/);
+      expect(got.message).toMatch(/2\.9/);
+    }
+  });
+
+  it('rejects non-integer --timeout (q-mp-1217)', () => {
+    const got = parse(['--timeout=5000.5']);
+    expect(got.ok).toBe(false);
+    if (!got.ok) {
+      expect(got.message).toMatch(/Invalid --timeout/);
+      expect(got.message).toMatch(/integer/);
+      expect(got.message).toMatch(/5000\.5/);
     }
   });
 });
