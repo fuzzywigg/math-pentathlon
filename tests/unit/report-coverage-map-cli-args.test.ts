@@ -231,7 +231,10 @@ describe('report-coverage-map invalid / malformed summaries (q-mp-993 / q-mp-100
   });
 
   it('invalidSummaryMessage / malformedJsonMessage are stack-free', () => {
-    const invalid = invalidSummaryMessage('tmp/c.json', 'zero directories under src/');
+    const invalid = invalidSummaryMessage(
+      'tmp/c.json',
+      'zero directories under src/'
+    );
     expect(invalid).toMatch(/invalid coverage summary at tmp\/c\.json/);
     expect(invalid).toMatch(/zero directories under src\//);
     expect(invalid).toMatch(/no doc writes/);
@@ -311,6 +314,81 @@ describe('report-coverage-map invalid / malformed summaries (q-mp-993 / q-mp-100
     expect(combined).not.toMatch(/wrote /);
     expect(fs.statSync(MD_PATH).mtimeMs).toBe(mdBefore);
     expect(fs.statSync(SVG_PATH).mtimeMs).toBe(svgBefore);
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+});
+
+describe('report-coverage-map UTF-8 BOM summary ingest (q-mp-1388)', () => {
+  const sampleSummary = () =>
+    JSON.stringify({
+      total: {
+        lines: { total: 10, covered: 5, pct: 50 },
+        branches: { total: 4, covered: 2, pct: 50 },
+        functions: { total: 2, covered: 1, pct: 50 },
+        statements: { total: 10, covered: 5, pct: 50 },
+      },
+      [`${process.cwd()}/src/games/hex/rules.ts`]: {
+        lines: { total: 10, covered: 5, pct: 50 },
+        branches: { total: 4, covered: 2, pct: 50 },
+        functions: { total: 2, covered: 1, pct: 50 },
+        statements: { total: 10, covered: 5, pct: 50 },
+      },
+    });
+
+  it('writeReport accepts BOM-prefixed summary with byte-identical map vs non-BOM', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cov-map-bom-'));
+    // Same path for both reads so md path stamps match; only the file bytes differ.
+    const summaryPath = path.join(tmpDir, 'coverage-summary.json');
+    const body = sampleSummary();
+    const opts = {
+      summaryPath,
+      dryRun: true as const,
+      now: '2026-10-11T00:00:00.000Z',
+    };
+
+    fs.writeFileSync(summaryPath, body, 'utf8');
+    const plain = writeReport(opts);
+
+    fs.writeFileSync(summaryPath, `\uFEFF${body}`, 'utf8');
+    const bom = writeReport(opts);
+
+    expect(bom.rows).toEqual(plain.rows);
+    expect(bom.svg).toBe(plain.svg);
+    expect(bom.md).toBe(plain.md);
+    expect(
+      Buffer.from(bom.svg, 'utf8').equals(Buffer.from(plain.svg, 'utf8'))
+    ).toBe(true);
+    expect(
+      Buffer.from(bom.md, 'utf8').equals(Buffer.from(plain.md, 'utf8'))
+    ).toBe(true);
+
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  });
+
+  it('CLI --dry-run accepts BOM summary (exit 0) and still rejects BOM-malformed', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cov-map-bom-cli-'));
+    const bomOk = path.join(tmpDir, 'bom-ok.json');
+    const bomBad = path.join(tmpDir, 'bom-bad.json');
+    fs.writeFileSync(bomOk, `\uFEFF${sampleSummary()}`, 'utf8');
+    fs.writeFileSync(bomBad, '\uFEFF{', 'utf8');
+
+    const ok = runScript(['--dry-run', bomOk]);
+    expect(ok.status).toBe(0);
+    expect(ok.stdout).toMatch(/dry-run; not writing/);
+    expect(ok.stdout).toMatch(/director/);
+    expect(`${ok.stdout}${ok.stderr}`).not.toMatch(/malformed JSON/);
+
+    const bad = runScript(['--dry-run', bomBad]);
+    expect(bad.status).toBe(1);
+    expect(`${bad.stdout}${bad.stderr}`).toMatch(/malformed JSON/);
+
+    // Mid-payload FEFF is not a leading BOM — still malformed.
+    const midBom = path.join(tmpDir, 'mid-bom.json');
+    fs.writeFileSync(midBom, `{\uFEFF"total":{}}`, 'utf8');
+    const mid = runScript(['--dry-run', midBom]);
+    expect(mid.status).toBe(1);
+    expect(`${mid.stdout}${mid.stderr}`).toMatch(/malformed JSON/);
+
     fs.rmSync(tmpDir, { recursive: true, force: true });
   });
 });
