@@ -39,14 +39,130 @@ const DOCS_DIR = path.join(ROOT, 'docs');
 
 const PATH_RE =
   /`((?:src|tests|docs|scripts)\/[A-Za-z0-9_./@+-]+\.(?:ts|tsx|js|mjs|css|md|json))`/g;
-// Destination + optional CommonMark title ("…" / '…' / (…)). Nested paren
-// titles must be matched here — a naive [^)]+ truncates at the title's ')'.
-const MD_LINK_RE =
-  /\]\(([^)\s]+(?:\s+(?:"[^"]*"|'[^']*'|\([^)]*\)))?)\)/g;
 const TABLE_ROW_RE =
   /^\|\s*`([^`]+)`\s*\|\s*`((?:src|tests|docs|scripts)\/[^`]+)`\s*\|/;
 const MODULE_ROW_RE =
   /^\|\s*\*\(module\)\*\s*\|\s*`((?:src|tests|docs|scripts)\/[^`]+)`\s*\|/;
+
+/**
+ * True for ASCII horizontal whitespace (space / tab). Newlines end bare
+ * destinations per CommonMark (destination cannot span lines unescaped).
+ * @param {string} ch
+ */
+function isMdLinkHorizSpace(ch) {
+  return ch === ' ' || ch === '\t';
+}
+
+/**
+ * Scan Markdown for inline links `](destination optional-title)`.
+ *
+ * Destinations may be:
+ *   - `<angle-bracketed>` (spaces allowed; q-mp-1175 strips the brackets later)
+ *   - bare paths with **balanced** parentheses (q-mp-1174) — a RegExp like
+ *     `[^)]+` / `[^)\s]+` truncates at the first `)` in `file_(draft).md`
+ *
+ * Optional CommonMark titles (`"…"` / `'…'` / `(…)`) stay in the captured
+ * href so {@link stripMdLinkTitle} (q-mp-1095 / q-mp-1152) can remove them.
+ *
+ * @param {string} text
+ * @returns {Array<{ 0: string, 1: string, index: number }>}
+ */
+export function matchAllMdLinks(text) {
+  /** @type {Array<{ 0: string, 1: string, index: number }>} */
+  const out = [];
+  let i = 0;
+  while (i < text.length) {
+    const open = text.indexOf('](', i);
+    if (open === -1) break;
+    const parsed = parseMdLinkAfterOpen(text, open + 2);
+    if (!parsed) {
+      i = open + 2;
+      continue;
+    }
+    out.push({
+      0: text.slice(open, parsed.end),
+      1: parsed.href,
+      index: open,
+    });
+    i = parsed.end;
+  }
+  return out;
+}
+
+/**
+ * @param {string} text
+ * @param {number} start index immediately after `](`
+ * @returns {{ href: string, end: number } | null}
+ */
+function parseMdLinkAfterOpen(text, start) {
+  let p = start;
+  while (p < text.length && isMdLinkHorizSpace(text[p])) p += 1;
+  if (p >= text.length) return null;
+
+  let destEnd;
+  if (text[p] === '<') {
+    // Angle destination: <…> (no unescaped '>'; we treat first '>' as close).
+    const close = text.indexOf('>', p + 1);
+    if (close === -1) return null;
+    destEnd = close + 1;
+    p = destEnd;
+  } else {
+    // Bare destination: non-whitespace with balanced parentheses.
+    let depth = 0;
+    const destStart = p;
+    while (p < text.length) {
+      const c = text[p];
+      if (c === '\n' || c === '\r') break;
+      if (isMdLinkHorizSpace(c)) break;
+      if (c === '(') {
+        depth += 1;
+        p += 1;
+        continue;
+      }
+      if (c === ')') {
+        if (depth === 0) break; // closing paren of the link
+        depth -= 1;
+        p += 1;
+        continue;
+      }
+      p += 1;
+    }
+    if (p === destStart || depth !== 0) return null;
+    destEnd = p;
+  }
+
+  // Optional whitespace + title ("…" / '…' / (…)).
+  let q = destEnd;
+  while (q < text.length && isMdLinkHorizSpace(text[q])) q += 1;
+  let afterTitle = destEnd;
+  if (q > destEnd && q < text.length) {
+    const t = text[q];
+    if (t === '"' || t === "'") {
+      const close = text.indexOf(t, q + 1);
+      if (close === -1) return null;
+      afterTitle = close + 1;
+      q = afterTitle;
+    } else if (t === '(') {
+      const close = text.indexOf(')', q + 1);
+      if (close === -1) return null;
+      afterTitle = close + 1;
+      q = afterTitle;
+    } else {
+      // Non-title token — require the link to close at destEnd.
+      q = destEnd;
+      afterTitle = destEnd;
+    }
+  }
+
+  let r = afterTitle;
+  while (r < text.length && isMdLinkHorizSpace(text[r])) r += 1;
+  if (r >= text.length || text[r] !== ')') return null;
+
+  return {
+    href: text.slice(start, afterTitle).replace(/^[ \t]+/, ''),
+    end: r + 1,
+  };
+}
 
 /**
  * @param {string} fileRel
@@ -85,6 +201,17 @@ export function stripMdLinkTitle(href) {
 }
 
 /**
+ * Strip CommonMark `<destination>` angle brackets (q-mp-1175).
+ * Only a full wrap `<…>` (no nested `>`) is unwrapped; bare paths unchanged.
+ * @param {string} dest
+ * @returns {string}
+ */
+export function stripMdLinkAngleBrackets(dest) {
+  const m = /^<([^>\n]*)>$/.exec(dest);
+  return m ? m[1] : dest;
+}
+
+/**
  * @param {string} fromDocAbs
  * @param {string} href
  */
@@ -100,9 +227,22 @@ export function resolveMdLink(fromDocAbs, href) {
     return { skip: true };
   }
   // Titles must be stripped before #/? splits — otherwise `"title"` stays in
-  // the path segment and yields a false broken-md-link (q-mp-1095).
+  // the path segment and yields a false broken-md-link (q-mp-1095 / q-mp-1152).
+  // Angle brackets are destination syntax and must be removed before resolve
+  // (q-mp-1175); order is title → angles so `<path.md> "title"` works.
   const withoutTitle = stripMdLinkTitle(href);
-  const clean = withoutTitle.split('#')[0].split('?')[0];
+  const withoutAngles = stripMdLinkAngleBrackets(withoutTitle);
+  // After unwrapping <…>, absolute / external destinations may appear.
+  if (
+    withoutAngles.startsWith('http://') ||
+    withoutAngles.startsWith('https://') ||
+    withoutAngles.startsWith('#') ||
+    withoutAngles.startsWith('mailto:') ||
+    withoutAngles.startsWith('/')
+  ) {
+    return { skip: true };
+  }
+  const clean = withoutAngles.split('#')[0].split('?')[0];
   if (!clean) return { skip: true };
   const abs = path.resolve(path.dirname(fromDocAbs), clean);
   return { abs, rel: path.relative(ROOT, abs) };
@@ -220,7 +360,7 @@ function main() {
       }
     }
 
-    for (const match of text.matchAll(MD_LINK_RE)) {
+    for (const match of matchAllMdLinks(text)) {
       const href = match[1];
       const resolved = resolveMdLink(docAbs, href);
       if (resolved.skip) continue;
