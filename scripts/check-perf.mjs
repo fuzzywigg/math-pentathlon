@@ -16,6 +16,11 @@
  * `Promise.race`, the spawned LH/Chrome child is signaled SIGTERM then SIGKILL
  * (preview kill in `finally` is unchanged).
  *
+ * Missing performance score (q-mp-1208): when LH JSON lacks a finite
+ * `categories.performance.score`, the row is `ok: false` with an error (not a
+ * fake score `0`). Present numeric `0` stays representable. Process exit for
+ * measurement paths stays report-only exit 0 when `dist/` exists.
+ *
  * Usage:
  *   npm run build && npm run check:perf
  *   PERF_SKIP_LIGHTHOUSE=1 npm run check:perf   # bundles only
@@ -242,6 +247,29 @@ export function runCmd(args, opts = {}) {
 }
 
 /**
+ * Fail closed when Lighthouse JSON lacks a finite performance score (q-mp-1208).
+ * Present numeric `0` stays representable as score `0` (unlike `score || 0`).
+ *
+ * @param {unknown} report
+ * @returns {{ ok: true, score: number } | { ok: false, error: string }}
+ */
+export function shapeLhPerformanceScore(report) {
+  const raw =
+    report &&
+    typeof report === 'object' &&
+    /** @type {{ categories?: { performance?: { score?: unknown } } }} */ (
+      report
+    ).categories?.performance?.score;
+  if (typeof raw !== 'number' || !Number.isFinite(raw)) {
+    return {
+      ok: false,
+      error: 'missing Lighthouse performance score',
+    };
+  }
+  return { ok: true, score: Math.round(raw * 100) };
+}
+
+/**
  * @param {string} baseUrl
  * @param {string} formFactor 'mobile' | 'desktop'
  * @param {{ id: string, path: string, label: string }} target
@@ -319,14 +347,23 @@ export async function runLighthouse(
   }
 
   const report = JSON.parse(readFile(outJson, 'utf8'));
+  const shaped = shapeLhPerformanceScore(report);
+  if (!shaped.ok) {
+    return {
+      id: target.id,
+      label: target.label,
+      formFactor,
+      ok: false,
+      error: shaped.error,
+    };
+  }
   const audits = report.audits || {};
-  const score = Math.round((report.categories?.performance?.score || 0) * 100);
   return {
     id: target.id,
     label: target.label,
     formFactor,
     ok: true,
-    score,
+    score: shaped.score,
     fcp: audits['first-contentful-paint']?.displayValue ?? '—',
     lcp: audits['largest-contentful-paint']?.displayValue ?? '—',
     tbt: audits['total-blocking-time']?.displayValue ?? '—',
