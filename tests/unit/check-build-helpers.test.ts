@@ -11,6 +11,7 @@ import {
   collectHtmlNonRootAssetRefs,
   isPrecacheAuditOk,
   scanEnvLeakage,
+  hasHealthTxt,
 } from '../../scripts/check-build.mjs';
 
 describe('check-build helpers', () => {
@@ -231,6 +232,27 @@ describe('check-build helpers', () => {
     ]);
   });
 
+  it('includes .mjs assets in listChunkNames (q-mp-1334)', () => {
+    // offlineNeededPaths already covers .mjs; chunk-name diffs must match.
+    const tree = new Map([
+      ['assets/w.mjs', '1'],
+      ['assets/a.js', '2'],
+      ['assets/b.css', '3'],
+      ['vendor/worker.mjs', '4'],
+      ['favicon.ico', '5'],
+      ['assets/note.txt', '6'],
+    ]);
+    expect(listChunkNames(tree)).toEqual([
+      'assets/a.js',
+      'assets/b.css',
+      'assets/w.mjs',
+      'vendor/worker.mjs',
+    ]);
+    expect(offlineNeededPaths(tree.keys())).toEqual(
+      expect.arrayContaining(['assets/w.mjs', 'vendor/worker.mjs'])
+    );
+  });
+
   it('treats Inter weight ignores and deploy meta as not offline-needed', () => {
     const paths = [
       'assets/game-hex-abc.js',
@@ -253,7 +275,11 @@ describe('check-build helpers', () => {
   it('requires shipped .mjs under dist for offline precache (q-mp-1226)', () => {
     // Hermetic path list: .mjs must join .js; .wasm/.webp stay out until shipped.
     expect(
-      offlineNeededPaths(['assets/worker.mjs', 'assets/app.js', 'assets/x.wasm'])
+      offlineNeededPaths([
+        'assets/worker.mjs',
+        'assets/app.js',
+        'assets/x.wasm',
+      ])
     ).toEqual(['assets/app.js', 'assets/worker.mjs']);
   });
 
@@ -305,6 +331,23 @@ describe('check-build helpers', () => {
     ]);
   });
 
+  it('collects unquoted src/href non-root asset refs (q-mp-1335)', () => {
+    const html = [
+      '<script src=assets/x.js></script>',
+      '<link href=assets/y.css>',
+      '<script src="/root.js"></script>',
+      '<script src="assets/quoted.js"></script>',
+      "<script src='assets/single.js'></script>",
+      '<a href=#skip>skip</a>',
+    ].join('');
+    expect(collectHtmlNonRootAssetRefs(html)).toEqual([
+      'assets/x.js',
+      'assets/y.css',
+      'assets/quoted.js',
+      'assets/single.js',
+    ]);
+  });
+
   it('honors ?query/#hash on relative asset refs (q-mp-1227)', () => {
     const html = [
       '<script src="assets/app.js?v=1"></script>',
@@ -348,6 +391,17 @@ describe('check-build helpers', () => {
       expect(
         findings.some((f) => f.path === 'prose.js' || f.path === 'bare.js')
       ).toBe(false);
+    } finally {
+      rmSync(dist, { recursive: true, force: true });
+    }
+  });
+
+  it('hasHealthTxt reports presence of dist/health.txt (q-mp-1336)', () => {
+    const dist = mkdtempSync(join(tmpdir(), 'check-build-health-'));
+    try {
+      expect(hasHealthTxt(dist)).toBe(false);
+      writeFileSync(join(dist, 'health.txt'), 'ok\n');
+      expect(hasHealthTxt(dist)).toBe(true);
     } finally {
       rmSync(dist, { recursive: true, force: true });
     }
