@@ -29,7 +29,7 @@ Script names must match `package.json`. Prefer these over bare `npx tsc` / ad-ho
 1. **`npm run verify`** — blocking half of CI job `lint` in `.github/workflows/ci.yml` (verify ⊆ lint job; does **not** include the soft copy-pins step):
    `lint` → `lint:ratchet` → `format:check` → `typecheck` → `typecheck:ratchet` → `check:boundaries`
 2. **`npm run test:unit`** — required CI `unit` job.
-3. As needed: **`npm run build`** (hard 250 kB JS chunk budget under `dist/assets`) then report-only **`npm run size:check`**; required e2e **`npm run test:e2e:chromium`**.
+3. As needed: **`npm run build`** (hard 250 kB JS chunk budget under `dist/assets`) then report-only **`npm run size:check`** (local default; CI build also runs `npm run size:check -- --fail-on-new-over` with `continue-on-error: true` so novel OVER exits **1** without failing the job); required e2e **`npm run test:e2e:chromium`**.
 
 Ratchets (`lint:ratchet`, `typecheck:ratchet`, `check:boundaries`) may only go **down**. Do not skip Prettier or ratchets.
 
@@ -46,7 +46,7 @@ Workflow: `permissions: contents: read`; checkout `persist-credentials: false`.
 | --- | --- | --- |
 | **Blocking `lint`** | `npm run verify` (= `lint` → `lint:ratchet` → `format:check` → `typecheck` → `typecheck:ratchet` → `check:boundaries`); then soft `check:copy-pins -- --fail` (`continue-on-error: true`) | `npm run verify` · soft: `npm run check:copy-pins` |
 | **Blocking `audit`** | `npm audit --audit-level=high` | same |
-| **Blocking `build`** | `build`; `dist/` + `dist/health.txt`; hard 250 kB/JS chunk; soft `size:check`, `check:pwa-manifest` | `npm run build` · soft: `npm run size:check` · `npm run check:pwa-manifest` |
+| **Blocking `build`** | `build`; `dist/` + `dist/health.txt`; hard 250 kB/JS chunk; soft `size:check -- --fail-on-new-over` (`continue-on-error: true`), `check:pwa-manifest` | `npm run build` · soft: `npm run size:check` (CI: `-- --fail-on-new-over`) · `npm run check:pwa-manifest` |
 | **Blocking `unit`** | Vitest under `tests/unit` | `npm run test:unit` |
 | **Blocking `e2e`** | Chromium smoke (`@fullgame` excluded) | `npm run test:e2e:chromium` |
 | **Report-only** | `e2e-fullgame`, `mobile-touch`, `zoom-reflow`, `forced-colors`, `e2e-cross-browser`, `knip`, `visual-baseline` | `npm run test:e2e:fullgame` · `npm run test:e2e:mobile` · `npm run test:e2e:zoom-reflow` · `npm run test:e2e:forced-colors` · `npm run test:e2e:firefox-webkit` (CI job runs `npm run test:e2e -- --project=firefox --project=webkit`) · `npm run report:knip` · `npm run test:e2e:visual` |
