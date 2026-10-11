@@ -110,6 +110,10 @@ const nodePureFiles = [
   'tests/unit/ai-determinism-shard-e.test.ts',
   'tests/unit/ai-calibration-difficulty-order.test.ts',
   'tests/unit/state-roundtrip-fuzz.test.ts',
+  // q-mp-1108: parallel shards (queens seeds + other games) — keep on unit-node.
+  'tests/unit/state-roundtrip-fuzz-queens-a.test.ts',
+  'tests/unit/state-roundtrip-fuzz-queens-b.test.ts',
+  'tests/unit/state-roundtrip-fuzz-games.test.ts',
   'tests/unit/engine-property-invariants.test.ts',
   'tests/unit/ai-worker-parity-fab.test.ts',
   'tests/unit/ai-worker-parity-queens-hex.test.ts',
