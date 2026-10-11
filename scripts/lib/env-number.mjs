@@ -1,7 +1,8 @@
 /**
- * Env-number parsing for harness scripts (q-mp-876 / q-mp-908).
- * Rejects non-finite / non-positive values before browser launch.
- * Kept free of Playwright so unit tests can import it hermetically.
+ * Env-number parsing for harness scripts (q-mp-876 / q-mp-908 / q-mp-1234).
+ * Rejects non-finite / non-positive / non-integer values before browser launch
+ * (count-like envs default to integer). Kept free of Playwright so unit tests
+ * can import it hermetically.
  *
  * This file is a library module. Direct CLI entry prints usage only:
  *   node scripts/lib/env-number.mjs [--help]
@@ -22,13 +23,14 @@ Options:
   -h, --help    Show this help and exit`;
 
 /**
- * @typedef {{ requirePositive?: boolean }} EnvNumberOpts
+ * @typedef {{ requirePositive?: boolean, integer?: boolean }} EnvNumberOpts
  */
 
 /**
  * Parse a numeric environment variable.
- * Unset or empty → `defaultValue`. Non-finite (and non-positive when required)
- * → usage error naming the variable.
+ * Unset or empty → `defaultValue`. Non-finite (and non-positive / non-integer
+ * when required) → usage error naming the variable. Count-like harness envs
+ * default to `integer: true` (q-mp-1234).
  *
  * @param {NodeJS.ProcessEnv | Record<string, string | undefined>} env
  * @param {string} name
@@ -38,6 +40,7 @@ Options:
  */
 export function parseEnvNumber(env, name, defaultValue, opts = {}) {
   const requirePositive = opts.requirePositive !== false;
+  const requireInteger = opts.integer !== false;
   const raw = env[name];
   if (raw === undefined || raw === '') {
     return { ok: true, value: defaultValue };
@@ -53,6 +56,12 @@ export function parseEnvNumber(env, name, defaultValue, opts = {}) {
     return {
       ok: false,
       message: `Invalid ${name}=${JSON.stringify(String(raw))} (expected a positive number).`,
+    };
+  }
+  if (requireInteger && !Number.isInteger(n)) {
+    return {
+      ok: false,
+      message: `Invalid ${name}=${JSON.stringify(String(raw))} (expected an integer).`,
     };
   }
   return { ok: true, value: n };
