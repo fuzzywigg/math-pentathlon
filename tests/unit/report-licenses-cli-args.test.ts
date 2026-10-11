@@ -162,4 +162,40 @@ describe('report-licenses parseArgs / CLI (q-mp-979)', () => {
       })
     ).toHaveLength(0);
   });
+
+  // q-mp-1299: null / non-object non-root entries must not count as usable
+  it('rejects null / non-object non-root package entries (q-mp-1299)', () => {
+    expect(isUsableLockPackages({ 'node_modules/bad': null })).toBe(false);
+    expect(isUsableLockPackages({ 'node_modules/bad': undefined })).toBe(
+      false
+    );
+    expect(isUsableLockPackages({ 'node_modules/bad': 'MIT' })).toBe(false);
+    expect(isUsableLockPackages({ 'node_modules/bad': 1 })).toBe(false);
+    expect(isUsableLockPackages({ 'node_modules/bad': [] })).toBe(false);
+    expect(
+      isUsableLockPackages({
+        '': { name: 'demo' },
+        'node_modules/bad': null,
+      })
+    ).toBe(false);
+    expect(
+      isUsableLockPackages({
+        'node_modules/good': { version: '1.0.0', license: 'MIT' },
+        'node_modules/bad': null,
+      })
+    ).toBe(true);
+    expect(
+      collectPackagesFromLock({
+        packages: { 'node_modules/bad': null },
+      })
+    ).toHaveLength(0);
+    expect(
+      collectPackagesFromLock({
+        packages: {
+          'node_modules/good': { version: '1.0.0', license: 'MIT' },
+          'node_modules/bad': null,
+        },
+      })
+    ).toHaveLength(1);
+  });
 });

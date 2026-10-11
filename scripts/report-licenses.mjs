@@ -132,10 +132,12 @@ export function malformedLockMessage(
 }
 
 /**
- * True when lock.packages is a plain object with ≥1 non-root entry
- * (q-mp-1037 empty/null; q-mp-1233 root-only inventory).
- * Null, undefined, arrays, `{}`, and `{ '': … }` alone are not usable —
- * collectPackagesFromLock skips the root key, so root-only yields 0 deps.
+ * True when lock.packages is a plain object with ≥1 usable non-root entry
+ * (q-mp-1037 empty/null; q-mp-1233 root-only; q-mp-1299 null/non-object
+ * non-root residual).
+ * Null, undefined, arrays, `{}`, `{ '': … }` alone, and maps whose only
+ * non-root values are null/non-objects are not usable — collectPackagesFromLock
+ * skips the root key and null/non-object metas, so those shapes yield 0 deps.
  * @param {unknown} packages
  * @returns {boolean}
  */
@@ -147,14 +149,18 @@ export function isUsableLockPackages(packages) {
   ) {
     return false;
   }
-  return Object.keys(/** @type {object} */ (packages)).some(
-    (key) => key !== ''
+  return Object.entries(/** @type {object} */ (packages)).some(
+    ([key, meta]) =>
+      key !== '' &&
+      meta != null &&
+      typeof meta === 'object' &&
+      !Array.isArray(meta)
   );
 }
 
 /**
- * Stable message for null / missing / empty / root-only lock packages
- * (q-mp-1037, q-mp-1233).
+ * Stable message for null / missing / empty / root-only / null-entry lock
+ * packages (q-mp-1037, q-mp-1233, q-mp-1299).
  * @param {string} [lockPath]
  * @returns {string}
  */
@@ -479,12 +485,15 @@ export function collectPackagesFromLock(lock, nodeModulesRoot = '') {
  * @returns {Record<string, number>}
  */
 export function countByLicense(packages) {
+  // Null-prototype map so odd SPDX-ish keys (`__proto__`, `constructor`)
+  // count as licenses instead of polluting Object.prototype (q-mp-1298).
   /** @type {Record<string, number>} */
-  const counts = {};
+  const counts = Object.create(null);
   for (const pkg of packages) {
     const key = pkg.license || '(missing)';
     counts[key] = (counts[key] || 0) + 1;
   }
+  // Object.fromEntries → plain object dump for markdown / JSON consumers.
   return Object.fromEntries(
     Object.entries(counts).sort(
       (a, b) => b[1] - a[1] || a[0].localeCompare(b[0])
