@@ -14,6 +14,9 @@ import {
   USAGE,
   filesFromErrorMessage,
   loadFilesFromList,
+  gitDiffNameOnlyErrorMessage,
+  listAiTouchedFiles,
+  runEmitIdentityCheck,
 } from '../../scripts/check-emit-identity.mjs';
 
 describe('check-emit-identity helpers', () => {
@@ -274,5 +277,113 @@ export const n: N = 1;
       ok: true,
       files: ['src/games/hex/ai.ts', 'src/games/fiar/ai.ts'],
     });
+  });
+
+  it('gitDiffNameOnlyErrorMessage includes Usage and refs (q-mp-1301)', () => {
+    const msg = gitDiffNameOnlyErrorMessage(
+      'does-not-exist',
+      'WORKING_TREE',
+      "fatal: bad revision 'does-not-exist'",
+      128
+    );
+    expect(msg).toContain(USAGE);
+    expect(msg).toMatch(/^error: git diff failed for --base does-not-exist/);
+    expect(msg).toContain('--head WORKING_TREE');
+    expect(msg).toContain('(exit 128)');
+    expect(msg).toContain("fatal: bad revision 'does-not-exist'");
+    expect(msg).not.toMatch(/ENOENT|Error:/);
+  });
+
+  it('listAiTouchedFiles fails closed on non-zero git diff (q-mp-1301)', () => {
+    const listed = listAiTouchedFiles('does-not-exist', 'WORKING_TREE', {
+      spawnSync: () => ({
+        status: 128,
+        stdout: '',
+        stderr: "fatal: bad revision 'does-not-exist'\n",
+        error: undefined,
+      }),
+    });
+    expect(listed.ok).toBe(false);
+    if (!listed.ok) {
+      expect(listed.message).toContain('git diff failed');
+      expect(listed.message).toContain('does-not-exist');
+      expect(listed.message).toContain(USAGE);
+      expect(listed.message).toContain("fatal: bad revision 'does-not-exist'");
+    }
+  });
+
+  it('listAiTouchedFiles returns empty files when git succeeds (q-mp-1301)', () => {
+    const listed = listAiTouchedFiles('HEAD', 'HEAD', {
+      spawnSync: () => ({
+        status: 0,
+        stdout: '',
+        stderr: '',
+        error: undefined,
+      }),
+    });
+    expect(listed).toEqual({ ok: true, files: [] });
+  });
+
+  it('listAiTouchedFiles filters ai modules from successful git stdout (q-mp-1301)', () => {
+    const listed = listAiTouchedFiles('abc', 'def', {
+      spawnSync: () => ({
+        status: 0,
+        stdout:
+          'src/games/hex/ai.ts\nsrc/games/hex/board.ts\nsrc/games/fiar/ai-client.ts\n',
+        stderr: '',
+        error: undefined,
+      }),
+    });
+    expect(listed).toEqual({
+      ok: true,
+      files: ['src/games/fiar/ai-client.ts', 'src/games/hex/ai.ts'],
+    });
+  });
+
+  it('runEmitIdentityCheck fails closed when default file discovery cannot diff (q-mp-1301)', async () => {
+    const result = await runEmitIdentityCheck(
+      {
+        base: 'does-not-exist',
+        head: 'WORKING_TREE',
+        files: [],
+        normalize: false,
+        minify: false,
+        json: false,
+      },
+      {
+        listAiTouchedFiles: () => ({
+          ok: false,
+          message: gitDiffNameOnlyErrorMessage(
+            'does-not-exist',
+            'WORKING_TREE',
+            "fatal: bad revision 'does-not-exist'",
+            128
+          ),
+        }),
+      }
+    );
+    expect(result.ok).toBe(false);
+    expect(result.results).toEqual([]);
+    expect(result.error).toMatch(/git diff failed/);
+    expect(result.error).toContain('does-not-exist');
+  });
+
+  it('runEmitIdentityCheck still ok on true empty touched set (q-mp-1301)', async () => {
+    const result = await runEmitIdentityCheck(
+      {
+        base: 'HEAD',
+        head: 'HEAD',
+        files: [],
+        normalize: false,
+        minify: false,
+        json: false,
+      },
+      {
+        listAiTouchedFiles: () => ({ ok: true, files: [] }),
+      }
+    );
+    expect(result.ok).toBe(true);
+    expect(result.results).toEqual([]);
+    expect(result.error).toBeUndefined();
   });
 });
