@@ -89,16 +89,15 @@ vi.mock('../../src/demos/expression-demo', () => ({
 }));
 
 const { installGameErrorBoundary, boundaryState } = vi.hoisted(() => {
-  type InstallFn = typeof import('../../src/ui/game-error-boundary').installGameErrorBoundary;
+  type InstallFn =
+    typeof import('../../src/ui/game-error-boundary').installGameErrorBoundary;
   const boundaryState: { real: InstallFn | null } = { real: null };
-  const installGameErrorBoundary = vi.fn(
-    ((opts: Parameters<InstallFn>[0]) => {
-      if (!boundaryState.real) {
-        throw new Error('q-mp-685: real installGameErrorBoundary not armed');
-      }
-      return boundaryState.real(opts);
-    }) as InstallFn
-  );
+  const installGameErrorBoundary = vi.fn(((opts: Parameters<InstallFn>[0]) => {
+    if (!boundaryState.real) {
+      throw new Error('q-mp-685: real installGameErrorBoundary not armed');
+    }
+    return boundaryState.real(opts);
+  }) as InstallFn);
   return { installGameErrorBoundary, boundaryState };
 });
 
