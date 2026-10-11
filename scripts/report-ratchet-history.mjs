@@ -18,7 +18,8 @@
  *   npm run report:ratchet-history
  *
  * By default uses `git log --all` so pre-squash tip folds still appear when
- * those refs are present locally. Pass --first-parent to restrict to HEAD.
+ * those refs are present locally. Pass --first-parent to restrict to HEAD
+ * first-parent history (forwards `--first-parent` to every `git log`).
  *
  * Default invocation (no --dry-run) still writes the md/svg docs intentionally.
  * --help / -h and --dry-run must not write those files (q-mp-872).
@@ -594,7 +595,7 @@ export function collectHistory(runGit, opts = {}) {
   const firstParent = opts.firstParent === true;
   const logArgsBase = [
     'log',
-    ...(firstParent ? [] : ['--all']),
+    ...(firstParent ? ['--first-parent'] : ['--all']),
     '--date-order',
     '--format=%H\t%cI\t%s',
     '--',
@@ -730,7 +731,7 @@ export function writeReport(opts = {}) {
   const firstParent = opts.firstParent === true;
   const dryRun = opts.dryRun === true;
   const rows = collectHistory(git, { firstParent });
-  const gitMode = firstParent ? 'git log (HEAD only)' : 'git log --all';
+  const gitMode = firstParent ? 'git log --first-parent' : 'git log --all';
   const tip = git(['rev-parse', 'HEAD']);
   const tipSha =
     (tip.status ?? 1) === 0 ? tip.stdout.trim() : (rows.at(-1)?.sha ?? '');
