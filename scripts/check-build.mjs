@@ -312,7 +312,9 @@ export function scanEnvLeakage(distRoot) {
     { re: /sourceMappingURL\s*=/, label: 'sourceMappingURL' },
   ];
   for (const rel of hashTree(distRoot).keys()) {
-    if (!/\.(js|css|html|webmanifest|txt)$/.test(rel)) continue;
+    // Include .mjs/.cjs alongside .js — offlineNeededPaths already tracks
+    // module chunks; skipping them false-negatives env leaks (q-mp-1356).
+    if (!/\.(js|mjs|cjs|css|html|webmanifest|txt)$/.test(rel)) continue;
     if (rel.startsWith('workbox-') || rel === 'sw.js') continue;
     const text = fs.readFileSync(path.join(distRoot, rel), 'utf8');
     for (const { re, label } of needles) {
@@ -325,16 +327,32 @@ export function scanEnvLeakage(distRoot) {
 }
 
 /**
- * Collect non-root absolute asset refs from HTML `src` / `href` attributes.
+ * Collect non-root absolute asset refs from HTML `src` / `href` / `poster`
+ * attributes and `srcset` candidate URLs.
  * Accepts double- or single-quoted attributes (q-mp-1179) and unquoted
- * HTML attribute values (q-mp-1335).
+ * HTML attribute values (q-mp-1335). `poster` / `srcset` added in q-mp-1369
+ * (srcset before src in the alternation so `srcset=` is not eaten as `src`).
  * @param {string} html
  * @returns {string[]}
  */
 export function collectHtmlNonRootAssetRefs(html) {
-  const htmlAssetRefs = [
-    ...html.matchAll(/(?:src|href)=(?:"([^"]+)"|'([^']+)'|([^\s"'=<>`]+))/g),
-  ].map((m) => m[1] ?? m[2] ?? m[3]);
+  /** @type {string[]} */
+  const htmlAssetRefs = [];
+  for (const m of html.matchAll(
+    /(?:srcset|poster|src|href)=(?:"([^"]+)"|'([^']+)'|([^\s"'=<>`]+))/g
+  )) {
+    const raw = m[1] ?? m[2] ?? m[3];
+    const attr = m[0].slice(0, m[0].indexOf('=')).toLowerCase();
+    if (attr === 'srcset') {
+      // Tokenizer-lite: comma-separated candidates; URL is the first token.
+      for (const part of raw.split(',')) {
+        const url = part.trim().split(/\s+/, 1)[0];
+        if (url) htmlAssetRefs.push(url);
+      }
+    } else {
+      htmlAssetRefs.push(raw);
+    }
+  }
   return htmlAssetRefs.filter((href) => {
     // Protocol-relative `//host/…` is not root-absolute (q-mp-1228).
     const isRootAbsolute = href.startsWith('/') && !href.startsWith('//');
