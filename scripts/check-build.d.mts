@@ -36,6 +36,9 @@ export function scanEnvLeakage(
 
 export function collectHtmlNonRootAssetRefs(html: string): string[];
 
+/** UTF-8 BOM–tolerant site.webmanifest JSON.parse (q-mp-1401). */
+export function parseWebmanifestJson(raw: string): Record<string, unknown>;
+
 /** CI parity helper for dist/health.txt (q-mp-1336). */
 export function hasHealthTxt(distRoot: string): boolean;
 

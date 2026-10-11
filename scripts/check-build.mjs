@@ -328,12 +328,19 @@ export function scanEnvLeakage(distRoot) {
  * Collect non-root absolute asset refs from HTML `src` / `href` attributes.
  * Accepts double- or single-quoted attributes (q-mp-1179) and unquoted
  * HTML attribute values (q-mp-1335).
+ * Attribute names require a word-boundary lookbehind so `data-src` / `ng-src`
+ * / `xsrc` are not false-positive `src` matches (q-mp-1383; peer
+ * `parseMenuCriticalRefs`). Extension set includes `.mjs` / `.cjs` so module
+ * script refs are audited with `.js` (q-mp-1384). webp/jpg stay out until a
+ * tip build ships them.
  * @param {string} html
  * @returns {string[]}
  */
 export function collectHtmlNonRootAssetRefs(html) {
   const htmlAssetRefs = [
-    ...html.matchAll(/(?:src|href)=(?:"([^"]+)"|'([^']+)'|([^\s"'=<>`]+))/g),
+    ...html.matchAll(
+      /(?<![A-Za-z0-9_-])(?:src|href)=(?:"([^"]+)"|'([^']+)'|([^\s"'=<>`]+))/g
+    ),
   ].map((m) => m[1] ?? m[2] ?? m[3]);
   return htmlAssetRefs.filter((href) => {
     // Protocol-relative `//host/…` is not root-absolute (q-mp-1228).
@@ -344,8 +351,23 @@ export function collectHtmlNonRootAssetRefs(html) {
     // Strip ?query / #hash before the extension test (q-mp-1227).
     const pathOnly = href.split(/[?#]/, 1)[0];
     // skip-link / in-page only; module scripts must be root-absolute with base /
-    return /\.(js|css|webmanifest|ico|svg|png|woff2?)$/.test(pathOnly);
+    return /\.(js|mjs|cjs|css|webmanifest|ico|svg|png|woff2?)$/.test(pathOnly);
   });
+}
+
+/**
+ * Parse `site.webmanifest` JSON, stripping a single leading UTF-8 BOM
+ * (q-mp-1401). Non-BOM input matches `JSON.parse(raw || '{}')` byte-for-byte
+ * on the parse path (empty → `{}`). Mid-payload FEFF is left alone.
+ * @param {string} raw
+ * @returns {Record<string, any>}
+ */
+export function parseWebmanifestJson(raw) {
+  let text = raw ?? '';
+  if (text.charCodeAt(0) === 0xfeff) {
+    text = text.slice(1);
+  }
+  return JSON.parse(text || '{}');
 }
 
 /**
@@ -375,7 +397,7 @@ function auditSourcemapsAndBase(distRoot) {
   /** @type {string[]} */
   const manifestIssues = [];
   try {
-    const m = JSON.parse(manifest || '{}');
+    const m = parseWebmanifestJson(manifest);
     if (m.start_url !== '/') {
       manifestOk = false;
       manifestIssues.push(`start_url=${JSON.stringify(m.start_url)}`);
