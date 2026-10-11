@@ -1,7 +1,8 @@
 /**
  * Deep playtest harness for Fraction Pinball.
  * Desktop + tablet Chromium, Easy/Medium/Hard, 10+ full games each.
- * Outputs JSON summary + screenshots under docs/playtest/fraction-pinball-deep-2026-10-07/
+ * Outputs JSON summary + screenshots under
+ * docs/playtest/fraction-pinball-deep-<UTC-YYYY-MM-DD>/
  *
  * Env:
  *   PLAYTEST_BASE   Base URL (default http://localhost:5173)
@@ -11,10 +12,13 @@ import { chromium, devices } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import { requireEnvNumber } from '../../scripts/lib/env-number.mjs';
+import { utcPlaytestDateStamp } from '../../scripts/lib/playtest-date.mjs';
 import { joinPlaytestGameUrl } from '../../scripts/lib/playtest-url.mjs';
 
 const BASE = process.env.PLAYTEST_BASE || 'http://localhost:5173';
-const OUT = path.resolve('docs/playtest/fraction-pinball-deep-2026-10-07');
+const OUT = path.resolve(
+  `docs/playtest/fraction-pinball-deep-${utcPlaytestDateStamp()}`
+);
 const GAMES_PER = requireEnvNumber('PLAYTEST_GAMES', 10);
 const DIFFICULTIES = ['easy', 'medium', 'hard'];
 

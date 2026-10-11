@@ -8,6 +8,7 @@ import { chromium, devices } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { utcPlaytestDateStamp } from '../../scripts/lib/playtest-date.mjs';
 import {
   installPageSeededRandom,
   resolvePlaytestSeed,
@@ -15,7 +16,7 @@ import {
 import { joinPlaytestGameUrl } from '../../scripts/lib/playtest-url.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const OUT = join(__dirname, 'hex-deep-2026-10-07');
+const OUT = join(__dirname, `hex-deep-${utcPlaytestDateStamp()}`);
 const BASE = process.env.HEX_PLAYTEST_URL || 'http://127.0.0.1:5173';
 const SEED = resolvePlaytestSeed(process.env);
 const PROBE = process.argv.includes('--probe');
