@@ -18,9 +18,12 @@ npm test                         # unit then Chromium e2e (CI required pair)
 npm run test:unit
 npm run test:unit:watch
 npm run test:unit:coverage
+npm run bench:engines            # Vitest engines-rules bench (local; not CI)
 npm run report:coverage-map      # rewrite docs/dev/coverage-map.{md,svg}; wiki: [heat map](./coverage-map.md)
 npm run report:engine-coverage-rank -- <summary.json>  # rank engine modules from a local coverage-summary.json (not CI)
+npm run test:e2e                 # every Playwright project — prefer an explicit script
 npm run test:e2e:chromium        # required CI e2e path
+npm run test:e2e:fullgame        # report-only @fullgame Chromium suite
 npm run test:e2e:firefox-webkit  # full Firefox + WebKit suite (CI report-only)
 npm run test:e2e:cross           # Firefox + WebKit + iPad WebKit
 npm run test:e2e:mobile          # phone + tablet touch smoke (report-only)
