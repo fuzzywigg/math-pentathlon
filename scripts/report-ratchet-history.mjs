@@ -243,15 +243,15 @@ export function extractMetric(kind, json) {
   switch (kind) {
     case 'typePhase2': {
       // Match check-type-ratchet: top-level outOfScopeErrors, else nested totals.
-      // Nested totals support kept from q-mp-1247.
-      const top = obj.outOfScopeErrors;
-      if (typeof top === 'number' && Number.isFinite(top)) return top;
+      // Nested totals support kept from q-mp-1247. Coerce finite numeric strings
+      // like lint/boundaries (q-mp-1311) so string-encoded Phase-2 baselines chart.
+      const top = coerceFiniteNumber(obj.outOfScopeErrors);
+      if (top != null) return top;
       const totals = obj.totals;
       if (totals != null && typeof totals === 'object') {
-        const nested = /** @type {Record<string, unknown>} */ (totals)
-          .outOfScopeErrors;
-        if (typeof nested === 'number' && Number.isFinite(nested))
-          return nested;
+        return coerceFiniteNumber(
+          /** @type {Record<string, unknown>} */ (totals).outOfScopeErrors
+        );
       }
       return null;
     }
@@ -664,9 +664,7 @@ export function renderMarkdown(rows, meta = {}) {
   }
 
   if (rows.length === 0) {
-    lines.push(
-      `| — | — | ${emptyLintCells} | — | — | _(no commits found)_ |`
-    );
+    lines.push(`| — | — | ${emptyLintCells} | — | — | _(no commits found)_ |`);
   }
 
   lines.push('');
