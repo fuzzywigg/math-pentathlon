@@ -168,11 +168,15 @@ function parseMdLinkAfterOpen(text, start) {
  * @param {string} fileRel
  * @param {string} symbol
  */
-function symbolInFile(fileRel, symbol) {
+/**
+ * Whether `symbol` appears as a declaration / export in TypeScript/JS source.
+ * Used by "| Symbol | File |" table checks (q-mp-1176: `export type { Foo }`).
+ * @param {string} text
+ * @param {string} symbol
+ * @returns {boolean}
+ */
+export function symbolInSource(text, symbol) {
   if (symbol === '*(module)*') return true;
-  const abs = path.join(ROOT, fileRel);
-  if (!fs.existsSync(abs) || !fs.statSync(abs).isFile()) return false;
-  const text = fs.readFileSync(abs, 'utf8');
   const escaped = symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const patterns = [
     new RegExp(String.raw`export\s+(?:async\s+)?function\s+${escaped}\b`),
@@ -182,10 +186,27 @@ function symbolInFile(fileRel, symbol) {
     new RegExp(
       String.raw`\b(?:function|const|type|interface|class)\s+${escaped}\b`
     ),
-    // Type-only re-exports / named exports in braces
+    // Named exports in braces (incl. `export { type Foo }`)
     new RegExp(String.raw`export\s+\{[^}]*\b${escaped}\b`),
+    // Type-only re-export barrels: `export type { Foo }` / `export type { Foo as Alias }`
+    // Line-anchored so `// export type { Foo }` comments are not false hits (q-mp-1176).
+    new RegExp(
+      String.raw`(?:^|[\r\n])\s*export\s+type\s+\{[^}]*\b${escaped}\b`
+    ),
   ];
   return patterns.some((re) => re.test(text));
+}
+
+/**
+ * @param {string} fileRel
+ * @param {string} symbol
+ */
+function symbolInFile(fileRel, symbol) {
+  if (symbol === '*(module)*') return true;
+  const abs = path.join(ROOT, fileRel);
+  if (!fs.existsSync(abs) || !fs.statSync(abs).isFile()) return false;
+  const text = fs.readFileSync(abs, 'utf8');
+  return symbolInSource(text, symbol);
 }
 
 /**

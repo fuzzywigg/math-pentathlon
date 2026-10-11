@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it, expect } from 'vitest';
 import {
@@ -5,6 +6,7 @@ import {
   stripMdLinkAngleBrackets,
   resolveMdLink,
   matchAllMdLinks,
+  symbolInSource,
 } from '../../scripts/check-dev-doc-links.mjs';
 
 const fromDoc = path.resolve('docs/dev/sample.md');
@@ -177,5 +179,37 @@ describe('resolveMdLink (q-mp-1095 + q-mp-1152 + q-mp-1175)', () => {
       true
     );
     expect(resolveMdLink(fromDoc, '</absolute/path.md>').skip).toBe(true);
+  });
+});
+
+describe('symbolInSource (q-mp-1176 export type { Foo })', () => {
+  it('detects export type { Sym } and export type { Sym as Alias }', () => {
+    expect(symbolInSource('export type { Foo }\n', 'Foo')).toBe(true);
+    expect(symbolInSource('export type { Foo, Bar }\n', 'Foo')).toBe(true);
+    expect(symbolInSource('export type { Foo, Bar }\n', 'Bar')).toBe(true);
+    expect(symbolInSource('export type { Foo as Alias }\n', 'Foo')).toBe(true);
+    expect(symbolInSource('export type { Foo as Alias }\n', 'Alias')).toBe(
+      true
+    );
+  });
+
+  it('keeps prior patterns (export type Foo / export { type Foo })', () => {
+    expect(symbolInSource('export type Foo = string;\n', 'Foo')).toBe(true);
+    expect(symbolInSource('export { type Foo }\n', 'Foo')).toBe(true);
+    expect(symbolInSource('export { Foo }\n', 'Foo')).toBe(true);
+    expect(symbolInSource('export function Foo() {}\n', 'Foo')).toBe(true);
+  });
+
+  it('does not treat // export type { Foo } comments as hits', () => {
+    expect(symbolInSource('// export type { Foo }\n', 'Foo')).toBe(false);
+    expect(
+      symbolInSource('const x = 1;\n// export type { Foo }\n', 'Foo')
+    ).toBe(false);
+  });
+
+  it('matches live seat-labels SeatId re-export barrel', () => {
+    const text = fs.readFileSync('src/ui/seat-labels.ts', 'utf8');
+    expect(text).toContain('export type { SeatId }');
+    expect(symbolInSource(text, 'SeatId')).toBe(true);
   });
 });
