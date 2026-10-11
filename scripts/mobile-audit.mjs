@@ -15,6 +15,7 @@ import {
   resolveMobileAuditOutPath,
 } from './lib/mobile-audit-out-path.mjs';
 import { gotoGame, startHuman } from './lib/page-ready.mjs';
+import { waitDoubleRaf } from './lib/page-settle.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -278,16 +279,6 @@ async function auditGesturesStatic() {
       'Uses pointerdown + click for activation (touch-friendly). Hover styles are mouseenter/mouseleave only.',
     ],
   };
-}
-
-/** Double-rAF paint settle (no fixed sleep). */
-async function waitDoubleRaf(page) {
-  await page.evaluate(
-    () =>
-      new Promise((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-      })
-  );
 }
 
 /**

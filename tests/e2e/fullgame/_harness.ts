@@ -24,6 +24,39 @@ function seatToken(status: string): 'p1' | 'p2' | 'unknown' {
   return 'unknown';
 }
 
+/** Double-rAF paint settle — replaces fixed short sleeps after UI clicks. */
+async function waitForPaint(page: Page): Promise<void> {
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => resolve())
+        );
+      })
+  );
+}
+
+/**
+ * Wait until board fingerprint differs from `before`.
+ * Falls back to a paint settle when the board stays stable (missed click).
+ */
+async function waitForFingerprintChange(
+  page: Page,
+  before: string,
+  timeoutMs = 2_000
+): Promise<void> {
+  try {
+    await expect
+      .poll(() => boardFingerprint(page), {
+        timeout: timeoutMs,
+        intervals: [16, 32, 50],
+      })
+      .not.toBe(before);
+  } catch {
+    await waitForPaint(page);
+  }
+}
+
 async function isOver(page: Page, driver: GameDriver): Promise<boolean> {
   if (await page.locator(driver.gameOver).first().isVisible().catch(() => false)) {
     const text = await readStatusText(page);
@@ -103,7 +136,7 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
 
     const before = await boardFingerprint(page);
     const acted = await driver.playLegal(page);
-    await page.waitForTimeout(40);
+    await waitForFingerprintChange(page, before);
     const after = await boardFingerprint(page);
 
     if (driver.id === 'juggle') {
@@ -123,6 +156,7 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
       stalled += 1;
       if (stalled > 8) {
         // Nudge: try pass-like buttons generically
+        const beforeNudge = await boardFingerprint(page);
         await page
           .locator(
             'button:has-text("Pass"), button:has-text("Continue"), .star-track-draw-btn, .juggle-choose-other-btn'
@@ -130,7 +164,7 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
           .first()
           .click({ force: true })
           .catch(() => undefined);
-        await page.waitForTimeout(60);
+        await waitForFingerprintChange(page, beforeNudge);
       }
       // Juggle: never throw on stall — softlock reshuffle handles unplaceable shapes.
       if (stalled > 25 && driver.id !== 'juggle') {
@@ -194,7 +228,8 @@ export async function runFullgameMatch(
     // Illegal move rejected (status/material stable — selection chrome may churn)
     const beforeIllegal = await boardFingerprint(page);
     await driver.tryIllegal(page);
-    await page.waitForTimeout(80);
+    // Expect no board progress — paint settle only (not a fingerprint-change wait).
+    await waitForPaint(page);
     const afterIllegal = await boardFingerprint(page);
     expect(afterIllegal).toBe(beforeIllegal);
 
@@ -210,7 +245,7 @@ export async function runFullgameMatch(
       }
       const beforeLegal = await boardFingerprint(page);
       const acted = await driver.playLegal(page);
-      await page.waitForTimeout(60);
+      await waitForFingerprintChange(page, beforeLegal);
       const afterLegal = await boardFingerprint(page);
       if (acted && afterLegal !== beforeLegal) {
         accepted = true;
@@ -256,8 +291,9 @@ export async function runFullgameMatch(
         flipped = true;
         break;
       }
+      const beforeFlip = await boardFingerprint(page);
       await driver.playLegal(page);
-      await page.waitForTimeout(50);
+      await waitForFingerprintChange(page, beforeFlip);
     }
     expect(flipped, 'expected turn indicator to flip seats').toBe(true);
 

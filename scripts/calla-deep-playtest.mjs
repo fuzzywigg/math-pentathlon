@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { applyDeepPlaytestCli } from './lib/deep-playtest-cli.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
+import { waitForGameReady } from './lib/page-ready.mjs';
 
 const USAGE = `Usage: node scripts/calla-deep-playtest.mjs
 
@@ -54,8 +55,7 @@ async function dismissOwl(page) {
 
 async function startVsAi(page, difficulty) {
   await page.goto(`${BASE}/#/game/calla`, { waitUntil: 'domcontentloaded' });
-  await page.getByTestId('game-loading').waitFor({ state: 'hidden', timeout: 20_000 }).catch(() => {});
-  await page.locator('#new-game-btn').waitFor({ state: 'visible', timeout: 20_000 });
+  await waitForGameReady(page);
   await dismissOwl(page);
   await page.locator('#new-game-btn').click();
   const modal = page.locator('#new-game-modal');

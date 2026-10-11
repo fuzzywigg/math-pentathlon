@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { applyDeepPlaytestCli } from './lib/deep-playtest-cli.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
+import { waitForGameReady } from './lib/page-ready.mjs';
 
 const USAGE = `Usage: node scripts/ramrod-deep-playtest.mjs
 
@@ -137,13 +138,7 @@ async function waitForSelectionCleared(page, timeoutMs = 2_000) {
 
 async function startVsAi(page, difficulty) {
   await page.goto(`${BASE}/#/game/ramrod`, { waitUntil: 'domcontentloaded' });
-  await page
-    .getByTestId('game-loading')
-    .waitFor({ state: 'hidden', timeout: 20_000 })
-    .catch(() => {});
-  await page.locator('.ramrod-board, #new-game-btn').first().waitFor({
-    timeout: 20_000,
-  });
+  await waitForGameReady(page);
   await dismissOwl(page);
   await page.locator('#new-game-btn').click();
   const modal = page.locator('#new-game-modal');

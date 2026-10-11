@@ -152,6 +152,8 @@ const nodePureFiles = [
   'tests/unit/offline-probe-cli-help.test.ts',
   // deep-playtest early --help (q-mp-910); spawnSync CLI check needs node env.
   'tests/unit/deep-playtest-cli-help.test.ts',
+  // deep-playtest page-ready adoption (q-mp-925); spawnSync + source asserts need node.
+  'tests/unit/deep-playtest-page-ready.test.ts',
   // help-only CLI argv (q-mp-885); spawnSync CLI check needs node env.
   'tests/unit/help-only-cli.test.ts',
   // harness env Number() parser (q-mp-876 / q-mp-908); spawnSync CLI check needs node env.
@@ -168,6 +170,14 @@ const nodePureFiles = [
   'tests/unit/render-perf-mode-cli-help.test.ts',
   // check:perf early --help / unknown flags (q-mp-917); spawnSync CLI check needs node env.
   'tests/unit/check-perf-cli-args.test.ts',
+  // page-settle double-rAF helper (q-mp-920); hermetic fake page.evaluate needs node.
+  'tests/unit/page-settle.test.ts',
+  // memory-leak-audit page-ready adoption (q-mp-923); spawnSync --check/--help.
+  'tests/unit/memory-leak-page-ready.test.ts',
+  // lib main-entry usage / --help (q-mp-958); spawnSync CLI check needs node env.
+  'tests/unit/lib-main-entry-cli-help.test.ts',
+  // render-perf-mode measureTTI page-ready adoption (q-mp-948); fake page / node.
+  'tests/unit/render-perf-mode-measure-tti.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional

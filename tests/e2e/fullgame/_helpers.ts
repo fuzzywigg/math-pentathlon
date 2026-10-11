@@ -6,6 +6,7 @@ import { expect, type Page } from '@playwright/test';
 import {
   dismissOwl as dismissOwlCanonical,
   isBenignConsoleNoise,
+  waitForGameReady as waitForGameReadyCanonical,
 } from '../helpers/page';
 import { E2E_RNG_SEED } from '../helpers/stability';
 
@@ -88,13 +89,9 @@ async function installFullgamePrefs(page: Page): Promise<void> {
 export const dismissOwl = (page: Page): Promise<void> =>
   dismissOwlCanonical(page, { hide: true });
 
+/** Fullgame historically waits 20s for lazy chunks + chrome. */
 export async function waitForGameReady(page: Page): Promise<void> {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 20_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 20_000,
-  });
+  await waitForGameReadyCanonical(page, { timeoutMs: 20_000 });
 }
 
 /** Open New Game → human-vs-human → Start (reseeds via stability fixture). */

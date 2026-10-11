@@ -9,6 +9,7 @@ import {
   dismissOwl,
   waitForGameReady as sharedWaitForGameReady,
 } from './page';
+import { waitDoubleRaf } from './page-settle';
 
 /** Fixed seed for Mulberry32 — same algorithm as src/core/ai-worker/seeded-rng.ts */
 const VISUAL_RNG_SEED = 0xc0ffee;
@@ -110,12 +111,7 @@ async function waitForPostNeutralizePaint(page: Page): Promise<void> {
     }
     return document.fonts?.status === 'loaded' || !document.fonts;
   });
-  await page.evaluate(
-    () =>
-      new Promise<void>((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-      })
-  );
+  await waitDoubleRaf(page);
 }
 
 export async function waitForGameReady(page: Page): Promise<void> {

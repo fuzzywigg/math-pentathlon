@@ -9,9 +9,25 @@
  *
  * e2e specs should keep using `tests/e2e/helpers/page.ts` — this module is
  * for plain `.mjs` harnesses that cannot import that TypeScript helper.
+ *
+ * This file is a library module. Direct CLI entry prints usage only:
+ *   node scripts/lib/page-ready.mjs [--help]
+ * Unknown flags exit 2. Import from harnesses (e.g. runtime-perf, mobile-audit).
  */
 
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { dismissOwl } from './dismiss-owl.mjs';
+import { parseHelpOnlyArgv } from './help-only-cli.mjs';
+
+export const PAGE_READY_USAGE = `Usage: node scripts/lib/page-ready.mjs [--help]
+
+Library module — import from harness scripts (e.g. scripts/runtime-perf.mjs,
+scripts/render-perf.mjs, scripts/mobile-audit.mjs, scripts/console-sweep.mjs).
+Not a standalone CLI.
+
+Options:
+  -h, --help    Show this help and exit`;
 
 /**
  * Wait until the game shell is past the loading marker and chrome is visible.
@@ -66,4 +82,30 @@ export async function startHuman(page) {
     await modal.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => {});
   }
   await dismissOwl(page);
+}
+
+/**
+ * CLI entry when this file is executed directly (q-mp-958).
+ * Import-as-library path is unchanged (no side effects on import).
+ *
+ * @param {string[]} [argv]
+ */
+export function main(argv = process.argv.slice(2)) {
+  const parsed = parseHelpOnlyArgv(argv);
+  if (parsed.kind === 'error') {
+    console.error(`Unknown flag: ${parsed.flag}`);
+    console.error(PAGE_READY_USAGE);
+    process.exit(2);
+  }
+  // --help / -h, bare main, or stray positionals: usage only (not runnable).
+  console.log(PAGE_READY_USAGE);
+  process.exit(0);
+}
+
+const isMain =
+  Boolean(process.argv[1]) &&
+  import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
+
+if (isMain) {
+  main();
 }

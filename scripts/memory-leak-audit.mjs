@@ -25,6 +25,7 @@ import { fileURLToPath } from 'node:url';
 import { dismissOwl } from './lib/dismiss-owl.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
+import { waitForGameReady, startHuman } from './lib/page-ready.mjs';
 
 const USAGE = `Usage: node scripts/memory-leak-audit.mjs
 
@@ -120,29 +121,6 @@ async function openDivision(page, division) {
   await page.waitForTimeout(150);
 }
 
-async function waitGameReady(page) {
-  await page
-    .locator('[data-testid="game-loading"]')
-    .waitFor({ state: 'hidden', timeout: 25_000 })
-    .catch(() => {});
-  await page.locator('#back-btn, #new-game-btn, h1').first().waitFor({
-    timeout: 25_000,
-  });
-  await dismissOwl(page);
-}
-
-async function startHuman(page) {
-  await dismissOwl(page);
-  const modal = page.locator('#new-game-modal');
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator('.mode-option[data-mode="human-vs-human"]');
-    if (await human.isVisible().catch(() => false)) await human.click();
-    await page.locator('#start-game-btn').click();
-    await modal.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => {});
-  }
-  await dismissOwl(page);
-}
-
 async function openGameFromMenu(page, game) {
   await waitMenu(page);
   await dismissOwl(page);
@@ -163,7 +141,8 @@ async function openGameFromMenu(page, game) {
       })
       .click({ force: true });
   });
-  await waitGameReady(page);
+  // Keep the prior 25s ready timeout (shared default is 20s).
+  await waitForGameReady(page, { timeoutMs: 25_000 });
   await startHuman(page);
   // Let 3D / first paint settle before closing.
   await page.waitForTimeout(BOARD3D_GAMES.has(game.id) ? 600 : 200);
