@@ -43,6 +43,25 @@ function isObject(value) {
 }
 
 /**
+ * js-yaml keeps quoted scalars (`"true"` / `"false"`) as strings. Accept the
+ * boolean or the case-sensitive string spellings used in GHA YAML.
+ *
+ * @param {unknown} value
+ * @returns {boolean}
+ */
+export function isYamlTrue(value) {
+  return value === true || value === 'true';
+}
+
+/**
+ * @param {unknown} value
+ * @returns {boolean}
+ */
+export function isYamlFalse(value) {
+  return value === false || value === 'false';
+}
+
+/**
  * GitHub Actions accepts `on` as a mapping (`on: pull_request:`) or a
  * sequence shorthand (`on: [pull_request]`). Treat both forms the same.
  *
@@ -133,7 +152,7 @@ export function auditWorkflow(file, doc, raw) {
     if (typeof conc.group !== 'string' || conc.group.length === 0) {
       fail('concurrency.group must be a non-empty string');
     }
-    if (conc['cancel-in-progress'] !== true) {
+    if (!isYamlTrue(conc['cancel-in-progress'])) {
       fail('concurrency.cancel-in-progress must be true');
     }
   }
@@ -201,7 +220,7 @@ export function auditWorkflow(file, doc, raw) {
         if (step.uses.startsWith('actions/checkout@')) {
           hasCheckout = true;
           const withObj = isObject(step.with) ? step.with : {};
-          if (withObj['persist-credentials'] !== false) {
+          if (!isYamlFalse(withObj['persist-credentials'])) {
             checkoutPersistOk = false;
           }
         }
