@@ -186,6 +186,8 @@ const nodePureFiles = [
   'tests/unit/page-settle.test.ts',
   // memory-leak-audit page-ready adoption (q-mp-923); spawnSync --check/--help.
   'tests/unit/memory-leak-page-ready.test.ts',
+  // memory-leak heap snapshot / null deltas (q-mp-1215 / 1216); hermetic fixtures.
+  'tests/unit/memory-leak-heap-snapshot.test.ts',
   // lib main-entry usage / --help (q-mp-958); spawnSync CLI check needs node env.
   'tests/unit/lib-main-entry-cli-help.test.ts',
   // render-perf-mode measureTTI page-ready adoption (q-mp-948); fake page / node.
