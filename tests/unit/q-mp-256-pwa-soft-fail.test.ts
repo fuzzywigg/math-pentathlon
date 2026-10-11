@@ -15,11 +15,28 @@ import {
 import { bootstrapPwa } from '../../src/pwa/bootstrap';
 import { bootstrapOwl } from '../../src/pwa/bootstrap-owl';
 
+// unit-shared uses isolate:false — restore navigator.serviceWorker so later
+// suites do not see a stuck stub from Object.defineProperty (q-mp-1365).
+// document.hidden restore for this file is q-mp-1364 — leave alone here.
+const originalServiceWorker = Object.getOwnPropertyDescriptor(
+  navigator,
+  'serviceWorker'
+);
+
+function restoreServiceWorker(): void {
+  if (originalServiceWorker) {
+    Object.defineProperty(navigator, 'serviceWorker', originalServiceWorker);
+  } else {
+    Reflect.deleteProperty(navigator, 'serviceWorker');
+  }
+}
+
 describe('q-mp-256 registerPwa soft-fail / offline contract', () => {
   afterEach(() => {
     resetPwaReloadGuardForTests();
     vi.useRealTimers();
     vi.restoreAllMocks();
+    restoreServiceWorker();
   });
 
   it('wires immediate + onOfflineReady + onNeedRefresh + onRegisteredSW without network', () => {
@@ -149,6 +166,7 @@ describe('q-mp-256 idle-warm soft-fail / offline paths', () => {
     } catch {
       /* ignore */
     }
+    restoreServiceWorker();
   });
 
   it('continues to next warm game when one import rejects (offline-ish chunk miss)', async () => {
@@ -247,6 +265,7 @@ describe('q-mp-256 bootstrap helpers soft-fail / schedule contract', () => {
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
     vi.useRealTimers();
+    restoreServiceWorker();
   });
 
   it('bootstrapPwa defaultSchedule uses requestIdleCallback timeout 3000', () => {
