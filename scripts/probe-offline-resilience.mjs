@@ -1,6 +1,6 @@
 /**
  * One-shot Chromium probe: offline-after-first-load + Slow 3G.
- * Writes JSON findings to /opt/cursor/artifacts for the resilience doc.
+ * Writes JSON findings via scripts/lib/artifact-dir.mjs for the resilience doc.
  *
  * Uses a production `vite preview` build so the Workbox service worker is active
  * (dev mode has no SW unless PWA_DEV=1).
@@ -13,6 +13,7 @@ import { createServer } from 'node:net';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { artifactPath } from './lib/artifact-dir.mjs';
 import { applyOfflineProbeCli } from './lib/offline-probe-cli.mjs';
 
 const USAGE = `Usage: node scripts/probe-offline-resilience.mjs
@@ -26,7 +27,7 @@ Options:
 applyOfflineProbeCli(process.argv.slice(2), USAGE);
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const OUT = '/opt/cursor/artifacts/offline-resilience-probe.json';
+const OUT = artifactPath('offline-resilience-probe.json');
 
 const SLOW_3G = {
   offline: false,
