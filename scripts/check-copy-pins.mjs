@@ -28,8 +28,9 @@ const ROOT = path.resolve(__dirname, '..');
 const TESTS_DIR = path.join(ROOT, 'tests');
 
 const MESSAGE_APIS = ['getPhaseMessage', 'getCurrentPhaseMessage'];
+/** Content matchers that can pin player-facing copy (incl. jest-dom / Playwright). */
 const MATCHER_RE =
-  /\.\s*(?:not\s*\.\s*)?(?:toBe|toEqual|toStrictEqual|toMatch|toContain)\s*\(/;
+  /\.\s*(?:not\s*\.\s*)?(?:toBe|toEqual|toStrictEqual|toMatch|toContain|toHaveTextContent|toHaveAccessibleName|toHaveText)\s*\(/;
 const EXPECT_RE = /\bexpect\s*\(/;
 const COMING_SOON_LIT_RE = /(['"`])Coming Soon\1|\/Coming Soon\/[gimsuy]*/;
 /** How many lines after `expect(` to join for multi-line asserts. */
@@ -55,6 +56,34 @@ it('getPhaseMessage returns empty string when gameOver and winner is null', () =
 it('renders Coming Soon badge for unavailable games', () => {
   const badge = document.querySelector('.game-card-badge');
   expect(badge?.textContent).toBe('Coming Soon');
+});
+`,
+  },
+  {
+    id: 'jest-dom-toHaveTextContent-coming-soon',
+    path: 'virtual/jest-dom-toHaveTextContent.ts',
+    source: `
+it('renders Coming Soon badge via jest-dom text matcher', () => {
+  const badge = document.querySelector('.game-card-badge');
+  expect(badge).toHaveTextContent('Coming Soon');
+});
+`,
+  },
+  {
+    id: 'jest-dom-toHaveAccessibleName',
+    path: 'virtual/jest-dom-toHaveAccessibleName.ts',
+    source: `
+it('pins Coming Soon accessible name', () => {
+  expect(badge).toHaveAccessibleName('Coming Soon');
+});
+`,
+  },
+  {
+    id: 'playwright-toHaveText-coming-soon',
+    path: 'virtual/playwright-toHaveText.ts',
+    source: `
+it('pins Coming Soon via Playwright toHaveText', async () => {
+  await expect(badge).toHaveText('Coming Soon');
 });
 `,
   },
@@ -338,8 +367,9 @@ function extractExpectUnit(text) {
   const endExpectArg = closeParen(openExpect);
   if (endExpectArg < 0) return null;
   const afterExpect = text.slice(endExpectArg + 1);
+  // Reuse MATCHER_RE (leading whitespace allowed after expect(...)).
   const matcherMatch = afterExpect.match(
-    /^\s*\.\s*(?:not\s*\.\s*)?(?:toBe|toEqual|toStrictEqual|toMatch|toContain)\s*\(/
+    new RegExp(String.raw`^\s*${MATCHER_RE.source}`)
   );
   if (!matcherMatch) return null;
   const matcherOpen =
