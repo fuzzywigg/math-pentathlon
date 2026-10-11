@@ -198,9 +198,25 @@ async function measureHeap(cdp) {
   };
 }
 
-async function prepareMenu(page, baseURL, board3d) {
+/**
+ * Join menu baseURL with optional board3d query (q-mp-1372).
+ * Strips trailing slashes so `baseURL/` does not become `//?board3d=1#/`.
+ * Peer of `gotoGame` in page-ready.mjs.
+ *
+ * @param {string | null | undefined} baseURL
+ * @param {boolean} [board3d]
+ * @returns {string}
+ */
+export function joinMemoryLeakMenuUrl(baseURL, board3d = false) {
+  const base = String(baseURL ?? '').replace(/\/+$/, '');
   const q = board3d ? '?board3d=1' : '';
-  await page.goto(`${baseURL}/${q}#/`, { waitUntil: 'domcontentloaded' });
+  return `${base}/${q}#/`;
+}
+
+async function prepareMenu(page, baseURL, board3d) {
+  await page.goto(joinMemoryLeakMenuUrl(baseURL, board3d), {
+    waitUntil: 'domcontentloaded',
+  });
   await waitMenu(page);
   await dismissOwl(page);
 }
