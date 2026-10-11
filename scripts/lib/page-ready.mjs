@@ -58,8 +58,10 @@ export async function waitForGameReady(page, options = {}) {
  * @returns {Promise<void>}
  */
 export async function gotoGame(page, baseURL, gameId, board3d = false) {
+  // Strip trailing slashes so `baseURL/` does not become `//#/game/…`.
+  const base = String(baseURL ?? '').replace(/\/+$/, '');
   const q = board3d ? '?board3d=1' : '';
-  await page.goto(`${baseURL}/${q}#/game/${gameId}`, {
+  await page.goto(`${base}/${q}#/game/${gameId}`, {
     waitUntil: 'domcontentloaded',
   });
   await waitForGameReady(page);
