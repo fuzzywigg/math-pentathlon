@@ -1,7 +1,7 @@
 /**
  * Full AI calibration matrix runner.
  * Usage: npx vite-node scripts/run-ai-calibration.ts
- * Env: CALIBRATION_GAMES (default 50)
+ * Env: CALIBRATION_GAMES (default 50; non-finite / non-positive / non-integer → exit 2)
  */
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -19,11 +19,13 @@ import type {
   Difficulty,
   MatchupStats,
 } from '../tests/helpers/ai-calibration/types';
+import { requireEnvNumber } from './lib/env-number.mjs';
 
 // Prefer wall-clock deadlines so deep search games finish in reasonable time.
 process.env.CALIBRATION_WALL_CLOCK ??= '1';
 
-const GAMES = Number(process.env.CALIBRATION_GAMES ?? 50);
+// q-mp-1290: reject NaN / non-positive / non-integer before any matchup loop.
+const GAMES = requireEnvNumber('CALIBRATION_GAMES', 50);
 const BASE_SEED = 20261007;
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'docs', 'ai-calibration-2026-10-07.md');
@@ -90,13 +92,7 @@ for (const adapter of ALL_ADAPTERS) {
 
   for (const m of aiVsAiMatchups()) {
     const t0 = Date.now();
-    const stats = runMatchup(
-      adapter,
-      m.p1,
-      m.p2,
-      GAMES,
-      BASE_SEED + 7_000_000
-    );
+    const stats = runMatchup(adapter, m.p1, m.p2, GAMES, BASE_SEED + 7_000_000);
     lines.push(
       `| ${m.label} | ${(stats.p1WinRate * 100).toFixed(1)}% | ${(stats.p2WinRate * 100).toFixed(1)}% | ${(stats.drawRate * 100).toFixed(1)}% | ${stats.avgLength.toFixed(1)} | ${stats.games} |`
     );
