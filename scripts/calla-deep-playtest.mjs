@@ -12,6 +12,7 @@ import { chromium, devices } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import { artifactPath } from './lib/artifact-dir.mjs';
+import { isCallaEndStatus } from './lib/calla-end-status.mjs';
 import { applyDeepPlaytestCli } from './lib/deep-playtest-cli.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
@@ -147,8 +148,8 @@ async function playOneGame(page, { viewport, difficulty, gameIndex }) {
 
     for (let step = 0; step < 120; step++) {
       const st = await statusText(page);
-      // "You Win!" must match (singular) as well as "Wins" / "Tie"
-      if (/win|tie/i.test(st)) {
+      // Word-boundary win/wins/tie — not substring (Drawing / patience)
+      if (isCallaEndStatus(st)) {
         winner = st;
         turns = step;
         break;
@@ -182,8 +183,8 @@ async function playOneGame(page, { viewport, difficulty, gameIndex }) {
         // Wait briefly for AI / render / end banner
         await page.waitForTimeout(250);
         const st2 = await statusText(page);
-        // "You Win!" / "AI Wins!" / "Tie" — match win|wins|tie
-        if (/win|tie/i.test(st2)) {
+        // "You Wins!" / "AI Wins!" / "It's a Tie!" — word-boundary match
+        if (isCallaEndStatus(st2)) {
           winner = st2;
           turns = step;
           break;
@@ -192,13 +193,13 @@ async function playOneGame(page, { viewport, difficulty, gameIndex }) {
         // retry once more
         await page.waitForTimeout(600);
         const st3 = await statusText(page);
-        if (/win|tie/i.test(st3)) {
+        if (isCallaEndStatus(st3)) {
           winner = st3;
           turns = step;
           break;
         }
         const n2 = await page.locator('.calla-pit-valid').count();
-        if (n2 === 0 && !/thinking|win|tie/i.test(st3)) {
+        if (n2 === 0 && !/thinking/i.test(st3) && !isCallaEndStatus(st3)) {
           stalled = true;
           stallReason = `No valid pits; status="${st3}"`;
           break;
@@ -212,7 +213,7 @@ async function playOneGame(page, { viewport, difficulty, gameIndex }) {
       await valid.nth(idx).click({ force: true });
       humanMoves++;
 
-      // Wait for status change or thinking
+      // Wait for status change or thinking / end (word-boundary; browser isolate)
       await page
         .waitForFunction(
           (prev) => {
@@ -221,7 +222,11 @@ async function playOneGame(page, { viewport, difficulty, gameIndex }) {
             )
               .replace(/\s+/g, ' ')
               .trim();
-            return t !== prev || /thinking|wins|tie/i.test(t);
+            return (
+              t !== prev ||
+              /thinking/i.test(t) ||
+              /\b(?:wins?|tie)\b/i.test(t)
+            );
           },
           before,
           { timeout: 5_000 }
