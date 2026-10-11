@@ -20,7 +20,7 @@ Those pins break (or freeze) restore surfaces when seat labels / status copy cha
 
 Scans `tests/**/*.{test,spec}.{ts,tsx,js,mjs}` (skips `_tokenmaxx_archive`) for:
 
-1. **message-api** — `expect(...getPhaseMessage(...)...)` / `getCurrentPhaseMessage` (including `import { getPhaseMessage as alias }`) with `toBe` / `toEqual` / `toStrictEqual` / `toMatch` / `toContain` / `toHaveTextContent` / `toHaveAccessibleName` / `toHaveText` (and `.not.` variants).
+1. **message-api** — `expect(...getPhaseMessage(...)...)` / `getCurrentPhaseMessage` (including `import { getPhaseMessage as alias }`) with `toBe` / `toEqual` / `toStrictEqual` / `toMatch` / `toContain` / `toHaveTextContent` / `toHaveAccessibleName` / `toHaveAccessibleDescription` / `toHaveText` / `toBeInTheDocument` / `toHaveAttribute` / `toHaveValue` (and `.not.` variants).
 2. **coming-soon** — matcher args that pin the literal `"Coming Soon"` or `/Coming Soon/`.
 3. **registry-string** — matcher args that pin distinctive string literals harvested from `getPhaseMessage` / `getCurrentPhaseMessage` bodies under `src/games/*/rules.ts` + `game-state.ts`, plus the menu badge string from `src/ui/game-selector.ts`.
 
@@ -30,18 +30,29 @@ Scans `tests/**/*.{test,spec}.{ts,tsx,js,mjs}` (skips `_tokenmaxx_archive`) for:
 - `typeof getPhaseMessage(state) === 'string'` / `expect(typeof …).toBe('string')`.
 - Fixture names / `it()` titles that merely mention “Coming Soon”.
 - `.length` / emptiness probes without pinning message body text.
-- CSS class / attribute structural asserts.
+- CSS class / attribute structural asserts that do not pin copy literals (e.g. `toHaveAttribute('role', 'dialog')`).
 
 ## Usage
 
 ```bash
-npm run check:copy-pins              # scan tip tests/; always exit 0
+npm run check:copy-pins              # scan tip tests/; default report-only exit 0
 npm run check:copy-pins -- --json    # machine-readable findings
 npm run check:copy-pins -- --self-test   # prove review 7/8 examples + negatives
 npm run check:copy-pins -- --fail    # opt-in exit 1 when findings (CI uses this + continue-on-error)
+# unknown flags (e.g. --wat) exit 2 with usage
 ```
 
 `--self-test` runs in-memory snippets that mirror the review 7/8 drops plus negative cases. It does **not** depend on those hunks still being present in `tests/`.
+
+### Exit codes
+
+| Mode | Exit |
+| --- | --- |
+| Default tip scan (report-only) | **0** (findings printed; not a blocking gate) |
+| `--fail` with findings | **1** |
+| `--fail` with no findings | **0** |
+| Unknown flags | **2** (usage on stderr) |
+| `--help` / `-h` | **0** |
 
 ## Guidance for future drafts
 
@@ -64,5 +75,7 @@ The current tip still contains older suites that pin phase-message or “Coming 
 
 ```bash
 npm run check:copy-pins -- --self-test   # flags review 7/8 examples; negatives stay 0
-npm run check:copy-pins                  # tip scan; exit 0 (report-only)
+npm run check:copy-pins                  # tip scan; default report-only exit 0
+npm run check:copy-pins -- --fail        # opt-in; exit 1 when findings
+node scripts/check-copy-pins.mjs --wat; echo $?   # unknown flag → 2
 ```
