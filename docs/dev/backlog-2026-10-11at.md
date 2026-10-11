@@ -59,7 +59,7 @@ Also skipped: Merom / Sullivan / data-center / grants / nonprofit; `pappas-infra
 | `scripts/check-build.mjs`                                                | `1209` + `1213` — serialize after open `#1341`/`#1345` (`1178`/`1179`)      |
 | `tests/unit/burn-wave25-owl-component-chrome.test.ts` (+ owl polluters)  | `1210` only; leave `#1346`/`1180`/`1181` alone                              |
 | `tests/unit/engine-coverage-round-13-burn-1008.test.ts` (+ round-16)     | `1211` only                                                                 |
-| `tests/unit/q-mp-685-main-residual-branches.test.ts`                     | `1212` only                                                                 |
+| `tests/unit/q-mp-685-main-residual-branches.test.ts (sharded on tip)`    | `1212` only — live: `tests/unit/q-mp-685-main-residual-branches-catch-stale.test.ts` / `-crash-guards` / `-on-home` (+ `.shared.ts`) |
 | `scripts/check-bundle-budgets.mjs`                                       | `1214` only; leave menu open drafts alone                                   |
 | `scripts/memory-leak-audit.mjs`                                          | `1215` + `1216` — serialize                                                 |
 | `scripts/lib/mutation-report-args.mjs`                                   | `1217` only                                                                 |
@@ -417,7 +417,7 @@ Baselines also captured under `/opt/cursor/artifacts/q-mp-090at-baselines.log` �
 - **series:** test-speed
 - **verdict:** **SAFE** — isolate monolith; split preserves asserts
 - **CI / package.json callers:** CI `unit` job (`unit-isolated`)
-- **target files:** `tests/unit/q-mp-685-main-residual-branches.test.ts` → ≥2 files by describe/case families (demo catch-stale vs onHome vs crash/guards)
+- **target files:** `tests/unit/q-mp-685-main-residual-branches.test.ts (sharded on tip)` → live `tests/unit/q-mp-685-main-residual-branches-catch-stale.test.ts`, `tests/unit/q-mp-685-main-residual-branches-on-home.test.ts`, `tests/unit/q-mp-685-main-residual-branches-crash-guards.test.ts` (+ `tests/unit/q-mp-685-main-residual-branches.shared.ts`)
 - **measured baseline:** ~**2.57–2.87s** wall / **25** tests (`CI=1 npx vitest run … --project unit-isolated`).
 - **acceptance criteria:** Same asserts; multi-worker parallel wall **&lt; ~1.3s**; no AI/scoring/rules edits; keep in `unit-isolated` include list.
 - **verification commands:** `CI=1 npx vitest run tests/unit/q-mp-685-main-residual-branches*.test.ts --project unit-isolated --reporter=verbose`

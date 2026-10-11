@@ -64,7 +64,7 @@ Also skipped: Merom / Sullivan / data-center / grants / nonprofit; `pappas-infra
 | `scripts/flake-rate-e2e-loop.mjs`                                     | `1183` only; leave `1052` nested-suite alone                                               |
 | `scripts/report-licenses.mjs`                                         | `1185` only; leave license-classifier open drafts alone                                    |
 | `tests/unit/helpers/state-roundtrip-fuzz-run.ts`                      | `1186` only; leave `#1318`/`1108` shard alone                                              |
-| `tests/unit/existing-games-controllers.test.ts`                       | `1187` only                                                                                |
+| `tests/unit/existing-games-controllers.test.ts (sharded on tip)`      | `1187` only — live: `tests/unit/existing-games-controllers-illegal-board.test.ts` / `-illegal-modes` / `-init-container` / `-wave11-12` |
 | `tests/unit/burn-1008-registry-module-contract.test.ts`               | `1188` only                                                                                |
 | `scripts/check-type-ratchet.mjs`                                      | `1189` only                                                                                |
 | `scripts/check-lint-ratchet.mjs`                                      | `1190` only                                                                                |
@@ -428,7 +428,7 @@ Baselines also captured under `/opt/cursor/artifacts/q-mp-090as-baselines.log` �
 - **series:** test-speed
 - **verdict:** **SAFE** — isolate:true monolith; split preserves asserts
 - **CI / package.json callers:** CI `unit` job (`unit-isolated`)
-- **target files:** `tests/unit/existing-games-controllers.test.ts` → ≥3 files by existing describe/wave boundaries
+- **target files:** `tests/unit/existing-games-controllers.test.ts (sharded on tip)` → live `tests/unit/existing-games-controllers-illegal-board.test.ts`, `tests/unit/existing-games-controllers-illegal-modes.test.ts`, `tests/unit/existing-games-controllers-init-container.test.ts`, `tests/unit/existing-games-controllers-wave11-12.test.ts` (describe/wave boundaries)
 - **measured baseline:** ~**2675ms** wall / **67** tests (`CI=1 npx vitest run … --project unit-isolated --reporter=json`).
 - **acceptance criteria:** Same asserts; multi-worker parallel wall **&lt; ~1.2s** (measure with durations/json); no AI/scoring/rules edits.
 - **verification commands:** `CI=1 npx vitest run tests/unit/existing-games-controllers*.test.ts --project unit-isolated --reporter=json`
