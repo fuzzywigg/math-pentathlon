@@ -152,6 +152,8 @@ const nodePureFiles = [
   'tests/unit/offline-probe-cli-help.test.ts',
   // deep-playtest early --help (q-mp-910); spawnSync CLI check needs node env.
   'tests/unit/deep-playtest-cli-help.test.ts',
+  // deep-playtest page-ready adoption (q-mp-925); spawnSync + source asserts need node.
+  'tests/unit/deep-playtest-page-ready.test.ts',
   // help-only CLI argv (q-mp-885); spawnSync CLI check needs node env.
   'tests/unit/help-only-cli.test.ts',
   // harness env Number() parser (q-mp-876 / q-mp-908); spawnSync CLI check needs node env.
