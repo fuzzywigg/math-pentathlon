@@ -12,6 +12,10 @@
  * validation (`PERF_LH_TIMEOUT_MS`), before the `dist/` check, and before any
  * summary writes. Unknown flags exit 2. Valid default path unchanged.
  *
+ * Timeout cleanup (q-mp-1090): when `PERF_LH_TIMEOUT_MS` wins the Lighthouse
+ * `Promise.race`, the spawned LH/Chrome child is signaled SIGTERM then SIGKILL
+ * (preview kill in `finally` is unchanged).
+ *
  * Usage:
  *   npm run build && npm run check:perf
  *   PERF_SKIP_LIGHTHOUSE=1 npm run check:perf   # bundles only
@@ -150,24 +154,83 @@ async function waitForUrl(url, timeoutMs = 30_000) {
   throw new Error(`Timed out waiting for ${url}`);
 }
 
+/** Default grace between SIGTERM and SIGKILL for timed-out LH children. */
+const LH_KILL_GRACE_MS = 2_000;
+
 /**
- * @param {string[]} args
- * @param {{ cwd?: string, env?: NodeJS.ProcessEnv }} [opts]
- * @returns {Promise<{ code: number | null, stdout: string, stderr: string }>}
+ * Signal a child process: SIGTERM, then SIGKILL after grace if still alive.
+ * No-op when child is missing, already killed, or already exited.
+ *
+ * @param {import('node:child_process').ChildProcess | null | undefined} child
+ * @param {{
+ *   graceMs?: number,
+ *   kill?: (child: import('node:child_process').ChildProcess, signal: NodeJS.Signals) => boolean,
+ *   schedule?: (fn: () => void, ms: number) => ReturnType<typeof setTimeout>,
+ *   clearSchedule?: (id: ReturnType<typeof setTimeout>) => void,
+ * }} [opts]
+ * @returns {{ signaled: boolean }}
  */
-function runCmd(args, opts = {}) {
-  return new Promise((resolve) => {
-    const child = spawn(args[0], args.slice(1), {
-      cwd: opts.cwd ?? ROOT,
-      env: { ...process.env, ...opts.env },
-      stdio: ['ignore', 'pipe', 'pipe'],
+export function killChildProcess(child, opts = {}) {
+  if (!child || child.killed || child.exitCode != null) {
+    return { signaled: false };
+  }
+  const graceMs = opts.graceMs ?? LH_KILL_GRACE_MS;
+  const kill =
+    opts.kill ??
+    ((c, signal) => {
+      try {
+        return c.kill(signal);
+      } catch {
+        return false;
+      }
     });
+  const schedule = opts.schedule ?? setTimeout;
+  const clearSchedule = opts.clearSchedule ?? clearTimeout;
+
+  kill(child, 'SIGTERM');
+
+  const escalateId = schedule(() => {
+    if (child.killed || child.exitCode != null) return;
+    kill(child, 'SIGKILL');
+  }, graceMs);
+
+  const clearEscalate = () => clearSchedule(escalateId);
+  if (typeof child.once === 'function') {
+    child.once('exit', clearEscalate);
+    child.once('error', clearEscalate);
+  }
+
+  return { signaled: true };
+}
+
+/**
+ * Spawn a command and collect stdio; expose `child` for timeout cleanup.
+ *
+ * @param {string[]} args
+ * @param {{
+ *   cwd?: string,
+ *   env?: NodeJS.ProcessEnv,
+ *   spawn?: typeof spawn,
+ * }} [opts]
+ * @returns {{
+ *   promise: Promise<{ code: number | null, stdout: string, stderr: string }>,
+ *   child: import('node:child_process').ChildProcess,
+ * }}
+ */
+export function runCmd(args, opts = {}) {
+  const spawnFn = opts.spawn ?? spawn;
+  const child = spawnFn(args[0], args.slice(1), {
+    cwd: opts.cwd ?? ROOT,
+    env: { ...process.env, ...opts.env },
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  const promise = new Promise((resolve) => {
     let stdout = '';
     let stderr = '';
-    child.stdout.on('data', (d) => {
+    child.stdout?.on('data', (d) => {
       stdout += d.toString();
     });
-    child.stderr.on('data', (d) => {
+    child.stderr?.on('data', (d) => {
       stderr += d.toString();
     });
     child.on('close', (code) => resolve({ code, stdout, stderr }));
@@ -175,6 +238,7 @@ function runCmd(args, opts = {}) {
       resolve({ code: 1, stdout, stderr: String(err) })
     );
   });
+  return { promise, child };
 }
 
 /**
@@ -182,8 +246,24 @@ function runCmd(args, opts = {}) {
  * @param {string} formFactor 'mobile' | 'desktop'
  * @param {{ id: string, path: string, label: string }} target
  * @param {string} outJson
+ * @param {{
+ *   timeoutMs?: number,
+ *   killGraceMs?: number,
+ *   runCmd?: typeof runCmd,
+ *   killChildProcess?: typeof killChildProcess,
+ *   existsSync?: (p: string) => boolean,
+ *   readFileSync?: (p: string, enc: BufferEncoding) => string,
+ *   schedule?: (fn: () => void, ms: number) => ReturnType<typeof setTimeout>,
+ *   clearSchedule?: (id: ReturnType<typeof setTimeout>) => void,
+ * }} [opts]
  */
-async function runLighthouse(baseUrl, formFactor, target, outJson) {
+export async function runLighthouse(
+  baseUrl,
+  formFactor,
+  target,
+  outJson,
+  opts = {}
+) {
   const url = `${baseUrl.replace(/\/$/, '')}${target.path}`;
   const args = [
     'npx',
@@ -203,17 +283,32 @@ async function runLighthouse(baseUrl, formFactor, target, outJson) {
     args.push('--form-factor=mobile');
   }
 
-  const result = await Promise.race([
-    runCmd(args),
-    new Promise((resolve) =>
-      setTimeout(
-        () => resolve({ code: 1, stdout: '', stderr: 'lighthouse timeout' }),
-        LH_TIMEOUT_MS
-      )
-    ),
-  ]);
+  const timeoutMs = opts.timeoutMs ?? LH_TIMEOUT_MS;
+  const run = opts.runCmd ?? runCmd;
+  const killChild = opts.killChildProcess ?? killChildProcess;
+  const fileExists = opts.existsSync ?? ((p) => fs.existsSync(p));
+  const readFile = opts.readFileSync ?? ((p, enc) => fs.readFileSync(p, enc));
+  const schedule = opts.schedule ?? setTimeout;
+  const clearSchedule = opts.clearSchedule ?? clearTimeout;
 
-  if (result.code !== 0 || !fs.existsSync(outJson)) {
+  const { promise, child } = run(args);
+  /** @type {ReturnType<typeof setTimeout> | undefined} */
+  let timeoutId;
+  const timeoutPromise = new Promise((resolve) => {
+    timeoutId = schedule(() => {
+      killChild(child, {
+        graceMs: opts.killGraceMs ?? LH_KILL_GRACE_MS,
+        schedule,
+        clearSchedule,
+      });
+      resolve({ code: 1, stdout: '', stderr: 'lighthouse timeout' });
+    }, timeoutMs);
+  });
+
+  const result = await Promise.race([promise, timeoutPromise]);
+  if (timeoutId !== undefined) clearSchedule(timeoutId);
+
+  if (result.code !== 0 || !fileExists(outJson)) {
     return {
       id: target.id,
       label: target.label,
@@ -223,7 +318,7 @@ async function runLighthouse(baseUrl, formFactor, target, outJson) {
     };
   }
 
-  const report = JSON.parse(fs.readFileSync(outJson, 'utf8'));
+  const report = JSON.parse(readFile(outJson, 'utf8'));
   const audits = report.audits || {};
   const score = Math.round((report.categories?.performance?.score || 0) * 100);
   return {
@@ -424,36 +519,42 @@ async function main() {
   console.log('(report-only: exiting 0)');
 }
 
-const cli = parseHelpOnlyArgv(process.argv.slice(2));
-if (cli.kind === 'help') {
-  console.log(USAGE);
-  process.exit(0);
-}
-if (cli.kind === 'error') {
-  console.error(`Unknown flag: ${cli.flag}`);
-  console.error(USAGE);
-  process.exit(2);
-}
+const isMain =
+  !!process.argv[1] &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 
-// Validate PERF_LH_TIMEOUT_MS only on real runs (after --help / unknown flags).
-LH_TIMEOUT_MS = requireEnvNumber('PERF_LH_TIMEOUT_MS', 120_000);
+if (isMain) {
+  const cli = parseHelpOnlyArgv(process.argv.slice(2));
+  if (cli.kind === 'help') {
+    console.log(USAGE);
+    process.exit(0);
+  }
+  if (cli.kind === 'error') {
+    console.error(`Unknown flag: ${cli.flag}`);
+    console.error(USAGE);
+    process.exit(2);
+  }
 
-try {
-  await main();
-  // Preserve usage-error exit 2 from missing dist/; otherwise report-only exit 0.
-  if (process.exitCode == null) {
+  // Validate PERF_LH_TIMEOUT_MS only on real runs (after --help / unknown flags).
+  LH_TIMEOUT_MS = requireEnvNumber('PERF_LH_TIMEOUT_MS', 120_000);
+
+  try {
+    await main();
+    // Preserve usage-error exit 2 from missing dist/; otherwise report-only exit 0.
+    if (process.exitCode == null) {
+      process.exitCode = 0;
+    }
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : err);
+    try {
+      fs.mkdirSync(OUT_DIR, { recursive: true });
+      fs.writeFileSync(
+        SUMMARY_MD,
+        `# Load performance summary\n\nError: ${err instanceof Error ? err.message : String(err)}\n\n(report-only: exiting 0)\n`
+      );
+    } catch {
+      // ignore
+    }
     process.exitCode = 0;
   }
-} catch (err) {
-  console.error(err instanceof Error ? err.message : err);
-  try {
-    fs.mkdirSync(OUT_DIR, { recursive: true });
-    fs.writeFileSync(
-      SUMMARY_MD,
-      `# Load performance summary\n\nError: ${err instanceof Error ? err.message : String(err)}\n\n(report-only: exiting 0)\n`
-    );
-  } catch {
-    // ignore
-  }
-  process.exitCode = 0;
 }
