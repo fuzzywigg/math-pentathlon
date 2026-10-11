@@ -89,7 +89,16 @@ function stubViewport(width: number, height: number): void {
   });
 }
 
-function stubTooltipBox(width: number, height: number): void {
+/** Restore HTMLElement offset stubs so unit-shared isolate:false neighbors stay clean. */
+function stubTooltipBox(width: number, height: number): () => void {
+  const widthDesc = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetWidth'
+  );
+  const heightDesc = Object.getOwnPropertyDescriptor(
+    HTMLElement.prototype,
+    'offsetHeight'
+  );
   Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
     configurable: true,
     get() {
@@ -106,7 +115,17 @@ function stubTooltipBox(width: number, height: number): void {
         : 40;
     },
   });
+  return () => {
+    if (widthDesc) {
+      Object.defineProperty(HTMLElement.prototype, 'offsetWidth', widthDesc);
+    }
+    if (heightDesc) {
+      Object.defineProperty(HTMLElement.prototype, 'offsetHeight', heightDesc);
+    }
+  };
 }
+
+let restoreTooltipBox: (() => void) | undefined;
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -115,6 +134,8 @@ afterEach(() => {
       '.tutorial-tooltip, .tutorial-overlay, .tutorial-hit-proxy, .tutorial-tap-cue'
     )
     .forEach((el) => el.remove());
+  restoreTooltipBox?.();
+  restoreTooltipBox = undefined;
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
@@ -221,7 +242,7 @@ describe('engine-coverage-round-15 — tutorial post-r14 residuals', () => {
       height: 60,
     });
     stubViewport(360, 400);
-    stubTooltipBox(200, 160);
+    restoreTooltipBox = stubTooltipBox(200, 160);
 
     manager = new TutorialManager();
     manager.start(
@@ -253,7 +274,7 @@ describe('engine-coverage-round-15 — tutorial post-r14 residuals', () => {
       height: 40,
     });
     stubViewport(200, 160);
-    stubTooltipBox(180, 140);
+    restoreTooltipBox = stubTooltipBox(180, 140);
 
     manager = new TutorialManager();
     manager.start(

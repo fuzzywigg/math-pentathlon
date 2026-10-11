@@ -9,6 +9,8 @@ import { TutorialManager } from '../../src/core/tutorial';
 describe('Wave 40 tutorial — tap cue side', () => {
   let manager: TutorialManager;
   let cell: HTMLDivElement;
+  let widthDesc: PropertyDescriptor | undefined;
+  let heightDesc: PropertyDescriptor | undefined;
 
   beforeEach(() => {
     vi.stubGlobal('innerWidth', 1024);
@@ -21,6 +23,14 @@ describe('Wave 40 tutorial — tap cue side', () => {
       addEventListener: () => {},
       removeEventListener: () => {},
     });
+    widthDesc = Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      'offsetWidth'
+    );
+    heightDesc = Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      'offsetHeight'
+    );
     Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
       configurable: true,
       get() {
@@ -47,6 +57,14 @@ describe('Wave 40 tutorial — tap cue side', () => {
         '.tutorial-tooltip, .tutorial-overlay, .tutorial-hit-proxy, .tutorial-tap-cue'
       )
       .forEach((el) => el.remove());
+    if (widthDesc) {
+      Object.defineProperty(HTMLElement.prototype, 'offsetWidth', widthDesc);
+    }
+    if (heightDesc) {
+      Object.defineProperty(HTMLElement.prototype, 'offsetHeight', heightDesc);
+    }
+    widthDesc = undefined;
+    heightDesc = undefined;
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
