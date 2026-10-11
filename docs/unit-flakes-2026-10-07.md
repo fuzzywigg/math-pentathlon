@@ -16,13 +16,25 @@ npx vitest run --project unit-shared --sequence.shuffle --sequence.seed=<N> --ma
 
 Artifacts: `/opt/cursor/artifacts/unit-flakes/`.
 
+## Current Vitest layout (`vitest.config.ts`)
+
+Three projects (names match `vitest.config.ts`):
+
+| Project | Environment | `isolate` | Role |
+| --- | --- | --- |
+| `unit-node` | `node` | `false` | Curated pure AI / rules / CLI suites (`nodePureFiles`) |
+| `unit-shared` | `jsdom` | `false` | Default unit pool; excludes isolated + node-pure files |
+| `unit-isolated` | `jsdom` | `true` | Fresh module graph for `vi.mock` / controller singletons (`isolatedFiles`) |
+
+Selector suites on the tip (including `burn-wave24-stats-selector-ui` and `keyboard-a11y-game-selector`) are listed in `isolatedFiles` and therefore run under **`unit-isolated`**. Related game-selector residual / soft-fail suites (`burn-1008-ui-cov-r3-game-selector`, `q-mp-454-…`, `q-mp-654-…`) are also isolated. Do not re-run the historical “selector out of isolation” stress unless you temporarily remove those paths from `isolatedFiles` for a causal A/B.
+
 ## Method
 
 | Mode | Workers | Notes |
 | --- | --- | --- |
 | Full suite shuffle | default pool | 10 seeds `101…1010` |
 | `unit-shared` shuffle | `--maxWorkers=1` | 10 seeds incl. `909/2002/404/606/3333` |
-| Causal (selector out of `unit-isolated`) | `--maxWorkers=1` | Measures restoreAllMocks ↔ navigate mock |
+| Causal (historical A/B: selector temporarily out of `unit-isolated`) | `--maxWorkers=1` | 2026-10-07 measure of restoreAllMocks ↔ navigate mock |
 | Solo | n/a | Selector, owl, FIAR timer victims |
 
 ## Before (flake counts)
@@ -34,9 +46,11 @@ Artifacts: `/opt/cursor/artifacts/unit-flakes/`.
 | Runs | **10 / 10 green** |
 | Failed tests | **0** |
 
-Multi-worker scheduling often separates `vi.mock(router)` victims from `restoreAllMocks` polluters, so the selector flake is rare here.
+Multi-worker scheduling often separates `vi.mock(router)` victims from `restoreAllMocks` polluters, so the selector flake is rare here. On the current tip the selector files stay in `unit-isolated`, so this path is the normal CI/`npm run test:unit` posture.
 
-### Causal — selector **not** in `unit-isolated`, `--maxWorkers=1`
+### Causal (historical A/B, 2026-10-07) — selector temporarily **not** in `unit-isolated`, `--maxWorkers=1`
+
+Historical numbers only — reproduced by moving selector files out of `isolatedFiles` for that hunt. On the current tip those files are back in `unit-isolated`; do not treat this table as live placement.
 
 | Metric | Result |
 | --- | --- |
@@ -55,7 +69,7 @@ Mini-suite (selector + known polluters, seeds `909`/`2002`): selector navigate f
 - **Case:** `navigates available game cards via click and Enter/Space`
 - **Symptom:** `navigate` expected `/game/<id>` but **0 calls**; passes in isolation
 - **Root cause:** Under `isolate: false`, sibling `vi.restoreAllMocks()` tears down the hoisted `vi.mock('../../src/core/router')`
-- **Fix:** Keep file in `unit-isolated`; replace `restoreAllMocks` with `clearAllMocks` in known polluter tests; document in `tests/unit/setup.ts`
+- **Fix:** Keep file in `unit-isolated` (current tip: listed in `isolatedFiles` with `keyboard-a11y-game-selector`); replace `restoreAllMocks` with `clearAllMocks` in known polluter tests; document in `tests/unit/setup.ts`
 
 ### 2. Owl `onGameEnd` without start — negative duration (shared state / timers)
 
@@ -76,7 +90,7 @@ Mini-suite (selector + known polluters, seeds `909`/`2002`): selector navigate f
 - `tests/unit/setup.ts` — reset `owlSystem.gameStartTime`; restore `window.alert` / `Math.random` spies; `clearAllTimers` before `useRealTimers` (still **no** `restoreAllMocks`)
 - Demo overnight files + Fab AI suites — `clearAllMocks` instead of `restoreAllMocks`
 - FIAR timer / null-draw suites — timer + controller cleanup
-- `vitest.config.ts` — selector + tablet bench remain in `unit-isolated` (unchanged from tip)
+- `vitest.config.ts` — selector suites (`burn-wave24-stats-selector-ui`, `keyboard-a11y-game-selector`, plus related selector residual files) + tablet bench remain in `unit-isolated` (see Current Vitest layout)
 
 ## After (flake counts)
 
