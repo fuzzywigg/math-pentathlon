@@ -20,6 +20,9 @@
  * Empty / total-only / non-engine summaries (q-mp-992) exit 2 before rank output.
  * Missing / non-numeric pct on matching engine rows (q-mp-1018): derive from
  * numeric covered/total when possible; otherwise exit 2 with a schema message.
+ * Contradictory numeric pct vs covered/total (q-mp-1033): when both covered and
+ * total are finite numbers, display/rank pct is always derived from them so a
+ * stale pct cannot invert rank order.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -141,9 +144,13 @@ export class InvalidCoverageMetricError extends Error {
 }
 
 /**
- * Normalize a lines/branches metric: prefer finite numeric pct; otherwise derive
- * from numeric covered/total (total===0 → 100). Absent metric → zeros (legacy
- * default for missing branches). Non-numeric pct without covered/total → null.
+ * Normalize a lines/branches metric.
+ *
+ * When numeric covered + total are present, derive pct from them (q-mp-1033) —
+ * including when a finite numeric pct contradicts the counts (stale istanbul
+ * rows). total===0 → 100. Absent metric → zeros (legacy default for missing
+ * branches). Pct-only numeric (no covered/total) keeps the supplied pct.
+ * Non-numeric / missing pct without covered/total → null (q-mp-1018).
  *
  * @param {unknown} m
  * @returns {{ pct: number, covered: number, total: number } | null}
@@ -160,17 +167,18 @@ export function resolveMetric(m) {
   const coveredOk = typeof covered === 'number' && Number.isFinite(covered);
   const totalOk = typeof total === 'number' && Number.isFinite(total);
 
+  // q-mp-1033: covered/total win over contradictory (or matching) numeric pct.
+  if (coveredOk && totalOk) {
+    const derived = total === 0 ? 100 : (100 * covered) / total;
+    return { pct: derived, covered, total };
+  }
+
   if (typeof pct === 'number' && Number.isFinite(pct)) {
     return {
       pct,
       covered: coveredOk ? covered : 0,
       total: totalOk ? total : 0,
     };
-  }
-
-  if (coveredOk && totalOk) {
-    const derived = total === 0 ? 100 : (100 * covered) / total;
-    return { pct: derived, covered, total };
   }
 
   return null;

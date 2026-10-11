@@ -2,7 +2,8 @@
  * Hermetic helpers for scripts/engine-coverage-rank.mjs
  * (q-mp-842 missing-summary UX; q-mp-918 early --help / flag rejection;
  * q-mp-992 empty / non-engine summary reject;
- * q-mp-1018 derive or reject missing/non-numeric pct).
+ * q-mp-1018 derive or reject missing/non-numeric pct;
+ * q-mp-1033 prefer covered/total over contradictory numeric pct).
  */
 import { describe, it, expect, vi } from 'vitest';
 import {
@@ -312,7 +313,7 @@ describe('engine-coverage-rank empty / non-engine summaries (q-mp-992)', () => {
 });
 
 describe('engine-coverage-rank missing / non-numeric pct (q-mp-1018)', () => {
-  it('resolveMetric prefers numeric pct and derives from covered/total', () => {
+  it('resolveMetric derives from covered/total; pct-only keeps numeric pct', () => {
     expect(resolveMetric(undefined)).toEqual({ pct: 0, covered: 0, total: 0 });
     expect(resolveMetric({ pct: 12.5, covered: 1, total: 8 })).toEqual({
       pct: 12.5,
@@ -326,6 +327,12 @@ describe('engine-coverage-rank missing / non-numeric pct (q-mp-1018)', () => {
     });
     expect(resolveMetric({ total: 0, covered: 0 })).toEqual({
       pct: 100,
+      covered: 0,
+      total: 0,
+    });
+    // Pct-only numeric (no covered/total) still accepted.
+    expect(resolveMetric({ pct: 12.5 })).toEqual({
+      pct: 12.5,
       covered: 0,
       total: 0,
     });
@@ -458,6 +465,77 @@ describe('engine-coverage-rank missing / non-numeric pct (q-mp-1018)', () => {
     const rows = collectEngineRows(raw);
     expect(formatRankOutput(rows)).toContain(
       '1\tsrc/games/hex/rules.ts\t90.00\t9/10\t80.00\t8/10'
+    );
+  });
+});
+
+describe('engine-coverage-rank contradictory numeric pct (q-mp-1033)', () => {
+  it('resolveMetric prefers covered/total over contradictory numeric pct', () => {
+    expect(
+      resolveMetric({ total: 100, covered: 90, skipped: 0, pct: 10 })
+    ).toEqual({ pct: 90, covered: 90, total: 100 });
+    expect(
+      resolveMetric({ total: 100, covered: 50, skipped: 0, pct: 50 })
+    ).toEqual({ pct: 50, covered: 50, total: 100 });
+  });
+
+  it('never ranks a 90/100 row below a 50/100 row because stale pct:10 won', () => {
+    const rows = collectEngineRows({
+      'src/games/calla/rules.ts': {
+        lines: { total: 100, covered: 90, skipped: 0, pct: 10 },
+        branches: { total: 100, covered: 90, skipped: 0, pct: 10 },
+      },
+      'src/games/ramrod/rules.ts': {
+        lines: { total: 100, covered: 50, skipped: 0, pct: 50 },
+        branches: { total: 100, covered: 50, skipped: 0, pct: 50 },
+      },
+    });
+    expect(rows).toHaveLength(2);
+    // Lower coverage ranks first (debt order): ramrod 50% before calla 90%.
+    expect(rows[0].file).toBe('src/games/ramrod/rules.ts');
+    expect(rows[0].linePct).toBe(50);
+    expect(rows[1].file).toBe('src/games/calla/rules.ts');
+    expect(rows[1].linePct).toBe(90);
+    const out = formatRankOutput(rows);
+    expect(out).toContain(
+      '1\tsrc/games/ramrod/rules.ts\t50.00\t50/100\t50.00\t50/100'
+    );
+    expect(out).toContain(
+      '2\tsrc/games/calla/rules.ts\t90.00\t90/100\t90.00\t90/100'
+    );
+    expect(out).not.toMatch(/calla\/rules\.ts\t10\.00/);
+  });
+
+  it('main derives stale pct from covered/total and exits 0', () => {
+    const logs: string[] = [];
+    const errors: string[] = [];
+    const fixture = JSON.stringify({
+      'src/games/calla/rules.ts': {
+        lines: { total: 100, covered: 90, skipped: 0, pct: 10 },
+        branches: { total: 100, covered: 90, skipped: 0, pct: 10 },
+      },
+      'src/games/ramrod/rules.ts': {
+        lines: { total: 100, covered: 50, skipped: 0, pct: 50 },
+        branches: { total: 100, covered: 50, skipped: 0, pct: 50 },
+      },
+    });
+    const code = main(['/tmp/stale-pct.json'], {
+      existsSync: (p) => p === '/tmp/stale-pct.json',
+      readFileSync: () => fixture,
+      log: (s) => logs.push(s),
+      error: (s) => errors.push(s),
+    });
+    expect(code).toBe(0);
+    expect(errors).toEqual([]);
+    const table = logs.join('\n');
+    expect(table.indexOf('src/games/ramrod/rules.ts')).toBeLessThan(
+      table.indexOf('src/games/calla/rules.ts')
+    );
+    expect(table).toContain(
+      '1\tsrc/games/ramrod/rules.ts\t50.00\t50/100\t50.00\t50/100'
+    );
+    expect(table).toContain(
+      '2\tsrc/games/calla/rules.ts\t90.00\t90/100\t90.00\t90/100'
     );
   });
 });
