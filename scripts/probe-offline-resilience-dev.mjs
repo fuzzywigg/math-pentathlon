@@ -11,6 +11,7 @@ import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { artifactPath } from './lib/artifact-dir.mjs';
+import { classifyOfflineProbeUrl } from './lib/offline-probe-classify.mjs';
 import { applyOfflineProbeCli } from './lib/offline-probe-cli.mjs';
 
 const USAGE = `Usage: node scripts/probe-offline-resilience-dev.mjs
@@ -66,12 +67,7 @@ async function waitForUrl(url, timeoutMs = 60_000) {
 }
 
 function classify(url) {
-  if (/\/fonts\/|\.woff2?(?:\?|$)/i.test(url)) return 'font';
-  if (/three|board-3d|\/ui\/three/i.test(url)) return '3d-asset';
-  if (/game-controller|\/games\//i.test(url)) return 'lazy-game-chunk';
-  if (/\.css(\?|$)/i.test(url)) return 'css';
-  if (/\.js|\.ts(\?|$)/i.test(url)) return 'js';
-  return 'other';
+  return classifyOfflineProbeUrl(url, { mode: 'dev' });
 }
 
 function shorten(url) {
