@@ -9,12 +9,14 @@
 import { chromium } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
+import { artifactPath } from '../../scripts/lib/artifact-dir.mjs';
+import { dismissOwl } from '../../scripts/lib/dismiss-owl.mjs';
 
 const BASE = process.env.PLAYTEST_BASE_URL || 'http://localhost:5173';
 const GAMES_PER = Number(process.env.PLAYTEST_GAMES_PER || 10);
 const OUT_DIR = path.resolve('docs/playtest');
 const SHOT_DIR = path.join(OUT_DIR, 'fab-a-diffy-deep-2026-10-07');
-const ART_DIR = '/opt/cursor/artifacts/fab-a-diffy-playtest';
+const ART_DIR = artifactPath('fab-a-diffy-playtest');
 
 const ALL_VIEWPORTS = {
   desktop: { width: 1280, height: 800 },
@@ -27,13 +29,6 @@ const VIEWPORTS = ONLY_VP
   : ALL_VIEWPORTS;
 
 const DIFFICULTIES = ONLY_DIFF ? [ONLY_DIFF] : ['easy', 'medium', 'hard'];
-
-async function dismissOwl(page) {
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) el.style.pointerEvents = 'none';
-  });
-}
 
 async function startVsAi(page, difficulty) {
   await page.goto(`${BASE}/#/game/fab-a-diffy`, { waitUntil: 'domcontentloaded' });
