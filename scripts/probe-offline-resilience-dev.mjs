@@ -83,7 +83,7 @@ function tally(failed) {
 async function main() {
   mkdirSync(path.dirname(OUT), { recursive: true });
   const findings = {
-    date: '2026-10-07',
+    date: new Date().toISOString().slice(0, 10),
     browser: 'chromium',
     mode: 'vite-dev',
     scenarios: {},
