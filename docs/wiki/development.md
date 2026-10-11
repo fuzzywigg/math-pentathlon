@@ -54,6 +54,8 @@ npm run report:lint-buckets      # per-rule path buckets (local report-only; doc
 npm run perf:runtime             # runtime AI/move timing probe
                                  # PERF_MODE=render → tablet/CPU4× RENDER/INPUT report (docs/dev/render-perf-2026-10.md)
 npm run audit:memory             # heap / detach probe across game mounts
+npm run flake:unit               # local unit flake-rate loop (scripts/flake-rate-unit-loop.mjs; not CI)
+npm run flake:e2e                # local Chromium e2e flake-rate loop (scripts/flake-rate-e2e-loop.mjs; not CI)
 ```
 
 `npm test` = `test:unit` && `test:e2e:chromium`. Bare `npm run test:e2e` (no `--project`) runs **every** Playwright project — prefer an explicit script. Prefer `npm run typecheck` over bare `npx tsc --noEmit` so local gates match `package.json` / CI.
