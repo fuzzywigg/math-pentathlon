@@ -17,7 +17,12 @@ export type WaitForGameReadyOptions = {
   requireChrome?: boolean;
 };
 
-/** Lazy game chunks show `data-testid="game-loading"` until the shell mounts. */
+/**
+ * Lazy game chunks show `data-testid="game-loading"` until the shell mounts.
+ * `game-load-error` must be hidden (or absent) — shell chrome alone is not
+ * ready when a lazy load failed (q-mp-1294). After the error slot clears,
+ * success uses `#new-game-btn, h1` when `requireChrome` (default).
+ */
 export async function waitForGameReady(
   page: Page,
   options: WaitForGameReadyOptions = {}
@@ -25,6 +30,9 @@ export async function waitForGameReady(
   const timeoutMs = options.timeoutMs ?? 15_000;
   const requireChrome = options.requireChrome !== false;
   await expect(page.getByTestId('game-loading')).toBeHidden({
+    timeout: timeoutMs,
+  });
+  await expect(page.getByTestId('game-load-error')).toBeHidden({
     timeout: timeoutMs,
   });
   if (requireChrome) {
@@ -54,8 +62,16 @@ export async function dismissOwl(
   const dismiss = page.locator(
     '#ollie-owl button[aria-label="Dismiss message"], #ollie-owl .owl-bubble-dismiss'
   );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click({ force: true }).catch(() => undefined);
+  if (
+    await dismiss
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
+    await dismiss
+      .first()
+      .click({ force: true })
+      .catch(() => undefined);
   }
   if (minimize) {
     const minBtn = page.locator('#ollie-owl .owl-minimize-btn');
