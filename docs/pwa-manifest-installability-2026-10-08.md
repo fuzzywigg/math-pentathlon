@@ -35,5 +35,5 @@ npm run lint
 npx tsc --noEmit
 npm run test:unit
 npm run build
-npm run check:pwa-manifest   # report-only (REPORT_ONLY=0 to fail)
+npm run check:pwa-manifest   # report-only (opt-in: REPORT_ONLY=0 for local exit 1; CI soft step stays report-only unless tip-owner wires otherwise)
 ```
