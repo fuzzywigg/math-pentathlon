@@ -7,7 +7,8 @@
  *
  * Writes docs/dev/type-ratchet-phase2-baseline.json (report-only inventory).
  * Exit 0 always when export succeeds; use --check to fail if totals regress
- * above the checked-in baseline (counts may only go down).
+ * above the checked-in baseline (counts may only go down). `--check` fails
+ * closed when the baseline omits a numeric `outOfScopeErrors` (q-mp-1266).
  *
  * Scope matches scripts/check-type-ratchet.mjs: in-scope (ui/core/helpers) must
  * stay at 0; this export inventories everything else (games AI/rules/UI, demos, main).
@@ -116,7 +117,11 @@ const IN_SCOPE = new RegExp(
  */
 function kindOf(file) {
   const base = path.basename(file);
-  if (file === 'src/main.ts' || file.startsWith('src/demos/') || file.startsWith('src/pwa/')) {
+  if (
+    file === 'src/main.ts' ||
+    file.startsWith('src/demos/') ||
+    file.startsWith('src/pwa/')
+  ) {
     return 'shell_misc';
   }
   if (
@@ -151,7 +156,12 @@ function gameOf(file) {
  */
 function rootCause(e) {
   const { code, message: msg } = e;
-  if (code === 'TS2375' || code === 'TS2379' || code === 'TS2412' || code === 'TS2790') {
+  if (
+    code === 'TS2375' ||
+    code === 'TS2379' ||
+    code === 'TS2412' ||
+    code === 'TS2790'
+  ) {
     return 'exact_optional_property_types';
   }
   if (code === 'TS2532' || code === 'TS18048' || code === 'TS2493') {
@@ -161,7 +171,8 @@ function rootCause(e) {
   if (code === 'TS2722') return 'possibly_undefined_callable';
   if (code === 'TS2538') return 'undefined_as_index';
   if (code === 'TS2488') return 'possibly_undefined_iterable';
-  if (code === 'TS2339' && /\| undefined/.test(msg)) return 'unchecked_index_access';
+  if (code === 'TS2339' && /\| undefined/.test(msg))
+    return 'unchecked_index_access';
   if (
     code === 'TS2345' &&
     (/\| undefined/.test(msg) || /undefined is not assignable/.test(msg))
@@ -172,7 +183,8 @@ function rootCause(e) {
     if (/optional property|exactOptionalPropertyTypes/i.test(msg)) {
       return 'exact_optional_property_types';
     }
-    if (/\| undefined'|Type 'undefined'/.test(msg)) return 'unchecked_index_access';
+    if (/\| undefined'|Type 'undefined'/.test(msg))
+      return 'unchecked_index_access';
     return 'type_assignability';
   }
   if (
@@ -197,168 +209,219 @@ function sortCounts(o) {
   );
 }
 
-const result = spawnSync(
-  'npx',
-  ['tsc', '--noEmit', '-p', 'tsconfig.ratchet.json', '--pretty', 'false'],
-  {
-    cwd: ROOT,
-    encoding: 'utf8',
-    maxBuffer: 32 * 1024 * 1024,
-    shell: process.platform === 'win32',
+/**
+ * Resolve baseline out-of-scope ceiling for `--check`.
+ * Fail-closed when the field is missing or non-numeric (q-mp-1266):
+ * `current > undefined` is false and used to green-wash regressions.
+ * Prefers top-level `outOfScopeErrors`, then nested `totals.outOfScopeErrors`
+ * (same order as `scripts/check-type-ratchet.mjs`).
+ *
+ * @param {unknown} prev
+ * @returns {{ ok: true, total: number } | { ok: false, error: string }}
+ */
+export function resolvePhase2PrevOutOfScopeTotal(prev) {
+  if (prev == null || typeof prev !== 'object') {
+    return { ok: false, error: 'baseline is not an object' };
   }
-);
-
-const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
-const errorLines = output
-  .split('\n')
-  .map((l) => l.trimEnd())
-  .filter((l) => /error TS\d+:/.test(l));
-
-/** @type {{ file: string, line: number, col: number, code: string, message: string, kind: string, game: string, rootCause: string }[]} */
-const parsed = [];
-for (const line of errorLines) {
-  const m = /^(.+?)\((\d+),(\d+)\): error (TS\d+): (.+)$/.exec(line);
-  if (!m) continue;
-  const file = m[1].replace(/\\/g, '/');
-  const entry = {
-    file,
-    line: Number(m[2]),
-    col: Number(m[3]),
-    code: m[4],
-    message: m[5],
-    kind: kindOf(file),
-    game: gameOf(file),
-    rootCause: '',
-  };
-  entry.rootCause = rootCause(entry);
-  parsed.push(entry);
-}
-
-const inScope = parsed.filter((e) => IN_SCOPE.test(e.file));
-const outOfScope = parsed.filter((e) => !IN_SCOPE.test(e.file));
-
-/** @type {Record<string, number>} */
-const byGame = {};
-/** @type {Record<string, number>} */
-const byFile = {};
-/** @type {Record<string, number>} */
-const byCode = {};
-/** @type {Record<string, number>} */
-const byRootCause = {};
-/** @type {Record<string, number>} */
-const byKind = {};
-/** @type {Record<string, { total: number, ai_search_scoring: number, rules_engine: number, game_ui: number, other_game_module: number, shell_misc: number, other: number }>} */
-const perGame = {};
-
-for (const e of outOfScope) {
-  byGame[e.game] = (byGame[e.game] || 0) + 1;
-  byFile[e.file] = (byFile[e.file] || 0) + 1;
-  byCode[e.code] = (byCode[e.code] || 0) + 1;
-  byRootCause[e.rootCause] = (byRootCause[e.rootCause] || 0) + 1;
-  byKind[e.kind] = (byKind[e.kind] || 0) + 1;
-
-  if (!perGame[e.game]) {
-    perGame[e.game] = {
-      total: 0,
-      ai_search_scoring: 0,
-      rules_engine: 0,
-      game_ui: 0,
-      other_game_module: 0,
-      shell_misc: 0,
-      other: 0,
+  const record = /** @type {Record<string, unknown>} */ (prev);
+  const top = record.outOfScopeErrors;
+  const totals = record.totals;
+  const nested =
+    totals != null && typeof totals === 'object'
+      ? /** @type {Record<string, unknown>} */ (totals).outOfScopeErrors
+      : undefined;
+  const candidate = typeof top === 'number' ? top : nested;
+  if (typeof candidate !== 'number' || !Number.isFinite(candidate)) {
+    return {
+      ok: false,
+      error:
+        'baseline omits numeric outOfScopeErrors (top-level or totals.outOfScopeErrors)',
     };
   }
-  const g = perGame[e.game];
-  g.total++;
-  if (e.kind in g) {
-    // @ts-expect-error dynamic
-    g[e.kind]++;
-  } else {
-    g.other++;
-  }
+  return { ok: true, total: candidate };
 }
 
-const tipSha = spawnSync('git', ['rev-parse', 'HEAD'], {
-  cwd: ROOT,
-  encoding: 'utf8',
-}).stdout.trim();
-
-const baseline = {
-  schemaVersion: 1,
-  reportOnly: true,
-  description:
-    'Phase-2 type-ratchet baseline: out-of-scope errors under tsconfig.ratchet.json. Counts must only decrease.',
-  taskId: 'burn-1008-mp-type-ratchet-batch-8',
-  generatedAt: new Date().toISOString(),
-  tipSha,
-  commands: {
-    export: 'node docs/dev/type-ratchet-phase2-export.mjs',
-    check: 'node docs/dev/type-ratchet-phase2-export.mjs --check',
-    summary: 'npm run typecheck:ratchet',
-    rawTsc: 'npx tsc --noEmit -p tsconfig.ratchet.json --pretty false',
-  },
-  ratchetFlags: [
-    'noUncheckedIndexedAccess',
-    'exactOptionalPropertyTypes',
-    'noImplicitOverride',
-    'forceConsistentCasingInFileNames',
-    'noImplicitReturns',
-  ],
-  inScopeErrors: inScope.length,
-  outOfScopeErrors: outOfScope.length,
-  fileCount: Object.keys(byFile).length,
-  byKind: sortCounts(byKind),
-  byRootCause: sortCounts(byRootCause),
-  byCode: sortCounts(byCode),
-  byGame: sortCounts(byGame),
-  perGame: Object.fromEntries(
-    Object.entries(perGame).sort((a, b) => b[1].total - a[1].total || a[0].localeCompare(b[0]))
-  ),
-  byFile: sortCounts(byFile),
-  errors: outOfScope.map((e) => ({
-    file: e.file,
-    line: e.line,
-    col: e.col,
-    code: e.code,
-    rootCause: e.rootCause,
-    kind: e.kind,
-    game: e.game,
-    message: e.message,
-  })),
-};
-
-const check = process.argv.includes('--check');
-if (check) {
-  if (!fs.existsSync(OUT)) {
-    console.error(`Missing baseline at ${OUT}. Run without --check first.`);
-    process.exit(1);
-  }
-  const prev = JSON.parse(fs.readFileSync(OUT, 'utf8'));
-  const prevTotal = prev.outOfScopeErrors;
-  const prevIn = prev.inScopeErrors;
-  let failed = false;
-  if (inScope.length > 0) {
-    console.error(`FAIL: in-scope errors rose to ${inScope.length} (must stay 0).`);
-    failed = true;
-  } else if (prevIn !== 0 && inScope.length !== 0) {
-    failed = true;
-  }
-  if (outOfScope.length > prevTotal) {
-    console.error(
-      `FAIL: out-of-scope errors ${outOfScope.length} > baseline ${prevTotal} (ratchet: counts may only go down).`
-    );
-    failed = true;
-  }
-  console.log(
-    `Phase-2 baseline check: in-scope=${inScope.length} out-of-scope=${outOfScope.length} (baseline ${prevTotal})`
+function main() {
+  const result = spawnSync(
+    'npx',
+    ['tsc', '--noEmit', '-p', 'tsconfig.ratchet.json', '--pretty', 'false'],
+    {
+      cwd: ROOT,
+      encoding: 'utf8',
+      maxBuffer: 32 * 1024 * 1024,
+      shell: process.platform === 'win32',
+    }
   );
-  process.exit(failed ? 1 : 0);
+
+  const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
+  const errorLines = output
+    .split('\n')
+    .map((l) => l.trimEnd())
+    .filter((l) => /error TS\d+:/.test(l));
+
+  /** @type {{ file: string, line: number, col: number, code: string, message: string, kind: string, game: string, rootCause: string }[]} */
+  const parsed = [];
+  for (const line of errorLines) {
+    const m = /^(.+?)\((\d+),(\d+)\): error (TS\d+): (.+)$/.exec(line);
+    if (!m) continue;
+    const file = m[1].replace(/\\/g, '/');
+    const entry = {
+      file,
+      line: Number(m[2]),
+      col: Number(m[3]),
+      code: m[4],
+      message: m[5],
+      kind: kindOf(file),
+      game: gameOf(file),
+      rootCause: '',
+    };
+    entry.rootCause = rootCause(entry);
+    parsed.push(entry);
+  }
+
+  const inScope = parsed.filter((e) => IN_SCOPE.test(e.file));
+  const outOfScope = parsed.filter((e) => !IN_SCOPE.test(e.file));
+
+  /** @type {Record<string, number>} */
+  const byGame = {};
+  /** @type {Record<string, number>} */
+  const byFile = {};
+  /** @type {Record<string, number>} */
+  const byCode = {};
+  /** @type {Record<string, number>} */
+  const byRootCause = {};
+  /** @type {Record<string, number>} */
+  const byKind = {};
+  /** @type {Record<string, { total: number, ai_search_scoring: number, rules_engine: number, game_ui: number, other_game_module: number, shell_misc: number, other: number }>} */
+  const perGame = {};
+
+  for (const e of outOfScope) {
+    byGame[e.game] = (byGame[e.game] || 0) + 1;
+    byFile[e.file] = (byFile[e.file] || 0) + 1;
+    byCode[e.code] = (byCode[e.code] || 0) + 1;
+    byRootCause[e.rootCause] = (byRootCause[e.rootCause] || 0) + 1;
+    byKind[e.kind] = (byKind[e.kind] || 0) + 1;
+
+    if (!perGame[e.game]) {
+      perGame[e.game] = {
+        total: 0,
+        ai_search_scoring: 0,
+        rules_engine: 0,
+        game_ui: 0,
+        other_game_module: 0,
+        shell_misc: 0,
+        other: 0,
+      };
+    }
+    const g = perGame[e.game];
+    g.total++;
+    if (e.kind in g) {
+      // @ts-expect-error dynamic
+      g[e.kind]++;
+    } else {
+      g.other++;
+    }
+  }
+
+  const tipSha = spawnSync('git', ['rev-parse', 'HEAD'], {
+    cwd: ROOT,
+    encoding: 'utf8',
+  }).stdout.trim();
+
+  const baseline = {
+    schemaVersion: 1,
+    reportOnly: true,
+    description:
+      'Phase-2 type-ratchet baseline: out-of-scope errors under tsconfig.ratchet.json. Counts must only decrease.',
+    taskId: 'burn-1008-mp-type-ratchet-batch-8',
+    generatedAt: new Date().toISOString(),
+    tipSha,
+    commands: {
+      export: 'node docs/dev/type-ratchet-phase2-export.mjs',
+      check: 'node docs/dev/type-ratchet-phase2-export.mjs --check',
+      summary: 'npm run typecheck:ratchet',
+      rawTsc: 'npx tsc --noEmit -p tsconfig.ratchet.json --pretty false',
+    },
+    ratchetFlags: [
+      'noUncheckedIndexedAccess',
+      'exactOptionalPropertyTypes',
+      'noImplicitOverride',
+      'forceConsistentCasingInFileNames',
+      'noImplicitReturns',
+    ],
+    inScopeErrors: inScope.length,
+    outOfScopeErrors: outOfScope.length,
+    fileCount: Object.keys(byFile).length,
+    byKind: sortCounts(byKind),
+    byRootCause: sortCounts(byRootCause),
+    byCode: sortCounts(byCode),
+    byGame: sortCounts(byGame),
+    perGame: Object.fromEntries(
+      Object.entries(perGame).sort(
+        (a, b) => b[1].total - a[1].total || a[0].localeCompare(b[0])
+      )
+    ),
+    byFile: sortCounts(byFile),
+    errors: outOfScope.map((e) => ({
+      file: e.file,
+      line: e.line,
+      col: e.col,
+      code: e.code,
+      rootCause: e.rootCause,
+      kind: e.kind,
+      game: e.game,
+      message: e.message,
+    })),
+  };
+
+  const check = process.argv.includes('--check');
+  if (check) {
+    if (!fs.existsSync(OUT)) {
+      console.error(`Missing baseline at ${OUT}. Run without --check first.`);
+      process.exit(1);
+    }
+    const prev = JSON.parse(fs.readFileSync(OUT, 'utf8'));
+    const resolved = resolvePhase2PrevOutOfScopeTotal(prev);
+    if (!resolved.ok) {
+      console.error(`FAIL: ${resolved.error}`);
+      process.exit(1);
+    }
+    const prevTotal = resolved.total;
+    const prevIn = prev.inScopeErrors;
+    let failed = false;
+    if (inScope.length > 0) {
+      console.error(
+        `FAIL: in-scope errors rose to ${inScope.length} (must stay 0).`
+      );
+      failed = true;
+    } else if (prevIn !== 0 && inScope.length !== 0) {
+      failed = true;
+    }
+    if (outOfScope.length > prevTotal) {
+      console.error(
+        `FAIL: out-of-scope errors ${outOfScope.length} > baseline ${prevTotal} (ratchet: counts may only go down).`
+      );
+      failed = true;
+    }
+    console.log(
+      `Phase-2 baseline check: in-scope=${inScope.length} out-of-scope=${outOfScope.length} (baseline ${prevTotal})`
+    );
+    process.exit(failed ? 1 : 0);
+  }
+
+  fs.writeFileSync(OUT, `${JSON.stringify(baseline, null, 2)}\n`);
+  console.log(`Wrote ${path.relative(ROOT, OUT)}`);
+  console.log(`  in-scope errors:     ${inScope.length}`);
+  console.log(`  out-of-scope errors: ${outOfScope.length}`);
+  console.log(`  files with errors:   ${Object.keys(byFile).length}`);
+  console.log(`  tipSha: ${tipSha}`);
+  process.exit(0);
 }
 
-fs.writeFileSync(OUT, `${JSON.stringify(baseline, null, 2)}\n`);
-console.log(`Wrote ${path.relative(ROOT, OUT)}`);
-console.log(`  in-scope errors:     ${inScope.length}`);
-console.log(`  out-of-scope errors: ${outOfScope.length}`);
-console.log(`  files with errors:   ${Object.keys(byFile).length}`);
-console.log(`  tipSha: ${tipSha}`);
-process.exit(0);
+const isMain =
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (isMain) {
+  main();
+}
