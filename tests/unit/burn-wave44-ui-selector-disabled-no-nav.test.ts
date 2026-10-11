@@ -8,6 +8,14 @@ import * as router from '../../src/core/router';
 
 describe('Wave 44 UI — selector disabled', () => {
   let container: HTMLElement;
+  // Direct prototype assign is not undone by vi.restoreAllMocks (q-mp-1180).
+  // Prefer a plain noop over delete: game-selector defers scrollIntoView via
+  // setTimeout, and deleting the method races those callbacks under jsdom.
+  const originalScrollIntoView =
+    typeof Element.prototype.scrollIntoView === 'function' &&
+    !vi.isMockFunction(Element.prototype.scrollIntoView)
+      ? Element.prototype.scrollIntoView
+      : function scrollIntoView() {};
   beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
@@ -16,6 +24,7 @@ describe('Wave 44 UI — selector disabled', () => {
   afterEach(() => {
     container.remove();
     vi.restoreAllMocks();
+    Element.prototype.scrollIntoView = originalScrollIntoView;
   });
 
   it('coming-soon card has badge and tabindex -1', () => {

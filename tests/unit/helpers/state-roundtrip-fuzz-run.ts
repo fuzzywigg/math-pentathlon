@@ -21,7 +21,7 @@ import {
 /** Second play seed (widens coverage without exploding runtime). */
 export const FUZZ_PLAY_SEED_B = FUZZ_PLAY_SEED ^ 0x9e3779b9;
 
-export const FUZZ_PLAY_SEEDS = [FUZZ_PLAY_SEED, FUZZ_PLAY_SEED_B] as const;
+const FUZZ_PLAY_SEEDS = [FUZZ_PLAY_SEED, FUZZ_PLAY_SEED_B] as const;
 
 export { AI_COMPARE_SEED, FUZZ_PLAY_SEED, ALL_GAME_ADAPTERS };
 export type { GameFuzzAdapter };

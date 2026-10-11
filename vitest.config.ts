@@ -15,7 +15,8 @@ const coverage = {
 /** Tests that need a fresh module graph (vi.mock / controller singletons). */
 const isolatedFiles = [
   'tests/unit/stats-dashboard.test.ts',
-  'tests/unit/existing-games-controllers.test.ts',
+  // q-mp-1187: shard monolith for unit-isolated parallel wall trim.
+  'tests/unit/existing-games-controllers*.test.ts',
   'tests/unit/existing-games-tutorials.test.ts',
   // MP-3D suites mock feature-flags / three.js and must not leak into 2D controller tests.
   'tests/unit/mp3d-*.test.ts',
@@ -59,7 +60,8 @@ const isolatedFiles = [
   // q-mp-653: game-prefetch residual branches — resetModules + doMock loaders.
   'tests/unit/q-mp-653-game-prefetch-residuals.test.ts',
   // Real controller imports + destroyGame mutates module singletons.
-  'tests/unit/burn-1008-registry-module-contract.test.ts',
+  // q-mp-1188: shards share isolate (real controller imports + destroyGame).
+  'tests/unit/burn-1008-registry-module-contract*.test.ts',
   // q-mp-117: generation-gated timeout characterization — fake timers +
   // isolate so shared-graph timer pollution cannot starve awaits (CI flake).
   'tests/unit/ui-helper-dedupe-characterization.test.ts',

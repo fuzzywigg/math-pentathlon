@@ -5,6 +5,7 @@ import {
   offlineNeededPaths,
   listChunkNames,
   PRECACHE_FONT_IGNORES,
+  collectHtmlNonRootAssetRefs,
 } from '../../scripts/check-build.mjs';
 
 describe('check-build helpers', () => {
@@ -156,6 +157,44 @@ describe('check-build helpers', () => {
     ]);
   });
 
+  it('accepts finite numeric revision values and stringifies them (q-mp-1178)', () => {
+    expect(parsePrecacheManifest('{url:"/a.js",revision:42}')).toEqual([
+      { url: '/a.js', revision: '42' },
+    ]);
+    expect(parsePrecacheManifest('{url:"/a.js",revision:0}')).toEqual([
+      { url: '/a.js', revision: '0' },
+    ]);
+    expect(parsePrecacheManifest('{"url":"/a.js","revision":42}')).toEqual([
+      { url: '/a.js', revision: '42' },
+    ]);
+    expect(parsePrecacheManifest('{revision:0,url:"/a.js"}')).toEqual([
+      { url: '/a.js', revision: '0' },
+    ]);
+    expect(parsePrecacheManifest('{revision:42,url:"/a.js"}')).toEqual([
+      { url: '/a.js', revision: '42' },
+    ]);
+    // Numeric revision + folded size/integrity extras still parse.
+    expect(
+      parsePrecacheManifest('{url:"/a.js",revision:42,size:12}')
+    ).toEqual([{ url: '/a.js', revision: '42' }]);
+    expect(
+      parsePrecacheManifest('{url:"/a.js",revision:0,integrity:null}')
+    ).toEqual([{ url: '/a.js', revision: '0' }]);
+    // String / null paths unchanged.
+    expect(parsePrecacheManifest('{url:"/a.js",revision:"1"}')).toEqual([
+      { url: '/a.js', revision: '1' },
+    ]);
+    expect(parsePrecacheManifest('{url:"/a.js",revision:null}')).toEqual([
+      { url: '/a.js', revision: null },
+    ]);
+    // Invalid revision shapes still drop the entry.
+    expect(parsePrecacheManifest('{url:"/a.js",revision:true}')).toEqual([]);
+    expect(parsePrecacheManifest('{url:"/a.js",revision:Infinity}')).toEqual(
+      []
+    );
+    expect(parsePrecacheManifest('{url:"/a.js",revision:NaN}')).toEqual([]);
+  });
+
   it('diffs hash trees for only-A / only-B / content', () => {
     const a = new Map([
       ['a.js', '111'],
@@ -213,5 +252,24 @@ describe('check-build helpers', () => {
     for (const u of urls) counts.set(u, (counts.get(u) || 0) + 1);
     const duplicates = [...counts.entries()].filter(([, n]) => n > 1);
     expect(duplicates).toEqual([['favicon.ico', 2]]);
+  });
+
+  it('collects single-quoted and double-quoted non-root asset refs (q-mp-1179)', () => {
+    const html = [
+      '<script src="./a.js"></script>',
+      "<script src='./b.js'></script>",
+      '<link href="./c.css">',
+      "<link href='./d.css'>",
+      '<script src="/root.js"></script>',
+      "<link href='/root.css'>",
+      '<a href="#skip">skip</a>',
+      '<img src="data:image/gif;base64,AA">',
+    ].join('');
+    expect(collectHtmlNonRootAssetRefs(html)).toEqual([
+      './a.js',
+      './b.js',
+      './c.css',
+      './d.css',
+    ]);
   });
 });

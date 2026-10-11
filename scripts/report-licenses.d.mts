@@ -71,8 +71,6 @@ export function buildCycloneDxBom(opts: {
   components: Array<Record<string, unknown>>;
 };
 
-export function formatSummaryMarkdown(report: unknown): string;
-
 export const OUT_DIR: string;
 export const OUT_DIR_REL: string;
 export const USAGE: string;
