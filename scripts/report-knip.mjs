@@ -273,6 +273,15 @@ function runKnip() {
  *   (leave q-mp-1019 `{}` → “no baseline file” alone).
  * - Present `metrics` missing keys or non-numeric → `{ kind: 'schema', message }` (exit 1).
  *
+ * Leading UTF-8 BOM (U+FEFF) is stripped before parse so editor-saved baselines
+ * are accepted (q-mp-1387). Mid-file FEFF is left alone. Non-BOM input is
+ * unchanged (byte-identical parse result).
+ *
+ * @param {{
+ *   existsSync?: typeof fs.existsSync,
+ *   readFileSync?: typeof fs.readFileSync,
+ *   baselinePath?: string,
+ * }} [io] injectables for hermetic tests
  * @returns {{
  *   kind: 'missing'
  * } | {
@@ -287,22 +296,39 @@ function runKnip() {
  *   metrics: Record<string, number>
  * }}
  */
-function loadBaseline() {
-  if (!fs.existsSync(BASELINE_PATH)) return { kind: 'missing' };
-  let doc;
+export function loadBaseline(io = {}) {
+  const existsSync = io.existsSync ?? fs.existsSync;
+  const readFileSync = io.readFileSync ?? fs.readFileSync;
+  const baselinePath = io.baselinePath ?? BASELINE_PATH;
+  if (!existsSync(baselinePath)) return { kind: 'missing' };
+  let raw;
   try {
-    doc = JSON.parse(fs.readFileSync(BASELINE_PATH, 'utf8'));
+    raw = readFileSync(baselinePath, 'utf8');
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err);
     return {
       kind: 'corrupt',
-      message: `report:knip — baseline JSON unparseable at ${path.relative(ROOT, BASELINE_PATH)}: ${detail}`,
+      message: `report:knip — baseline JSON unparseable at ${path.relative(ROOT, baselinePath)}: ${detail}`,
+    };
+  }
+  // Strip a single leading UTF-8 BOM (q-mp-1387). Mid-file FEFF is left alone.
+  if (raw.charCodeAt(0) === 0xfeff) {
+    raw = raw.slice(1);
+  }
+  let doc;
+  try {
+    doc = JSON.parse(raw);
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
+    return {
+      kind: 'corrupt',
+      message: `report:knip — baseline JSON unparseable at ${path.relative(ROOT, baselinePath)}: ${detail}`,
     };
   }
   if (doc == null || typeof doc !== 'object' || Array.isArray(doc)) {
     return {
       kind: 'schema',
-      message: `report:knip — baseline schema invalid at ${path.relative(ROOT, BASELINE_PATH)}: root must be an object`,
+      message: `report:knip — baseline schema invalid at ${path.relative(ROOT, baselinePath)}: root must be an object`,
     };
   }
   /** @type {{ knipVersion?: string, enforce?: boolean, metrics?: unknown, note?: string }} */
