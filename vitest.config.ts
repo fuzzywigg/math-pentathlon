@@ -156,6 +156,8 @@ const nodePureFiles = [
   'tests/unit/deep-playtest-page-ready.test.ts',
   // help-only CLI argv (q-mp-885); spawnSync CLI check needs node env.
   'tests/unit/help-only-cli.test.ts',
+  // report-licenses --dry-run write guard (q-mp-979); spawnSync CLI check needs node env.
+  'tests/unit/report-licenses-cli-args.test.ts',
   // harness env Number() parser (q-mp-876 / q-mp-908); spawnSync CLI check needs node env.
   'tests/unit/env-number.test.ts',
   // writable artifact-dir helper (q-mp-955); injectable mkdirSync needs node env.
