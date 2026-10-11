@@ -153,10 +153,9 @@ export function auditWorkflow(file, doc, raw) {
     }
     const job = /** @type {Record<string, unknown>} */ (jobVal);
 
-    if (
-      typeof job['timeout-minutes'] !== 'number' ||
-      job['timeout-minutes'] <= 0
-    ) {
+    // YAML may quote scalars (`timeout-minutes: "20"`); accept finite Number > 0.
+    const timeoutMinutes = Number(job['timeout-minutes']);
+    if (!Number.isFinite(timeoutMinutes) || timeoutMinutes <= 0) {
       fail(`job ${jobId}: missing positive timeout-minutes`);
     }
 

@@ -79,9 +79,9 @@ describe('auditWorkflow invariants', () => {
     expect(messages.some((m) => m.includes('contents must be "read"'))).toBe(
       true
     );
-    expect(
-      messages.some((m) => m.includes('persist-credentials: false'))
-    ).toBe(true);
+    expect(messages.some((m) => m.includes('persist-credentials: false'))).toBe(
+      true
+    );
   });
 
   it('requires concurrency cancel-in-progress and job timeouts', () => {
@@ -115,6 +115,31 @@ jobs:
       messages.some((m) => m.includes('cancel-in-progress must be true'))
     ).toBe(true);
     expect(messages.some((m) => m.includes('timeout-minutes'))).toBe(true);
+  });
+
+  it('accepts numeric-string timeout-minutes (q-mp-1057)', () => {
+    const quoted = GOOD_CI.replace(
+      'timeout-minutes: 10',
+      'timeout-minutes: "20"'
+    );
+    expect(auditWorkflow('ci.yml', yaml.load(quoted), quoted)).toEqual([]);
+
+    const zero = GOOD_CI.replace('timeout-minutes: 10', 'timeout-minutes: "0"');
+    expect(
+      auditWorkflow('ci.yml', yaml.load(zero), zero).some((v) =>
+        v.message.includes('timeout-minutes')
+      )
+    ).toBe(true);
+
+    const nonNumeric = GOOD_CI.replace(
+      'timeout-minutes: 10',
+      'timeout-minutes: "abc"'
+    );
+    expect(
+      auditWorkflow('ci.yml', yaml.load(nonNumeric), nonNumeric).some((v) =>
+        v.message.includes('timeout-minutes')
+      )
+    ).toBe(true);
   });
 
   it('rejects secrets on pull_request workflows', () => {
