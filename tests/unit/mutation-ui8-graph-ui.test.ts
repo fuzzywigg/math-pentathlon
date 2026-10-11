@@ -13,6 +13,10 @@ import {
 } from '../../src/core/settings-flags';
 import { stubRafClock } from '../helpers/raf-clock';
 
+// unit-shared uses isolate:false — restore matchMedia so later suites
+// do not see a stuck stub from Object.defineProperty (q-mp-1324).
+const originalMatchMedia = window.matchMedia;
+
 afterEach(() => {
   document.body.innerHTML = '';
   resetSettingsFlagsForTests();
@@ -20,6 +24,11 @@ afterEach(() => {
   vi.useRealTimers();
   const nowFn = performance.now as unknown as { mockRestore?: () => void };
   nowFn.mockRestore?.();
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    writable: true,
+    value: originalMatchMedia,
+  });
 });
 
 function stubMatchMedia(matches: boolean): void {

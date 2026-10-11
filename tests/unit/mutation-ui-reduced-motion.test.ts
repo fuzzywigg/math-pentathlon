@@ -14,10 +14,19 @@ import {
 import { resetSettingsFlagsForTests } from '../../src/core/settings-flags';
 
 describe('mutation-ui reduced-motion', () => {
+  // unit-shared uses isolate:false — restore matchMedia so later suites
+  // do not see a stuck stub from Object.defineProperty (q-mp-1324).
+  const originalMatchMedia = window.matchMedia;
+
   afterEach(() => {
     document.documentElement.removeAttribute(REDUCED_MOTION_ATTR);
     resetSettingsFlagsForTests();
     vi.restoreAllMocks();
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      writable: true,
+      value: originalMatchMedia,
+    });
   });
 
   it('prefersReducedMotion returns false when matchMedia is missing', () => {
