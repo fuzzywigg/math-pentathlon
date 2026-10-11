@@ -141,3 +141,46 @@ describe('flake-rate loop early --help (q-mp-893)', () => {
     expect(`${result.stdout}${result.stderr}`).toMatch(/--shuffle/);
   });
 });
+
+describe('flake-rate loop --help anywhere in argv (q-mp-970)', () => {
+  for (const [script, label] of [
+    [UNIT_LOOP, 'unit'],
+    [E2E_LOOP, 'e2e'],
+  ] as const) {
+    it(`${label} loop --out --help prints usage and exits 0 without mkdir/spawn`, () => {
+      const result = runScript(script, ['--out', '--help']);
+      expect(result.status).toBe(0);
+      const combined = `${result.stdout}${result.stderr}`;
+      expect(combined).toMatch(/Usage:/i);
+      expect(combined).toMatch(/-h, --help/);
+      expect(combined).not.toMatch(/Missing or invalid value for --out/);
+      expect(combined).not.toMatch(/\[flake-rate(?:-e2e)?\] starting/);
+    });
+
+    it(`${label} loop --runs --help prints usage and exits 0 without spawn`, () => {
+      const result = runScript(script, ['--runs', '--help']);
+      expect(result.status).toBe(0);
+      const combined = `${result.stdout}${result.stderr}`;
+      expect(combined).toMatch(/Usage:/i);
+      expect(combined).not.toMatch(/Missing value for --runs/);
+      expect(combined).not.toMatch(/\[flake-rate(?:-e2e)?\] starting/);
+    });
+
+    it(`${label} loop --out -h prints usage and exits 0 without mkdir/spawn`, () => {
+      const result = runScript(script, ['--out', '-h']);
+      expect(result.status).toBe(0);
+      const combined = `${result.stdout}${result.stderr}`;
+      expect(combined).toMatch(/Usage:/i);
+      expect(combined).not.toMatch(/Missing or invalid value for --out/);
+      expect(combined).not.toMatch(/\[flake-rate(?:-e2e)?\] starting/);
+    });
+  }
+
+  it('unit loop trailing --out without help still exits non-zero', () => {
+    const result = runScript(UNIT_LOOP, ['--out']);
+    expect(result.status).not.toBe(0);
+    const combined = `${result.stdout}${result.stderr}`;
+    expect(combined).toMatch(/Missing or invalid value for --out/);
+    expect(combined).not.toMatch(/\[flake-rate\] starting/);
+  });
+});
