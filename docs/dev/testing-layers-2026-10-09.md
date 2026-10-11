@@ -108,7 +108,7 @@ Typical local run (Vite must already be up for `node` paths). Base-URL env names
 
 | Harness | Env var | Default host form |
 | ------- | ------- | ----------------- |
-| `playtest:calla` → `scripts/calla-deep-playtest.mjs` | `PLAYTEST_BASE_URL` | `http://localhost:5173` |
+| `playtest:calla` → `scripts/calla-deep-playtest.mjs` | `PLAYTEST_BASE` (`PLAYTEST_BASE_URL` alias) | `http://127.0.0.1:5173` |
 | `playtest:ramrod` / `sum-dominoes` / `stars-bars` / `par-55` → `scripts/*-deep-playtest.mjs` | `PLAYTEST_BASE` | `http://127.0.0.1:5173` |
 | `tests/playtest/fab-a-diffy-deep.mjs` | `PLAYTEST_BASE_URL` | `http://localhost:5173` |
 | `tests/playtest/star-track-deep-playtest.mjs` | `PLAYTEST_BASE_URL` | `http://127.0.0.1:5173` |
