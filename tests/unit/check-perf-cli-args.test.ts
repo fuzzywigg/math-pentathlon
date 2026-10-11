@@ -1,7 +1,8 @@
 /**
  * @vitest-environment node
  *
- * Hermetic argv coverage for check:perf early --help / unknown flags (q-mp-917).
+ * Hermetic argv coverage for check:perf early --help / unknown flags (q-mp-917)
+ * and --help before PERF_LH_TIMEOUT_MS validation (q-mp-1001).
  * Spawns the script only — no build, no Lighthouse, no summary writes on help.
  */
 import { spawnSync } from 'node:child_process';
@@ -10,10 +11,10 @@ import { describe, expect, it } from 'vitest';
 
 const SCRIPT = resolve(process.cwd(), 'scripts/check-perf.mjs');
 
-function runScript(argv: string[]) {
+function runScript(argv: string[], env: NodeJS.ProcessEnv = process.env) {
   return spawnSync(process.execPath, [SCRIPT, ...argv], {
     encoding: 'utf8',
-    env: { ...process.env },
+    env: { ...env },
     timeout: 15_000,
   });
 }
@@ -47,5 +48,41 @@ describe('check-perf CLI argv (q-mp-917)', () => {
     expect(text).toMatch(/Usage: node scripts\/check-perf\.mjs/);
     expect(text).not.toMatch(/dist\/ not found/);
     expect(text).not.toMatch(/Wrote /);
+  });
+});
+
+describe('check-perf CLI env ordering (q-mp-1001)', () => {
+  it('--help exits 0 with usage even when PERF_LH_TIMEOUT_MS is invalid', () => {
+    const result = runScript(['--help'], {
+      ...process.env,
+      PERF_LH_TIMEOUT_MS: 'abc',
+    });
+    expect(result.status).toBe(0);
+    const text = `${result.stdout}\n${result.stderr}`;
+    expect(text).toMatch(/Usage: node scripts\/check-perf\.mjs/);
+    expect(text).not.toMatch(/Invalid PERF_LH_TIMEOUT_MS/);
+    expect(text).not.toMatch(/dist\/ not found/);
+  });
+
+  it('-h exits 0 with usage even when PERF_LH_TIMEOUT_MS is invalid', () => {
+    const result = runScript(['-h'], {
+      ...process.env,
+      PERF_LH_TIMEOUT_MS: 'abc',
+    });
+    expect(result.status).toBe(0);
+    const text = `${result.stdout}\n${result.stderr}`;
+    expect(text).toMatch(/Usage: node scripts\/check-perf\.mjs/);
+    expect(text).not.toMatch(/Invalid PERF_LH_TIMEOUT_MS/);
+  });
+
+  it('bare run still rejects invalid PERF_LH_TIMEOUT_MS (exit 2)', () => {
+    const result = runScript([], {
+      ...process.env,
+      PERF_LH_TIMEOUT_MS: 'abc',
+    });
+    expect(result.status).toBe(2);
+    const text = `${result.stdout}\n${result.stderr}`;
+    expect(text).toMatch(/Invalid PERF_LH_TIMEOUT_MS="abc"/);
+    expect(text).not.toMatch(/Usage: node scripts\/check-perf\.mjs/);
   });
 });
