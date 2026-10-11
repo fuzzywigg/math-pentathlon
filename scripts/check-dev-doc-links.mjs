@@ -41,12 +41,40 @@ const PATH_RE =
   /`((?:src|tests|docs|scripts)\/[A-Za-z0-9_./@+-]+\.(?:ts|tsx|js|mjs|css|md|json))`/g;
 // Destination + optional CommonMark title ("…" / '…' / (…)). Nested paren
 // titles must be matched here — a naive [^)]+ truncates at the title's ')'.
-const MD_LINK_RE =
-  /\]\(([^)\s]+(?:\s+(?:"[^"]*"|'[^']*'|\([^)]*\)))?)\)/g;
+const MD_LINK_RE = /\]\(([^)\s]+(?:\s+(?:"[^"]*"|'[^']*'|\([^)]*\)))?)\)/g;
 const TABLE_ROW_RE =
   /^\|\s*`([^`]+)`\s*\|\s*`((?:src|tests|docs|scripts)\/[^`]+)`\s*\|/;
 const MODULE_ROW_RE =
   /^\|\s*\*\(module\)\*\s*\|\s*`((?:src|tests|docs|scripts)\/[^`]+)`\s*\|/;
+
+/**
+ * Whether `symbol` appears as a declaration / export in TypeScript/JS source.
+ * Used by "| Symbol | File |" table checks (q-mp-1176: `export type { Foo }`).
+ * @param {string} text
+ * @param {string} symbol
+ * @returns {boolean}
+ */
+export function symbolInSource(text, symbol) {
+  if (symbol === '*(module)*') return true;
+  const escaped = symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const patterns = [
+    new RegExp(String.raw`export\s+(?:async\s+)?function\s+${escaped}\b`),
+    new RegExp(
+      String.raw`export\s+(?:type|interface|enum|class|const)\s+${escaped}\b`
+    ),
+    new RegExp(
+      String.raw`\b(?:function|const|type|interface|class)\s+${escaped}\b`
+    ),
+    // Named exports in braces (incl. `export { type Foo }`)
+    new RegExp(String.raw`export\s+\{[^}]*\b${escaped}\b`),
+    // Type-only re-export barrels: `export type { Foo }` / `export type { Foo as Alias }`
+    // Line-anchored so `// export type { Foo }` comments are not false hits (q-mp-1176).
+    new RegExp(
+      String.raw`(?:^|[\r\n])\s*export\s+type\s+\{[^}]*\b${escaped}\b`
+    ),
+  ];
+  return patterns.some((re) => re.test(text));
+}
 
 /**
  * @param {string} fileRel
@@ -57,19 +85,7 @@ function symbolInFile(fileRel, symbol) {
   const abs = path.join(ROOT, fileRel);
   if (!fs.existsSync(abs) || !fs.statSync(abs).isFile()) return false;
   const text = fs.readFileSync(abs, 'utf8');
-  const escaped = symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const patterns = [
-    new RegExp(String.raw`export\s+(?:async\s+)?function\s+${escaped}\b`),
-    new RegExp(
-      String.raw`export\s+(?:type|interface|enum|class|const)\s+${escaped}\b`
-    ),
-    new RegExp(
-      String.raw`\b(?:function|const|type|interface|class)\s+${escaped}\b`
-    ),
-    // Type-only re-exports / named exports in braces
-    new RegExp(String.raw`export\s+\{[^}]*\b${escaped}\b`),
-  ];
-  return patterns.some((re) => re.test(text));
+  return symbolInSource(text, symbol);
 }
 
 /**
