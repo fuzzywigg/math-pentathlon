@@ -244,6 +244,11 @@ function canStartRegexAt(js, i, afterRegex) {
   ) {
     return false;
   }
+  // Postfix ++ / -- yield a value; `/` after them is division, not regex.
+  // Binary `+` / `-` still allow a regex operand (`a + /x/`).
+  if ((c === '+' || c === '-') && j >= 1 && js[j - 1] === c) {
+    return false;
+  }
   if (/[0-9]/.test(c)) return false;
   if (/[A-Za-z_$]/.test(c)) {
     let k = j;
@@ -363,6 +368,20 @@ function collapseWhitespaceOutsideLiterals(js) {
     }
     if (c === '\n' || c === '\r') {
       ws = 'newline';
+      return;
+    }
+    // Spaces beside `/` after postfix ++/-- are insignificant (q-mp-1326).
+    // Without this, `x++ / 2` and `x++/2` normalize unequally even though
+    // `/` is correctly treated as division (not as a regex start).
+    if (
+      ws === 'space' &&
+      ((c === '/' && (out.endsWith('++') || out.endsWith('--'))) ||
+        out.endsWith('++/') ||
+        out.endsWith('--/'))
+    ) {
+      ws = 'code';
+      out += c;
+      afterRegex = false;
       return;
     }
     flushWs();
