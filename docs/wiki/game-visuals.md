@@ -10,7 +10,7 @@ Easy to pick the wrong suite — named `package.json` scripts and this docs capt
 
 | Entrypoint                | Purpose                                                                                                     | How to run                                                    |
 | ------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| Docs / iPad capture       | Regenerates PNGs under `docs/visuals/2026-10/` (this page). Not CI.                                         | `npx playwright test -c playwright.visuals-2026-10.config.ts` |
+| Docs / iPad capture       | Regenerates PNGs under `docs/visuals/2026-10/` (this page). Not CI.                                         | `npm run docs:visuals-2026-10`                                |
 | Opt-in 2D visual          | Local regression baselines in `tests/visual/__screenshots__/`. Not CI.                                      | `npm run test:visual` → `playwright.visual.config.ts`         |
 | CI report-only e2e visual | `visual-desktop` / `visual-phone` in `playwright.config.ts`; baselines under `tests/e2e/visual-baselines/`. | `npm run test:e2e:visual`                                     |
 
@@ -19,7 +19,7 @@ Named-script cheat sheet: [Development](./development.md) (visual bullets). Do n
 Regenerate this gallery only (not CI; does not refresh regression baselines):
 
 ```bash
-npx playwright test -c playwright.visuals-2026-10.config.ts
+npm run docs:visuals-2026-10
 ```
 
 ## Division I — Grades K–1
