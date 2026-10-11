@@ -1,10 +1,10 @@
 /**
- * Argv parse for scripts that accept only `--help` / `-h` (q-mp-885).
+ * Argv parse for scripts that accept only `--help` / `-h` (q-mp-885 / q-mp-1316).
  * No process.exit / I/O — hermetic for unit tests.
  *
  * This file is a library module. Direct CLI entry prints usage only:
  *   node scripts/lib/help-only-cli.mjs [--help]
- * Unknown flags exit 2. Import from harnesses (e.g. check-workflows).
+ * Unknown flags or positionals exit 2. Import from harnesses (e.g. check-workflows).
  */
 
 import { resolve } from 'node:path';
@@ -26,7 +26,9 @@ Options:
 export function parseHelpOnlyArgv(argv) {
   for (const a of argv) {
     if (a === '--help' || a === '-h') return { kind: 'help' };
-    if (a.startsWith('-')) return { kind: 'error', flag: a };
+    // Unknown flags and unexpected positionals — peer parity with
+    // parseBrowserHarnessArgs (q-mp-1316). Empty argv remains intentional run.
+    return { kind: 'error', flag: a };
   }
   return { kind: 'run' };
 }
@@ -51,7 +53,7 @@ export function main(argv = process.argv.slice(2)) {
     console.error(HELP_ONLY_CLI_USAGE);
     process.exit(2);
   }
-  // --help / -h, bare main, or stray positionals: usage only (not runnable).
+  // --help / -h or bare main: usage only (not runnable). Positionals are errors.
   console.log(HELP_ONLY_CLI_USAGE);
   process.exit(0);
 }
