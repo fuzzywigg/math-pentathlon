@@ -21,6 +21,8 @@
  *
  * Default invocation (no --dry-run) still writes the md/svg docs intentionally.
  * --help / -h and --dry-run must not write those files (q-mp-977).
+ * Empty / array / zero-directory summaries are rejected with no doc writes (q-mp-993).
+ * Malformed JSON prints a short message (no stack) and exits non-zero (q-mp-1005).
  */
 
 import fs from 'node:fs';
@@ -462,6 +464,41 @@ export function missingSummaryMessage(summaryPath = DEFAULT_SUMMARY) {
 }
 
 /**
+ * Stable message for empty / array / zero-directory summaries (q-mp-993).
+ * @param {string} [summaryPath]
+ * @param {string} [reason]
+ * @returns {string}
+ */
+export function invalidSummaryMessage(
+  summaryPath = DEFAULT_SUMMARY,
+  reason = 'empty or invalid shape'
+) {
+  const display = String(summaryPath).replace(/\\/g, '/');
+  return [
+    `report:coverage-map — invalid coverage summary at ${display}: ${reason}`,
+    'Expected a vitest json-summary object with at least one src/ file entry. Empty objects, arrays, and zero-directory summaries are rejected (no doc writes).',
+  ].join('\n');
+}
+
+/**
+ * Stable message for malformed JSON (q-mp-1005) — no stack.
+ * @param {string} [summaryPath]
+ * @param {string} [detail]
+ * @returns {string}
+ */
+export function malformedJsonMessage(
+  summaryPath = DEFAULT_SUMMARY,
+  detail = 'Unexpected end of JSON input'
+) {
+  const display = String(summaryPath).replace(/\\/g, '/');
+  return [
+    `report:coverage-map — malformed JSON in ${display}`,
+    detail,
+    'Pass a valid vitest coverage-summary.json (run `npm run test:unit:coverage`).',
+  ].join('\n');
+}
+
+/**
  * @param {unknown} err
  * @returns {err is Error & { code: string, path?: string }}
  */
@@ -472,6 +509,57 @@ function isMissingSummaryError(err) {
     'code' in err &&
     /** @type {{ code?: unknown }} */ (err).code === 'ENOENT'
   );
+}
+
+/**
+ * Input-shape / parse errors that should print message-only (no stack).
+ * @param {unknown} err
+ * @returns {err is Error & { code: string }}
+ */
+function isCoverageSummaryInputError(err) {
+  if (err == null || typeof err !== 'object' || !('code' in err)) return false;
+  const code = /** @type {{ code?: unknown }} */ (err).code;
+  return code === 'INVALID_SUMMARY' || code === 'MALFORMED_JSON';
+}
+
+/**
+ * Reject arrays, null, non-objects, and summaries that yield zero src/ dirs (q-mp-993).
+ * Hermetic — no I/O.
+ *
+ * @param {unknown} summary
+ * @param {{ root?: string }} [opts]
+ * @returns {{ ok: true, rows: DirRow[] } | { ok: false, reason: string }}
+ */
+export function validateCoverageSummary(summary, opts = {}) {
+  if (summary == null || typeof summary !== 'object') {
+    return { ok: false, reason: 'expected a non-null object' };
+  }
+  if (Array.isArray(summary)) {
+    return { ok: false, reason: 'array-shaped summary' };
+  }
+  const rows = aggregateByDirectory(
+    /** @type {Record<string, FileCov>} */ (summary),
+    { root: opts.root ?? ROOT }
+  );
+  if (rows.length === 0) {
+    return { ok: false, reason: 'zero directories under src/' };
+  }
+  return { ok: true, rows };
+}
+
+/**
+ * @param {string} message
+ * @param {'INVALID_SUMMARY' | 'MALFORMED_JSON'} code
+ * @param {string} [summaryPath]
+ * @returns {Error & { code: string, path?: string }}
+ */
+function coverageSummaryError(message, code, summaryPath) {
+  const err = /** @type {Error & { code: string, path?: string }} */ (
+    new Error(message)
+  );
+  err.code = code;
+  if (summaryPath !== undefined) err.path = summaryPath;
+  return err;
 }
 
 /**
@@ -486,23 +574,42 @@ function isMissingSummaryError(err) {
 export function writeReport(opts = {}) {
   const summaryPath = path.resolve(ROOT, opts.summaryPath ?? DEFAULT_SUMMARY);
   const dryRun = opts.dryRun === true;
-  /** @type {Record<string, FileCov>} */
+  const relSummary =
+    path.relative(ROOT, summaryPath).replace(/\\/g, '/') || DEFAULT_SUMMARY;
+  /** @type {unknown} */
   let summary;
   if (opts.summary != null) {
     summary = opts.summary;
   } else if (!fs.existsSync(summaryPath)) {
-    const rel =
-      path.relative(ROOT, summaryPath).replace(/\\/g, '/') || DEFAULT_SUMMARY;
-    const err = new Error(missingSummaryMessage(rel));
+    const err = new Error(missingSummaryMessage(relSummary));
     err.code = 'ENOENT';
     err.path = summaryPath;
     throw err;
   } else {
-    summary = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
+    const raw = fs.readFileSync(summaryPath, 'utf8');
+    try {
+      summary = JSON.parse(raw);
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : String(err);
+      throw coverageSummaryError(
+        malformedJsonMessage(relSummary, detail),
+        'MALFORMED_JSON',
+        summaryPath
+      );
+    }
   }
-  const rows = aggregateByDirectory(summary, { root: opts.root ?? ROOT });
+  const validated = validateCoverageSummary(summary, {
+    root: opts.root ?? ROOT,
+  });
+  if (!validated.ok) {
+    throw coverageSummaryError(
+      invalidSummaryMessage(relSummary, validated.reason),
+      'INVALID_SUMMARY',
+      summaryPath
+    );
+  }
+  const { rows } = validated;
   const generatedAt = opts.now ?? new Date().toISOString();
-  const relSummary = path.relative(ROOT, summaryPath).replace(/\\/g, '/');
   const svg = renderCoverageHeatSvg(rows, { generatedAt });
   const md = renderCoverageMapMarkdown(rows, {
     generatedAt,
@@ -562,6 +669,10 @@ if (isMain) {
           ? err.message
           : missingSummaryMessage(display)
       );
+      process.exitCode = 1;
+    } else if (isCoverageSummaryInputError(err)) {
+      // Invalid shape / malformed JSON — message only, no stack (q-mp-993 / q-mp-1005).
+      console.error(err instanceof Error ? err.message : String(err));
       process.exitCode = 1;
     } else {
       console.error('report:coverage-map error:', err);
