@@ -13,7 +13,8 @@
  * not walked — only *.md. Tip-vs-alpha / triage dumps stay in scope.)
  *
  * Verifies:
- *   1. Backtick paths that look like repo files (src/, tests/, docs/, scripts/, .github/)
+ *   1. Backtick paths that look like repo files (src/, tests/, docs/, scripts/,
+ *      .github/, plus common root configs — package.json, vitest.config.ts, …)
  *   2. Rows in "| Symbol | File |" tables — symbol must appear in that file
  *   3. Relative markdown links under docs/
  *
@@ -37,11 +38,14 @@ const ROOT = path.resolve(__dirname, '..');
 /** Walk root: whole docs/ tree (was docs/dev/ only before q-mp-857). */
 const DOCS_DIR = path.join(ROOT, 'docs');
 
-/** Backtick repo paths under src|tests|docs|scripts|.github.
+/** Backtick repo paths under src|tests|docs|scripts|.github, plus root configs.
  * Includes .mts / .d.mts (type companions; q-mp-1177) and .yml/.yaml
- * under `.github/` (workflows / copilot-instructions; q-mp-1250). */
+ * under `.github/` (workflows / copilot-instructions; q-mp-1250).
+ * Root allowlist (q-mp-1271): package.json, package-lock.json, vitest/vite/
+ * eslint/playwright configs, knip.json, tsconfig*.json, index.html,
+ * AGENTS.md, CONTRIBUTING.md. Glob stars (e.g. `tsconfig*.json`) stay unchecked. */
 export const PATH_RE =
-  /`((?:src|tests|docs|scripts|\.github)\/[A-Za-z0-9_./@+-]+\.(?:ts|tsx|js|mjs|mts|css|md|json|yml|yaml))`/g;
+  /`((?:(?:src|tests|docs|scripts|\.github)\/[A-Za-z0-9_./@+-]+\.(?:ts|tsx|js|mjs|mts|css|md|json|yml|yaml)|(?:package(?:-lock)?\.json|vitest\.config\.ts|vite\.config\.ts|eslint\.config\.js|knip\.json|playwright\.config\.ts|tsconfig(?:\.[A-Za-z0-9_-]+)?\.json|index\.html|AGENTS\.md|CONTRIBUTING\.md)))`/g;
 const TABLE_ROW_RE =
   /^\|\s*`([^`]+)`\s*\|\s*`((?:src|tests|docs|scripts)\/[^`]+)`\s*\|/;
 const MODULE_ROW_RE =
