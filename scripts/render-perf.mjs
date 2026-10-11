@@ -26,6 +26,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import { gotoGame, startHuman } from './lib/page-ready.mjs';
+import { waitDoubleRaf } from './lib/page-settle.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
 
@@ -94,15 +95,6 @@ const filter = (process.env.PERF_GAMES || '')
 const GAMES = filter.length
   ? ALL_GAMES.filter((g) => filter.includes(g))
   : ALL_GAMES;
-
-async function waitDoubleRaf(page) {
-  await page.evaluate(
-    () =>
-      new Promise((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-      })
-  );
-}
 
 /** Soft condition wait + paint settle (no fixed sleep). */
 async function waitForReadySoft(page, selector, timeout = 2_000) {
