@@ -16,6 +16,24 @@ describe('check-build helpers', () => {
     ]);
   });
 
+  it('accepts revision-first key order and single-quoted entries (q-mp-1058)', () => {
+    expect(parsePrecacheManifest('{ revision: "1", url: "/a.js" }')).toEqual([
+      { url: '/a.js', revision: '1' },
+    ]);
+    expect(parsePrecacheManifest("{ url: '/a.js', revision: '1' }")).toEqual([
+      { url: '/a.js', revision: '1' },
+    ]);
+    expect(parsePrecacheManifest("{ revision: '1', url: '/a.js' }")).toEqual([
+      { url: '/a.js', revision: '1' },
+    ]);
+    expect(parsePrecacheManifest('{ revision: null, url: "/a.js" }')).toEqual([
+      { url: '/a.js', revision: null },
+    ]);
+    expect(parsePrecacheManifest(`{url:"/a.js",revision:"1"}`)).toEqual([
+      { url: '/a.js', revision: '1' },
+    ]);
+  });
+
   it('diffs hash trees for only-A / only-B / content', () => {
     const a = new Map([
       ['a.js', '111'],
