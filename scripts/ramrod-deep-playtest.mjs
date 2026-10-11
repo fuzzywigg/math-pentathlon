@@ -5,10 +5,27 @@
  *
  * Usage: node scripts/ramrod-deep-playtest.mjs
  * Requires Vite on http://127.0.0.1:5173
+ *
+ * Options: -h, --help (exits before mkdir / browser launch)
  */
 import { chromium, devices } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
+import { applyDeepPlaytestCli } from './lib/deep-playtest-cli.mjs';
+
+const USAGE = `Usage: node scripts/ramrod-deep-playtest.mjs
+
+Deep playtest for Ramrod (human-vs-AI, Easy/Medium/Hard, tablet + desktop).
+Requires Vite on PLAYTEST_BASE (default http://127.0.0.1:5173).
+
+Env:
+  PLAYTEST_BASE   Base URL (default http://127.0.0.1:5173)
+  RAMROD_GAMES    Games per difficulty×viewport (default 10)
+
+Options:
+  -h, --help      Show this help and exit (no browser launch)`;
+
+applyDeepPlaytestCli(process.argv.slice(2), USAGE);
 
 const BASE = process.env.PLAYTEST_BASE || 'http://127.0.0.1:5173';
 const OUT = path.resolve('docs/playtest/ramrod-deep-2026-10-07');

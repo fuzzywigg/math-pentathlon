@@ -7,10 +7,28 @@
  * Requires Vite on http://127.0.0.1:5173
  *
  * Env: PAR55_GAMES (default 10), PLAYTEST_BASE, PAR55_QUICK=1 (1 game per combo)
+ *
+ * Options: -h, --help (exits before mkdir / browser launch)
  */
 import { chromium, devices } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
+import { applyDeepPlaytestCli } from './lib/deep-playtest-cli.mjs';
+
+const USAGE = `Usage: node scripts/par-55-deep-playtest.mjs
+
+Deep playtest for Par 55 (human-vs-AI, Easy/Medium/Hard, tablet + desktop).
+Requires Vite on PLAYTEST_BASE (default http://127.0.0.1:5173).
+
+Env:
+  PLAYTEST_BASE   Base URL (default http://127.0.0.1:5173)
+  PAR55_GAMES     Games per difficulty×viewport (default 10)
+  PAR55_QUICK=1   Force 1 game per difficulty×viewport
+
+Options:
+  -h, --help      Show this help and exit (no browser launch)`;
+
+applyDeepPlaytestCli(process.argv.slice(2), USAGE);
 
 const BASE = process.env.PLAYTEST_BASE || 'http://127.0.0.1:5173';
 const OUT = path.resolve('docs/playtest/par-55-deep-2026-10-07');
