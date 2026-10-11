@@ -2,6 +2,7 @@
 /**
  * Repeat unit runs and aggregate per-test pass/fail + timings.
  * Usage: node scripts/flake-rate-unit-loop.mjs [--runs N] [--shuffle N] [--out DIR]
+ * --help/-h exit 0 without spawning vitest. Unknown flags exit 2.
  */
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -11,9 +12,41 @@ const USAGE =
   'Usage: node scripts/flake-rate-unit-loop.mjs [--runs N] [--shuffle N] [--out DIR]\n' +
   '  --runs N      positive integer (default 7)\n' +
   '  --shuffle N   positive integer (default 3)\n' +
-  '  --out DIR     output directory';
+  '  --out DIR     output directory\n' +
+  '  -h, --help    show this help and exit (no vitest spawn)';
+
+const VALUE_FLAGS = new Set(['--runs', '--shuffle', '--out']);
 
 const args = process.argv.slice(2);
+
+/**
+ * Early argv gate: help / unknown flags before mkdir or vitest spawn.
+ * @param {string[]} argv
+ */
+function applyEarlyCli(argv) {
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (a === '--help' || a === '-h') {
+      console.log(USAGE);
+      process.exit(0);
+    }
+    if (VALUE_FLAGS.has(a)) {
+      // Consume the value slot when present; flag()/strFlag validate later.
+      if (i + 1 < argv.length) i += 1;
+      continue;
+    }
+    if (a.startsWith('-')) {
+      console.error(`Unknown flag: ${a}`);
+      console.error(USAGE);
+      process.exit(2);
+    }
+    console.error(`Unexpected argument: ${a}`);
+    console.error(USAGE);
+    process.exit(2);
+  }
+}
+
+applyEarlyCli(args);
 
 function usageExit(message) {
   console.error(message);
