@@ -6,7 +6,8 @@
  *
  * Exit codes:
  *   0 — ranked table printed (or --help / -h)
- *   2 — missing/unreadable summary path, or flag-like argv (prints usage; no stack)
+ *   2 — missing/unreadable summary path, flag-like argv, or empty/non-engine
+ *       summary (prints usage; no stack; no fake empty rank table)
  *
  * Default path when omitted: coverage-engine-baseline/coverage-summary.json
  * (generated locally; not committed).
@@ -14,6 +15,7 @@
  * CLI (q-mp-918): `--help`/`-h` exit 0 with usage; args starting with `-`
  * are rejected (exit 2) before path lookup — never treat `--help` as a path.
  * Missing-summary copy (q-mp-842) is unchanged.
+ * Empty / total-only / non-engine summaries (q-mp-992) exit 2 before rank output.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -89,6 +91,18 @@ export function missingSummaryMessage(summaryPath) {
     `error: coverage summary not found: ${summaryPath}`,
     USAGE,
     'Generate coverage-summary.json locally (e.g. npm run test:unit:coverage) and pass its path; the default coverage-engine-baseline/ directory is not committed.',
+  ].join('\n');
+}
+
+/**
+ * Message when the summary parses but has zero matching engine rows (q-mp-992).
+ * @param {string} summaryPath
+ */
+export function emptyEngineSummaryMessage(summaryPath) {
+  return [
+    `error: coverage summary has no matching engine modules: ${summaryPath}`,
+    USAGE,
+    'Expected at least one non-AI engine file matching src/games/<game>/(rules|types|game-state|board|pieces|serialization).ts. Empty objects, total-only summaries, and non-engine rows are rejected (not treated as zero debt).',
   ].join('\n');
 }
 
@@ -222,6 +236,10 @@ export function main(argv = process.argv.slice(2), io = {}) {
   }
 
   const rows = collectEngineRows(raw);
+  if (rows.length === 0) {
+    error(emptyEngineSummaryMessage(summaryPath));
+    return 2;
+  }
   log(formatRankOutput(rows));
   return 0;
 }
