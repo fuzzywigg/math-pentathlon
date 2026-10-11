@@ -31,6 +31,7 @@
     "WORKFLOW_LOOSENS_PERMISSIONS"
   ],
   "counts": {
+    "note": "by_primary_classification is mutually exclusive primary class; by_any_classification counts a file under every class in classifications[]. PLAYER_FACING_COPY any 38 = 32 primary + 6 secondary-only (AI-primary game-controller files that also carry copy).",
     "by_primary_classification": {
       "OK": 1010,
       "PLAYER_FACING_COPY": 32,
