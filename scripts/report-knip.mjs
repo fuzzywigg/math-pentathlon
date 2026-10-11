@@ -164,9 +164,15 @@ export function validateBaselineMetrics(metrics) {
 }
 
 /**
+ * Diff current metrics against baseline (ratchet-down posture).
+ *
+ * Non-finite baseline/current values must not green-wash as `same` (q-mp-1235):
+ * `NaN - n` is NaN, so neither `delta > 0` nor `delta < 0` holds and every key
+ * used to land in `same`. Fail closed with a schema error instead.
+ *
  * @param {Record<string, number>} current
  * @param {Record<string, number>} baseline
- * @returns {{ growth: Array<{key:string,baseline:number,current:number,delta:number}>, shrink: Array<{key:string,baseline:number,current:number,delta:number}>, same: string[] }}
+ * @returns {{ ok: true, growth: Array<{key:string,baseline:number,current:number,delta:number}>, shrink: Array<{key:string,baseline:number,current:number,delta:number}>, same: string[] } | { ok: false, message: string }}
  */
 export function diffMetrics(current, baseline) {
   /** @type {Array<{key:string,baseline:number,current:number,delta:number}>} */
@@ -178,12 +184,18 @@ export function diffMetrics(current, baseline) {
   for (const key of METRIC_KEYS) {
     const b = Number(baseline[key] ?? 0);
     const c = Number(current[key] ?? 0);
+    if (!Number.isFinite(b) || !Number.isFinite(c)) {
+      return {
+        ok: false,
+        message: `report:knip — diffMetrics schema invalid: "${key}" must be a finite number (baseline=${String(baseline[key])}, current=${String(current[key])})`,
+      };
+    }
     const delta = c - b;
     if (delta > 0) growth.push({ key, baseline: b, current: c, delta });
     else if (delta < 0) shrink.push({ key, baseline: b, current: c, delta });
     else same.push(key);
   }
-  return { growth, shrink, same };
+  return { ok: true, growth, shrink, same };
 }
 
 /**
@@ -415,10 +427,17 @@ function main() {
     console.log(`  ${key}: ${metrics[key]}`);
   }
 
-  /** @type {ReturnType<typeof diffMetrics> | null} */
+  /** @type {Extract<ReturnType<typeof diffMetrics>, { ok: true }> | null} */
   let diff = null;
   if (baselineMetrics) {
-    diff = diffMetrics(metrics, baselineMetrics);
+    const diffResult = diffMetrics(metrics, baselineMetrics);
+    if (!diffResult.ok) {
+      // Defensive: loadBaseline + validateBaselineMetrics already reject
+      // non-finite metrics; keep fail-closed if a caller bypasses that path.
+      console.error(diffResult.message);
+      process.exit(1);
+    }
+    diff = diffResult;
     if (diff.growth.length === 0) {
       annotate(
         'notice',
