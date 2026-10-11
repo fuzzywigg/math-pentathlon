@@ -21,23 +21,40 @@ import { chromium } from '@playwright/test';
 import { createServer } from 'vite';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dismissOwl } from './lib/dismiss-owl.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
 import { MEMORY_LEAK_AUDIT_USAGE } from './lib/browser-harness-script-usage.mjs';
+import {
+  analyzeHeapSnapshot,
+  fmtMb,
+  metricDelta,
+} from './lib/memory-leak-heap.mjs';
 import { waitForGameReady, startHuman } from './lib/page-ready.mjs';
 
-applyBrowserHarnessCli(process.argv.slice(2), MEMORY_LEAK_AUDIT_USAGE);
+export { analyzeHeapSnapshot, fmtMb, metricDelta };
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
-const LABEL = process.env.MEM_LEAK_LABEL || 'run';
-const CYCLES = requireEnvNumber('MEM_LEAK_CYCLES', 10);
-const PORT = requireEnvNumber('MEM_LEAK_PORT', 5181);
+
+/** Lazy MEM_LEAK_* env so hermetic unit imports stay free of requireEnvNumber. */
+function auditLabel() {
+  return process.env.MEM_LEAK_LABEL || 'run';
+}
+function auditCycles() {
+  return requireEnvNumber('MEM_LEAK_CYCLES', 10);
+}
+function auditPort() {
+  return requireEnvNumber('MEM_LEAK_PORT', 5181);
+}
 /** Optional date stem so re-runs can avoid clobbering the Oct 7 baseline twins. */
-const MEM_DATE = process.env.MEM_LEAK_DATE || '2026-10-07';
-const OUT_JSON = resolve(ROOT, `docs/memory-leaks-${LABEL}-${MEM_DATE}.json`);
+function auditDate() {
+  return process.env.MEM_LEAK_DATE || '2026-10-07';
+}
+function outJsonPath() {
+  return resolve(ROOT, `docs/memory-leaks-${auditLabel()}-${auditDate()}.json`);
+}
 
 const BOARD3D_GAMES = new Set([
   'kings-quadraphages',
@@ -89,11 +106,6 @@ const filter = (process.env.MEM_LEAK_GAMES || '')
 const GAMES = filter.length
   ? ALL_GAMES.filter((g) => filter.includes(g.id))
   : ALL_GAMES;
-
-function fmtMb(bytes) {
-  if (bytes == null) return 'n/a';
-  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
-}
 
 async function waitMenu(page) {
   await page.locator('.game-card').first().waitFor({ timeout: 20_000 });
@@ -151,34 +163,6 @@ async function closeToMenu(page) {
   await dismissOwl(page);
 }
 
-/** Parse Chrome heap snapshot for Detached DOM counts + total self size. */
-function analyzeHeapSnapshot(jsonText) {
-  const data = JSON.parse(jsonText);
-  const meta = data.snapshot.meta;
-  const nodeFields = meta.node_fields;
-  const strings = data.strings;
-  const nodes = data.nodes;
-  const fieldCount = nodeFields.length;
-  const nameOffset = nodeFields.indexOf('name');
-  const selfSizeOffset = nodeFields.indexOf('self_size');
-
-  let detachedDomNodes = 0;
-  let detachedSelfSize = 0;
-  let totalSelfSize = 0;
-
-  for (let i = 0; i < nodes.length; i += fieldCount) {
-    const selfSize = nodes[i + selfSizeOffset];
-    totalSelfSize += selfSize;
-    const name = strings[nodes[i + nameOffset]];
-    if (typeof name === 'string' && name.startsWith('Detached ')) {
-      detachedDomNodes += 1;
-      detachedSelfSize += selfSize;
-    }
-  }
-
-  return { detachedDomNodes, detachedSelfSize, totalSelfSize };
-}
-
 async function measureHeap(cdp) {
   await cdp.send('HeapProfiler.enable').catch(() => {});
   await cdp.send('HeapProfiler.collectGarbage').catch(() => {});
@@ -226,6 +210,7 @@ async function prepareMenu(page, baseURL, board3d) {
 
 async function auditGame(browser, baseURL, game) {
   const board3d = BOARD3D_GAMES.has(game.id);
+  const cycles = auditCycles();
   const context = await browser.newContext({ baseURL });
   const page = await context.newPage();
   const cdp = await context.newCDPSession(page);
@@ -236,7 +221,7 @@ async function auditGame(browser, baseURL, game) {
     gameId: game.id,
     name: game.name,
     board3d,
-    cycles: CYCLES,
+    cycles,
     samples: [],
     afterWarm: null,
     afterCycles: null,
@@ -258,7 +243,7 @@ async function auditGame(browser, baseURL, game) {
     result.afterWarm = afterWarm;
     result.samples.push({ label: 'after-warm', ...afterWarm });
 
-    for (let i = 1; i <= CYCLES; i++) {
+    for (let i = 1; i <= cycles; i++) {
       await openGameFromMenu(page, game);
       await closeToMenu(page);
       // Light metric each cycle (no full snapshot — those are expensive).
@@ -280,13 +265,19 @@ async function auditGame(browser, baseURL, game) {
     result.afterCycles = afterCycles;
     result.samples.push({ label: 'after-cycles', ...afterCycles });
 
-    result.deltaJsHeapBytes =
-      (afterCycles.jsHeapUsedBytes ?? 0) - (afterWarm.jsHeapUsedBytes ?? 0);
-    result.deltaDetachedDom =
-      (afterCycles.detachedDomNodes ?? 0) - (afterWarm.detachedDomNodes ?? 0);
-    result.deltaSnapshotSelfBytes =
-      (afterCycles.snapshotSelfSizeBytes ?? 0) -
-      (afterWarm.snapshotSelfSizeBytes ?? 0);
+    // q-mp-1216: missing metrics stay null (do not coerce null→0).
+    result.deltaJsHeapBytes = metricDelta(
+      afterCycles.jsHeapUsedBytes,
+      afterWarm.jsHeapUsedBytes
+    );
+    result.deltaDetachedDom = metricDelta(
+      afterCycles.detachedDomNodes,
+      afterWarm.detachedDomNodes
+    );
+    result.deltaSnapshotSelfBytes = metricDelta(
+      afterCycles.snapshotSelfSizeBytes,
+      afterWarm.snapshotSelfSizeBytes
+    );
   } catch (err) {
     result.error = err instanceof Error ? err.message : String(err);
   } finally {
@@ -297,18 +288,24 @@ async function auditGame(browser, baseURL, game) {
 }
 
 async function main() {
+  const label = auditLabel();
+  const cycles = auditCycles();
+  const port = auditPort();
+  const memDate = auditDate();
+  const outJson = outJsonPath();
+
   let baseURL = process.env.MEM_LEAK_BASE_URL || '';
   let server = null;
   if (!baseURL) {
     server = await createServer({
       root: ROOT,
-      server: { host: '127.0.0.1', port: PORT, strictPort: true },
+      server: { host: '127.0.0.1', port, strictPort: true },
       logLevel: 'error',
     });
     await server.listen();
     const addr = server.httpServer?.address();
-    const port = typeof addr === 'object' && addr ? addr.port : PORT;
-    baseURL = `http://127.0.0.1:${port}`;
+    const listenPort = typeof addr === 'object' && addr ? addr.port : port;
+    baseURL = `http://127.0.0.1:${listenPort}`;
   }
 
   const browser = await chromium.launch({
@@ -318,7 +315,7 @@ async function main() {
   const results = [];
 
   console.log(
-    `Memory-leak audit (${LABEL}): ${GAMES.length} games × ${CYCLES} cycles @ ${baseURL}`
+    `Memory-leak audit (${label}): ${GAMES.length} games × ${cycles} cycles @ ${baseURL}`
   );
 
   try {
@@ -329,9 +326,9 @@ async function main() {
       if (r.error) {
         console.log(`ERROR ${r.error}`);
       } else {
-        console.log(
-          `Δheap=${fmtMb(r.deltaJsHeapBytes)} Δdetached=${r.deltaDetachedDom}`
-        );
+        const detached =
+          r.deltaDetachedDom == null ? 'n/a' : String(r.deltaDetachedDom);
+        console.log(`Δheap=${fmtMb(r.deltaJsHeapBytes)} Δdetached=${detached}`);
       }
     }
   } finally {
@@ -339,21 +336,28 @@ async function main() {
     if (server) await server.close();
   }
 
-  await mkdir(dirname(OUT_JSON), { recursive: true });
+  await mkdir(dirname(outJson), { recursive: true });
   const payload = {
-    label: LABEL,
-    date: MEM_DATE,
-    cycles: CYCLES,
+    label,
+    date: memDate,
+    cycles,
     baseURL,
     method:
       'Playwright menu open/close; CDP HeapProfiler.takeHeapSnapshot + Performance.getMetrics; GC before samples',
     results,
   };
-  await writeFile(OUT_JSON, JSON.stringify(payload, null, 2));
-  console.log(`Wrote ${OUT_JSON}`);
+  await writeFile(outJson, JSON.stringify(payload, null, 2));
+  console.log(`Wrote ${outJson}`);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+const isMain =
+  Boolean(process.argv[1]) &&
+  import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
+
+if (isMain) {
+  applyBrowserHarnessCli(process.argv.slice(2), MEMORY_LEAK_AUDIT_USAGE);
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
