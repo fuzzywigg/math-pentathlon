@@ -65,6 +65,21 @@ export const OFFLINE_EXTS = new Set([
 ]);
 
 /**
+ * Normalize a matched Workbox revision capture to string | null.
+ * Finite numeric revisions (including 0) are stringified (q-mp-1178).
+ * @param {string | undefined} quoted
+ * @param {string | undefined} numeric
+ * @returns {string | null | undefined} undefined when the match is unusable
+ */
+function normalizePrecacheRevision(quoted, numeric) {
+  if (quoted !== undefined) return quoted;
+  if (numeric === undefined) return null;
+  const n = Number(numeric);
+  if (!Number.isFinite(n)) return undefined;
+  return String(n);
+}
+
+/**
  * Parse Workbox precache entries from generated sw.js.
  * Accepts url/revision in either key order and ' or " quotes (q-mp-1058).
  * Also accepts JSON-quoted keys `"url"` / `"revision"` (q-mp-1087).
@@ -72,32 +87,37 @@ export const OFFLINE_EXTS = new Set([
  * and colons (q-mp-1099 / q-mp-1125).
  * Optional Workbox `integrity` (q-mp-1126) and `size` (q-mp-1149) fields
  * after url/revision are ignored (do not drop the entry).
+ * Finite numeric `revision` values (including 0) are accepted and stringified
+ * (q-mp-1178).
  * @param {string} swSource
  * @returns {{ url: string, revision: string | null }[]}
  */
 export function parsePrecacheManifest(swSource) {
   const entries = [];
   // Optional " or ' around keys (JSON or bare identifiers).
-  // url-first or revision-first; string values may use ' or "; revision may be null.
+  // url-first or revision-first; string values may use ' or "; revision may be
+  // null or a finite number (stringified).
   // Optional WS around keys/colons; optional integrity/size; optional trailing `,`.
   const key = (name) => `(?:["']${name}["']|${name})`;
   // PrecacheEntry may include integrity (string|null) and/or size (number|null).
   const optExtra = `(?:\\s*,\\s*(?:["'](?:integrity|size)["']|(?:integrity|size))\\s*:\\s*(?:null|["'][^"']*["']|\\d+))*`;
+  // Finite number literal only (no NaN/Infinity identifiers).
+  const numRev = `(-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?)`;
+  // Groups: url-first 1=urlQ 2=url 3=revQ 4=revStr 5=revNum;
+  // rev-first 6=revQ 7=revStr 8=revNum 9=urlQ 10=url.
   const re = new RegExp(
-    `\\{\\s*(?:${key('url')}\\s*:\\s*(["'])([^"']+)\\1\\s*,\\s*${key('revision')}\\s*:\\s*(?:(["'])([^"']*)\\3|null)|${key('revision')}\\s*:\\s*(?:(["'])([^"']*)\\5|null)\\s*,\\s*${key('url')}\\s*:\\s*(["'])([^"']+)\\7)${optExtra}\\s*,?\\s*\\}`,
+    `\\{\\s*(?:${key('url')}\\s*:\\s*(["'])([^"']+)\\1\\s*,\\s*${key('revision')}\\s*:\\s*(?:(["'])([^"']*)\\3|null|${numRev})|${key('revision')}\\s*:\\s*(?:(["'])([^"']*)\\6|null|${numRev})\\s*,\\s*${key('url')}\\s*:\\s*(["'])([^"']+)\\9)${optExtra}\\s*,?\\s*\\}`,
     'g'
   );
   for (const match of swSource.matchAll(re)) {
     if (match[2] !== undefined) {
-      entries.push({
-        url: match[2],
-        revision: match[4] === undefined ? null : match[4],
-      });
+      const revision = normalizePrecacheRevision(match[4], match[5]);
+      if (revision === undefined) continue;
+      entries.push({ url: match[2], revision });
     } else {
-      entries.push({
-        url: match[8],
-        revision: match[6] === undefined ? null : match[6],
-      });
+      const revision = normalizePrecacheRevision(match[7], match[8]);
+      if (revision === undefined) continue;
+      entries.push({ url: match[10], revision });
     }
   }
   return entries;

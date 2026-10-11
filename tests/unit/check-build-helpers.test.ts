@@ -156,6 +156,44 @@ describe('check-build helpers', () => {
     ]);
   });
 
+  it('accepts finite numeric revision values and stringifies them (q-mp-1178)', () => {
+    expect(parsePrecacheManifest('{url:"/a.js",revision:42}')).toEqual([
+      { url: '/a.js', revision: '42' },
+    ]);
+    expect(parsePrecacheManifest('{url:"/a.js",revision:0}')).toEqual([
+      { url: '/a.js', revision: '0' },
+    ]);
+    expect(parsePrecacheManifest('{"url":"/a.js","revision":42}')).toEqual([
+      { url: '/a.js', revision: '42' },
+    ]);
+    expect(parsePrecacheManifest('{revision:0,url:"/a.js"}')).toEqual([
+      { url: '/a.js', revision: '0' },
+    ]);
+    expect(parsePrecacheManifest('{revision:42,url:"/a.js"}')).toEqual([
+      { url: '/a.js', revision: '42' },
+    ]);
+    // Numeric revision + folded size/integrity extras still parse.
+    expect(
+      parsePrecacheManifest('{url:"/a.js",revision:42,size:12}')
+    ).toEqual([{ url: '/a.js', revision: '42' }]);
+    expect(
+      parsePrecacheManifest('{url:"/a.js",revision:0,integrity:null}')
+    ).toEqual([{ url: '/a.js', revision: '0' }]);
+    // String / null paths unchanged.
+    expect(parsePrecacheManifest('{url:"/a.js",revision:"1"}')).toEqual([
+      { url: '/a.js', revision: '1' },
+    ]);
+    expect(parsePrecacheManifest('{url:"/a.js",revision:null}')).toEqual([
+      { url: '/a.js', revision: null },
+    ]);
+    // Invalid revision shapes still drop the entry.
+    expect(parsePrecacheManifest('{url:"/a.js",revision:true}')).toEqual([]);
+    expect(parsePrecacheManifest('{url:"/a.js",revision:Infinity}')).toEqual(
+      []
+    );
+    expect(parsePrecacheManifest('{url:"/a.js",revision:NaN}')).toEqual([]);
+  });
+
   it('diffs hash trees for only-A / only-B / content', () => {
     const a = new Map([
       ['a.js', '111'],
