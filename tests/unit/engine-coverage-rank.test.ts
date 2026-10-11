@@ -1,8 +1,13 @@
-/** Hermetic helpers for scripts/engine-coverage-rank.mjs (q-mp-842). */
-import { describe, it, expect } from 'vitest';
+/**
+ * Hermetic helpers for scripts/engine-coverage-rank.mjs
+ * (q-mp-842 missing-summary UX; q-mp-918 early --help / flag rejection).
+ */
+import { describe, it, expect, vi } from 'vitest';
 import {
   USAGE,
+  HELP,
   DEFAULT_SUMMARY_REL,
+  parseArgs,
   resolveSummaryPath,
   missingSummaryMessage,
   collectEngineRows,
@@ -49,6 +54,10 @@ describe('engine-coverage-rank helpers (q-mp-842)', () => {
     expect(logs).toEqual([]);
     expect(errors.join('\n')).toContain(USAGE);
     expect(errors.join('\n')).not.toMatch(/ENOENT|Error:/);
+    // Missing-summary path still uses the q-mp-842 one-line USAGE, not HELP options.
+    expect(errors.join('\n')).toBe(
+      missingSummaryMessage(`/repo/${DEFAULT_SUMMARY_REL}`)
+    );
   });
 
   it('ranks engine modules and keeps table shape on valid JSON', () => {
@@ -117,5 +126,98 @@ describe('engine-coverage-rank helpers (q-mp-842)', () => {
     expect(logs.join('\n')).toContain(
       'rank\tfile\tline%\tlines\tbranch%\tbranches'
     );
+  });
+});
+
+describe('engine-coverage-rank CLI argv (q-mp-918)', () => {
+  it('parseArgs recognizes --help / -h, path, and unknown flags', () => {
+    expect(parseArgs([])).toEqual({
+      ok: true,
+      help: false,
+      summaryPath: undefined,
+    });
+    expect(parseArgs(['--help'])).toEqual({
+      ok: true,
+      help: true,
+      summaryPath: undefined,
+    });
+    expect(parseArgs(['-h'])).toEqual({
+      ok: true,
+      help: true,
+      summaryPath: undefined,
+    });
+    expect(
+      parseArgs(['coverage-engine-baseline/coverage-summary.json'])
+    ).toEqual({
+      ok: true,
+      help: false,
+      summaryPath: 'coverage-engine-baseline/coverage-summary.json',
+    });
+    expect(parseArgs(['--wat'])).toEqual({
+      ok: false,
+      message: 'Unknown flag: --wat',
+    });
+    expect(parseArgs(['--help', 'extra.json']).ok).toBe(true);
+    expect(parseArgs(['a.json', 'b.json'])).toEqual({
+      ok: false,
+      message: 'Unexpected argument: b.json',
+    });
+  });
+
+  it('HELP documents --help and keeps USAGE one-liner stable', () => {
+    expect(HELP).toContain(USAGE);
+    expect(HELP).toMatch(/-h, --help/);
+    expect(USAGE).toBe(
+      'Usage: node scripts/engine-coverage-rank.mjs <path/to/coverage-summary.json>'
+    );
+  });
+
+  it('main --help exits 0 with usage before path lookup', () => {
+    const logs: string[] = [];
+    const errors: string[] = [];
+    const existsSync = vi.fn(() => false);
+    const code = main(['--help'], {
+      cwd: '/repo',
+      existsSync,
+      log: (s) => logs.push(s),
+      error: (s) => errors.push(s),
+    });
+    expect(code).toBe(0);
+    expect(errors).toEqual([]);
+    expect(logs.join('\n')).toContain(USAGE);
+    expect(logs.join('\n')).toMatch(/-h, --help/);
+    expect(logs.join('\n')).not.toMatch(/coverage summary not found/);
+    expect(existsSync).not.toHaveBeenCalled();
+  });
+
+  it('main -h matches --help (no path lookup)', () => {
+    const logs: string[] = [];
+    const existsSync = vi.fn(() => true);
+    const code = main(['-h'], {
+      existsSync,
+      log: (s) => logs.push(s),
+      error: () => undefined,
+    });
+    expect(code).toBe(0);
+    expect(logs.join('\n')).toMatch(/Usage:/i);
+    expect(existsSync).not.toHaveBeenCalled();
+  });
+
+  it('main unknown flags exit 2 with usage before path lookup', () => {
+    const errors: string[] = [];
+    const logs: string[] = [];
+    const existsSync = vi.fn(() => false);
+    const code = main(['--wat'], {
+      cwd: '/repo',
+      existsSync,
+      log: (s) => logs.push(s),
+      error: (s) => errors.push(s),
+    });
+    expect(code).toBe(2);
+    expect(logs).toEqual([]);
+    expect(errors.join('\n')).toMatch(/Unknown flag:\s*--wat/);
+    expect(errors.join('\n')).toContain(USAGE);
+    expect(errors.join('\n')).not.toMatch(/coverage summary not found/);
+    expect(existsSync).not.toHaveBeenCalled();
   });
 });
