@@ -254,6 +254,9 @@ function accumulateMetric(bucket, key, parsed) {
 
 /**
  * Finalize a directory metric from count and/or pct-only contributions.
+ * Prefer line-weighted covered/total when any counted rows exist; do not
+ * equal-weight pct-only files with counted files (q-mp-1229). Pct-only-only
+ * directories keep a simple pct average.
  * @param {DirBucket} bucket
  * @param {'lines'|'branches'|'functions'|'statements'} key
  * @returns {CovMetric}
@@ -261,22 +264,11 @@ function accumulateMetric(bucket, key, parsed) {
 function finalizeMetric(bucket, key) {
   const countFiles = bucket[`${key}CountFiles`];
   const pctFiles = bucket[`${key}PctFiles`];
-  if (countFiles > 0 && pctFiles === 0) {
+  if (countFiles > 0) {
     return metricFromCounts(bucket[`${key}C`], bucket[`${key}T`]);
   }
-  if (countFiles === 0 && pctFiles > 0) {
+  if (pctFiles > 0) {
     return metricFromPct(bucket[`${key}PctSum`] / pctFiles);
-  }
-  if (countFiles > 0 && pctFiles > 0) {
-    const countsPct = metricFromCounts(
-      bucket[`${key}C`],
-      bucket[`${key}T`]
-    ).pct;
-    const pctOnlyAvg = bucket[`${key}PctSum`] / pctFiles;
-    const combined =
-      (countsPct * countFiles + pctOnlyAvg * pctFiles) /
-      (countFiles + pctFiles);
-    return { total: null, covered: null, pct: clampPct(combined) };
   }
   // Totals absent and no pct — do not invent 100% from 0/0 (q-mp-1017).
   return { total: null, covered: null, pct: 0 };

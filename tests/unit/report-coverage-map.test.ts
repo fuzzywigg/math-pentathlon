@@ -179,6 +179,59 @@ describe('report-coverage-map helpers (q-mp-075)', () => {
     });
   });
 
+  it('prefers line-weighted counts over equal-weight pct-only mix (q-mp-1229)', () => {
+    const mixed = aggregateByDirectory(
+      {
+        'src/games/demo/full.ts': {
+          lines: { total: 100, covered: 100, pct: 100 },
+          branches: { total: 10, covered: 10, pct: 100 },
+          functions: { total: 5, covered: 5, pct: 100 },
+          statements: { total: 100, covered: 100, pct: 100 },
+        },
+        'src/games/demo/pct.ts': {
+          lines: { pct: 0 },
+          branches: { pct: 0 },
+          functions: { pct: 0 },
+          statements: { pct: 0 },
+        },
+      },
+      { root: '/workspace' }
+    );
+    expect(mixed).toHaveLength(1);
+    // Must not invent 50% / null totals by equal-weighting file pcts.
+    expect(mixed[0]).toMatchObject({
+      dir: 'src/games/demo',
+      files: 2,
+      lines: { covered: 100, total: 100, pct: 100 },
+      branches: { covered: 10, total: 10, pct: 100 },
+      functions: { covered: 5, total: 5, pct: 100 },
+      statements: { covered: 100, total: 100, pct: 100 },
+    });
+
+    const pctOnly = aggregateByDirectory(
+      {
+        'src/games/a/x.ts': {
+          lines: { pct: 20 },
+          branches: { pct: 10 },
+          functions: { pct: 30 },
+          statements: { pct: 20 },
+        },
+        'src/games/a/y.ts': {
+          lines: { pct: 40 },
+          branches: { pct: 50 },
+          functions: { pct: 10 },
+          statements: { pct: 40 },
+        },
+      },
+      { root: '/workspace' }
+    );
+    expect(pctOnly[0]?.lines).toEqual({
+      covered: null,
+      total: null,
+      pct: 30,
+    });
+  });
+
   it('keeps explicit 0/0 counts as istanbul 100% (q-mp-1017)', () => {
     const rows = aggregateByDirectory(
       {
