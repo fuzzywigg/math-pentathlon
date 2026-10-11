@@ -1,7 +1,8 @@
 /**
- * Hermetic coverage for offline probe ready helpers (q-mp-1261 / q-mp-1262):
+ * Hermetic coverage for offline probe ready helpers (q-mp-1261 / q-mp-1262 / q-mp-1337):
  * - HTTP 404 must not count as ready
  * - PROBE_BROWSERS trims (and lower-cases) comma-separated names
+ * - Allowlist Playwright projects; alias chrome→chromium; reject unknown
  *
  * Stays on the default unit-shared (jsdom) project so we do not need a
  * vitest.config nodePureFiles allowlist edit for this ticket.
@@ -91,7 +92,7 @@ describe('waitForUrl (q-mp-1261)', () => {
   });
 });
 
-describe('parseProbeBrowsers (q-mp-1262)', () => {
+describe('parseProbeBrowsers (q-mp-1262 / q-mp-1337)', () => {
   it('defaults to webkit when unset or blank', () => {
     expect(parseProbeBrowsers(undefined)).toEqual(['webkit']);
     expect(parseProbeBrowsers(null)).toEqual(['webkit']);
@@ -113,6 +114,25 @@ describe('parseProbeBrowsers (q-mp-1262)', () => {
 
   it('preserves a single default name without commas', () => {
     expect(parseProbeBrowsers('webkit')).toEqual(['webkit']);
+  });
+
+  it('aliases chrome → chromium (case-insensitive)', () => {
+    expect(parseProbeBrowsers('chrome')).toEqual(['chromium']);
+    expect(parseProbeBrowsers('CHROME')).toEqual(['chromium']);
+    expect(parseProbeBrowsers(' chrome , firefox ')).toEqual([
+      'chromium',
+      'firefox',
+    ]);
+  });
+
+  it('rejects unknown browser names with a clear error', () => {
+    expect(() => parseProbeBrowsers('bogus')).toThrow(
+      /Unknown PROBE_BROWSERS name: bogus/
+    );
+    expect(() => parseProbeBrowsers('webkit,edge')).toThrow(
+      /Unknown PROBE_BROWSERS name: edge/
+    );
+    expect(() => parseProbeBrowsers('bogus')).toThrow(/chrome→chromium/);
   });
 });
 
