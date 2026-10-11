@@ -4,6 +4,7 @@
  * Output: JSON report to stdout (and optionally --out path).
  *
  * Usage: node scripts/mobile-audit.mjs [--out <path>]
+ * Options: -h, --help (exits before browser launch)
  */
 import { chromium, devices } from '@playwright/test';
 import { writeFileSync, mkdirSync } from 'node:fs';
@@ -381,6 +382,10 @@ if (isMain) {
     console.error(parsed.message);
     console.error(mobileAuditOutUsage());
     process.exit(2);
+  }
+  if ('help' in parsed && parsed.help) {
+    console.log(mobileAuditOutUsage());
+    process.exit(0);
   }
   main(parsed.outPath).catch((e) => {
     console.error(e);

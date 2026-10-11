@@ -54,10 +54,13 @@ describe('resolveMobileAuditOutPath (q-mp-844)', () => {
     expect(got.ok).toBe(false);
   });
 
-  it('usage string names the script and --out', () => {
-    expect(mobileAuditOutUsage()).toBe(
-      'Usage: node scripts/mobile-audit.mjs [--out <path>]'
+  it('usage string names the script, --out, and --help', () => {
+    const usage = mobileAuditOutUsage();
+    expect(usage).toMatch(
+      /^Usage: node scripts\/mobile-audit\.mjs \[--out <path>\]/
     );
+    expect(usage).toMatch(/--out <path>/);
+    expect(usage).toMatch(/-h, --help/);
   });
 });
 

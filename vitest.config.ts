@@ -160,6 +160,8 @@ const nodePureFiles = [
   'tests/unit/mutation-report-args.test.ts',
   // report-coverage-map flag-like argv rejection (q-mp-906); spawnSync CLI check.
   'tests/unit/report-coverage-map-cli-args.test.ts',
+  // browser harness early --help (q-mp-900); spawnSync CLI check needs node env.
+  'tests/unit/browser-harness-cli-help.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional

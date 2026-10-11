@@ -14,6 +14,8 @@
  *   npm run perf:runtime
  *   PERF_BASE_URL=http://localhost:5173 node scripts/runtime-perf.mjs
  *   PERF_GAMES=hex,fiar node scripts/runtime-perf.mjs   # optional subset
+ *
+ * Options: -h, --help (exits before browser / vite server)
  */
 
 import { chromium } from '@playwright/test';
@@ -23,6 +25,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gotoGame, startHuman } from './lib/page-ready.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
+import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
 import {
   CPU_THROTTLE,
   MOVE_TARGET_RENDER,
@@ -35,6 +38,20 @@ import {
   setupRenderContext,
   writeRenderReport,
 } from './render-perf-mode.mjs';
+
+const USAGE = `Usage: node scripts/runtime-perf.mjs
+
+Report-only runtime perf harness (Playwright + CDP).
+Prefer: npm run perf:runtime
+
+Options:
+  -h, --help       Show this help and exit (no browser launch)
+
+Env:
+  PERF_BASE_URL / PERF_GAMES / PERF_MOVES / PERF_NAV_CYCLES / PERF_FRAME_MS
+  PERF_MODE / PERF_PHASE / PERF_DATE / PERF_FIXED_GAMES / PERF_FIX_NOTES`;
+
+applyBrowserHarnessCli(process.argv.slice(2), USAGE);
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
