@@ -164,6 +164,8 @@ const nodePureFiles = [
   'tests/unit/artifact-dir.test.ts',
   // mutation-report argv validation (q-mp-867 / q-mp-868); spawnSync CLI check.
   'tests/unit/mutation-report-args.test.ts',
+  // mutation-report Vitest status classify (q-mp-1038); hermetic node env.
+  'tests/unit/mutation-report-vitest-status.test.ts',
   // report-coverage-map flag-like argv rejection (q-mp-906); spawnSync CLI check.
   'tests/unit/report-coverage-map-cli-args.test.ts',
   // browser harness early --help (q-mp-900); spawnSync CLI check needs node env.

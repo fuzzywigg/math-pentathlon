@@ -24,13 +24,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import ts from 'typescript';
 import {
   MUTATION_REPORT_USAGE,
   parseMutationReportArgs,
   resolveMutationReportGames,
 } from './lib/mutation-report-args.mjs';
+import { classifyVitestRunResult } from './lib/mutation-report-vitest-status.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -39,26 +40,62 @@ const ARTIFACT_DIR = path.join(ROOT, 'docs');
 const REPORT_JSON = path.join(ARTIFACT_DIR, 'mutation-report-rules.json');
 
 const COMPARISON_FLIP = new Map([
-  [ts.SyntaxKind.LessThanToken, ts.factory.createToken(ts.SyntaxKind.LessThanEqualsToken)],
-  [ts.SyntaxKind.LessThanEqualsToken, ts.factory.createToken(ts.SyntaxKind.LessThanToken)],
-  [ts.SyntaxKind.GreaterThanToken, ts.factory.createToken(ts.SyntaxKind.GreaterThanEqualsToken)],
-  [ts.SyntaxKind.GreaterThanEqualsToken, ts.factory.createToken(ts.SyntaxKind.GreaterThanToken)],
-  [ts.SyntaxKind.EqualsEqualsEqualsToken, ts.factory.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken)],
-  [ts.SyntaxKind.ExclamationEqualsEqualsToken, ts.factory.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken)],
-  [ts.SyntaxKind.EqualsEqualsToken, ts.factory.createToken(ts.SyntaxKind.ExclamationEqualsToken)],
-  [ts.SyntaxKind.ExclamationEqualsToken, ts.factory.createToken(ts.SyntaxKind.EqualsEqualsToken)],
+  [
+    ts.SyntaxKind.LessThanToken,
+    ts.factory.createToken(ts.SyntaxKind.LessThanEqualsToken),
+  ],
+  [
+    ts.SyntaxKind.LessThanEqualsToken,
+    ts.factory.createToken(ts.SyntaxKind.LessThanToken),
+  ],
+  [
+    ts.SyntaxKind.GreaterThanToken,
+    ts.factory.createToken(ts.SyntaxKind.GreaterThanEqualsToken),
+  ],
+  [
+    ts.SyntaxKind.GreaterThanEqualsToken,
+    ts.factory.createToken(ts.SyntaxKind.GreaterThanToken),
+  ],
+  [
+    ts.SyntaxKind.EqualsEqualsEqualsToken,
+    ts.factory.createToken(ts.SyntaxKind.ExclamationEqualsEqualsToken),
+  ],
+  [
+    ts.SyntaxKind.ExclamationEqualsEqualsToken,
+    ts.factory.createToken(ts.SyntaxKind.EqualsEqualsEqualsToken),
+  ],
+  [
+    ts.SyntaxKind.EqualsEqualsToken,
+    ts.factory.createToken(ts.SyntaxKind.ExclamationEqualsToken),
+  ],
+  [
+    ts.SyntaxKind.ExclamationEqualsToken,
+    ts.factory.createToken(ts.SyntaxKind.EqualsEqualsToken),
+  ],
 ]);
 
 const ARITH_FLIP = new Map([
   [ts.SyntaxKind.PlusToken, ts.factory.createToken(ts.SyntaxKind.MinusToken)],
   [ts.SyntaxKind.MinusToken, ts.factory.createToken(ts.SyntaxKind.PlusToken)],
-  [ts.SyntaxKind.AsteriskToken, ts.factory.createToken(ts.SyntaxKind.SlashToken)],
-  [ts.SyntaxKind.SlashToken, ts.factory.createToken(ts.SyntaxKind.AsteriskToken)],
+  [
+    ts.SyntaxKind.AsteriskToken,
+    ts.factory.createToken(ts.SyntaxKind.SlashToken),
+  ],
+  [
+    ts.SyntaxKind.SlashToken,
+    ts.factory.createToken(ts.SyntaxKind.AsteriskToken),
+  ],
 ]);
 
 const LOGICAL_FLIP = new Map([
-  [ts.SyntaxKind.AmpersandAmpersandToken, ts.factory.createToken(ts.SyntaxKind.BarBarToken)],
-  [ts.SyntaxKind.BarBarToken, ts.factory.createToken(ts.SyntaxKind.AmpersandAmpersandToken)],
+  [
+    ts.SyntaxKind.AmpersandAmpersandToken,
+    ts.factory.createToken(ts.SyntaxKind.BarBarToken),
+  ],
+  [
+    ts.SyntaxKind.BarBarToken,
+    ts.factory.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
+  ],
 ]);
 
 function listGames() {
@@ -84,7 +121,9 @@ function testGlobsForGame(game) {
   // Shared rules smoke that covers multiple engines (safe, non-AI).
   if (game === 'kings-quadraphages') {
     globs.push('tests/unit/rules.test.ts');
-    globs.push('tests/unit/overnight-wave55-kings-rules-no-king-reject.test.ts');
+    globs.push(
+      'tests/unit/overnight-wave55-kings-rules-no-king-reject.test.ts'
+    );
     globs.push('tests/unit/overnight-wave49-kings-valid-moves-no-king.test.ts');
     globs.push('tests/unit/burn-wave41-kings-king-move-oob-reject.test.ts');
     globs.push('tests/unit/burn-wave41-kings-win-trap-placements.test.ts');
@@ -97,7 +136,9 @@ function testGlobsForGame(game) {
     globs.push('tests/unit/kwatro-sinko-end-rules-375.test.ts');
     globs.push('tests/unit/burn-wave41-kwatro-sinko-opening-rules.test.ts');
     globs.push('tests/unit/burn-wave47-kwatro-sinko-opening-rules.test.ts');
-    globs.push('tests/unit/overnight-wave67-kwatro-rules-node-coords-exact.test.ts');
+    globs.push(
+      'tests/unit/overnight-wave67-kwatro-rules-node-coords-exact.test.ts'
+    );
   }
   if (game === 'fiar') {
     globs.push('tests/unit/fiar-official-rules.test.ts');
@@ -129,11 +170,7 @@ function expandExistingTests(globs) {
     const dir = path.dirname(g);
     const base = path.basename(g);
     const re = new RegExp(
-      '^' +
-        base
-          .replace(/[.+^${}()|[\]\\]/g, '\\$&')
-          .replace(/\*/g, '.*') +
-        '$'
+      '^' + base.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$'
     );
     const absDir = path.join(ROOT, dir);
     if (!fs.existsSync(absDir)) continue;
@@ -149,7 +186,13 @@ function lineOf(sourceFile, pos) {
 }
 
 function collectMutants(sourceText, filePath) {
-  const sourceFile = ts.createSourceFile(filePath, sourceText, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  const sourceFile = ts.createSourceFile(
+    filePath,
+    sourceText,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS
+  );
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
   const mutants = [];
 
@@ -218,21 +261,33 @@ function collectMutants(sourceText, filePath) {
           `m${++counter}`,
           'ConditionalBoundary/Equality',
           node,
-          ts.factory.updateBinaryExpression(node, node.left, flipped, node.right),
+          ts.factory.updateBinaryExpression(
+            node,
+            node.left,
+            flipped,
+            node.right
+          ),
           `flip ${ts.tokenToString(op)} → ${ts.tokenToString(flipped.kind)}`
         );
       }
       if (ARITH_FLIP.has(op)) {
         // Skip string concatenation heuristics: if either side is a string literal
-        const leftStr = ts.isStringLiteral(node.left) || ts.isTemplateExpression(node.left);
-        const rightStr = ts.isStringLiteral(node.right) || ts.isTemplateExpression(node.right);
+        const leftStr =
+          ts.isStringLiteral(node.left) || ts.isTemplateExpression(node.left);
+        const rightStr =
+          ts.isStringLiteral(node.right) || ts.isTemplateExpression(node.right);
         if (!(leftStr || rightStr) || op !== ts.SyntaxKind.PlusToken) {
           const flipped = ARITH_FLIP.get(op);
           pushMutant(
             `m${++counter}`,
             'Arithmetic',
             node,
-            ts.factory.updateBinaryExpression(node, node.left, flipped, node.right),
+            ts.factory.updateBinaryExpression(
+              node,
+              node.left,
+              flipped,
+              node.right
+            ),
             `flip ${ts.tokenToString(op)} → ${ts.tokenToString(flipped.kind)}`
           );
         }
@@ -243,7 +298,12 @@ function collectMutants(sourceText, filePath) {
           `m${++counter}`,
           'Logical',
           node,
-          ts.factory.updateBinaryExpression(node, node.left, flipped, node.right),
+          ts.factory.updateBinaryExpression(
+            node,
+            node.left,
+            flipped,
+            node.right
+          ),
           `flip ${ts.tokenToString(op)} → ${ts.tokenToString(flipped.kind)}`
         );
       }
@@ -251,14 +311,29 @@ function collectMutants(sourceText, filePath) {
 
     // Boolean literals
     if (node.kind === ts.SyntaxKind.TrueKeyword) {
-      pushMutant(`m${++counter}`, 'BooleanLiteral', node, ts.factory.createFalse(), 'true → false');
+      pushMutant(
+        `m${++counter}`,
+        'BooleanLiteral',
+        node,
+        ts.factory.createFalse(),
+        'true → false'
+      );
     }
     if (node.kind === ts.SyntaxKind.FalseKeyword) {
-      pushMutant(`m${++counter}`, 'BooleanLiteral', node, ts.factory.createTrue(), 'false → true');
+      pushMutant(
+        `m${++counter}`,
+        'BooleanLiteral',
+        node,
+        ts.factory.createTrue(),
+        'false → true'
+      );
     }
 
     // Prefix ! removal
-    if (ts.isPrefixUnaryExpression(node) && node.operator === ts.SyntaxKind.ExclamationToken) {
+    if (
+      ts.isPrefixUnaryExpression(node) &&
+      node.operator === ts.SyntaxKind.ExclamationToken
+    ) {
       pushMutant(`m${++counter}`, 'UnaryNot', node, node.operand, 'remove !');
     }
 
@@ -305,7 +380,13 @@ function collectMutants(sourceText, filePath) {
 
 function runVitest(testFiles, timeoutMs, quiet) {
   if (testFiles.length === 0) {
-    return { status: 'no-tests', exitCode: 0, durationMs: 0, stdout: '', stderr: 'no test files' };
+    return {
+      status: 'no-tests',
+      exitCode: 0,
+      durationMs: 0,
+      stdout: '',
+      stderr: 'no test files',
+    };
   }
   const args = ['vitest', 'run', ...testFiles, '--reporter=dot'];
   const started = Date.now();
@@ -317,14 +398,31 @@ function runVitest(testFiles, timeoutMs, quiet) {
     maxBuffer: 8 * 1024 * 1024,
   });
   const durationMs = Date.now() - started;
+  const stdout = result.stdout || '';
+  const stderr = result.stderr || '';
   if (result.error && result.error.code === 'ETIMEDOUT') {
-    return { status: 'timeout', exitCode: null, durationMs, stdout: result.stdout || '', stderr: result.stderr || '' };
+    return {
+      status: classifyVitestRunResult({
+        timedOut: true,
+        exitCode: null,
+        stdout,
+        stderr,
+      }),
+      exitCode: null,
+      durationMs,
+      stdout,
+      stderr,
+    };
   }
   const exitCode = result.status;
-  if (exitCode === 0) {
-    return { status: 'survived', exitCode, durationMs, stdout: quiet ? '' : result.stdout, stderr: quiet ? '' : result.stderr };
-  }
-  return { status: 'killed', exitCode, durationMs, stdout: quiet ? '' : result.stdout, stderr: quiet ? '' : result.stderr };
+  const status = classifyVitestRunResult({ exitCode, stdout, stderr });
+  return {
+    status,
+    exitCode,
+    durationMs,
+    stdout: quiet ? '' : stdout,
+    stderr: quiet ? '' : stderr,
+  };
 }
 
 function scoreOf(killed, total) {
@@ -333,29 +431,49 @@ function scoreOf(killed, total) {
 }
 
 function formatTable(rows) {
-  const headers = ['Game', 'Mutants', 'Killed', 'Survived', 'Timeout', 'Error', 'Score %'];
-  const widths = headers.map((h, i) => Math.max(h.length, ...rows.map((r) => String(r[i]).length)));
-  const line = (cols) => cols.map((c, i) => String(c).padEnd(widths[i])).join('  ');
-  return [line(headers), line(widths.map((w) => '-'.repeat(w))), ...rows.map(line)].join('\n');
+  const headers = [
+    'Game',
+    'Mutants',
+    'Killed',
+    'Survived',
+    'Timeout',
+    'Error',
+    'Score %',
+  ];
+  const widths = headers.map((h, i) =>
+    Math.max(h.length, ...rows.map((r) => String(r[i]).length))
+  );
+  const line = (cols) =>
+    cols.map((c, i) => String(c).padEnd(widths[i])).join('  ');
+  return [
+    line(headers),
+    line(widths.map((w) => '-'.repeat(w))),
+    ...rows.map(line),
+  ].join('\n');
 }
 
 function mutateGame(game, opts) {
   const rulesPath = path.join(GAMES_DIR, game, 'rules.ts');
   const original = fs.readFileSync(rulesPath, 'utf8');
   const allMutants = collectMutants(original, rulesPath);
-  const selected =
-    opts.max === 0 ? allMutants : allMutants.slice(0, opts.max);
+  const selected = opts.max === 0 ? allMutants : allMutants.slice(0, opts.max);
 
   const tests = expandExistingTests(testGlobsForGame(game));
   console.log(`\n=== ${game} ===`);
-  console.log(`rules: ${path.relative(ROOT, rulesPath)} (${original.split('\n').length} lines)`);
-  console.log(`mutants: ${selected.length}/${allMutants.length} (cap=${opts.max === 0 ? 'none' : opts.max})`);
+  console.log(
+    `rules: ${path.relative(ROOT, rulesPath)} (${original.split('\n').length} lines)`
+  );
+  console.log(
+    `mutants: ${selected.length}/${allMutants.length} (cap=${opts.max === 0 ? 'none' : opts.max})`
+  );
   console.log(`tests: ${tests.length ? tests.join(', ') : '(none found)'}`);
 
   // Baseline sanity: original must pass
   const baseline = runVitest(tests, opts.timeoutMs, opts.quietTests);
   if (baseline.status !== 'survived' && baseline.status !== 'no-tests') {
-    console.warn(`  WARN: baseline tests did not pass (${baseline.status}, exit=${baseline.exitCode}). Skipping mutants.`);
+    console.warn(
+      `  WARN: baseline tests did not pass (${baseline.status}, exit=${baseline.exitCode}). Skipping mutants.`
+    );
     return {
       game,
       lines: original.split('\n').length,
@@ -381,7 +499,9 @@ function mutateGame(game, opts) {
 
   for (let i = 0; i < selected.length; i++) {
     const m = selected[i];
-    process.stdout.write(`  [${i + 1}/${selected.length}] L${m.line} ${m.kind}: ${m.description} ... `);
+    process.stdout.write(
+      `  [${i + 1}/${selected.length}] L${m.line} ${m.kind}: ${m.description} ... `
+    );
     try {
       fs.writeFileSync(rulesPath, m.text);
       const result = runVitest(tests, opts.timeoutMs, opts.quietTests);
@@ -392,6 +512,16 @@ function mutateGame(game, opts) {
         timeout++;
         console.log(`TIMEOUT`);
         survivors.push({ ...m, outcome: 'timeout' });
+      } else if (result.status === 'error') {
+        error++;
+        console.log(`ERROR (vitest infra / no test files)`);
+        survivors.push({
+          id: m.id,
+          kind: m.kind,
+          line: m.line,
+          description: m.description,
+          outcome: 'error',
+        });
       } else if (result.status === 'no-tests') {
         error++;
         console.log(`ERROR (no tests)`);
@@ -410,7 +540,14 @@ function mutateGame(game, opts) {
     } catch (e) {
       error++;
       console.log(`ERROR (${e.message})`);
-      survivors.push({ id: m.id, kind: m.kind, line: m.line, description: m.description, outcome: 'error', error: e.message });
+      survivors.push({
+        id: m.id,
+        kind: m.kind,
+        line: m.line,
+        description: m.description,
+        outcome: 'error',
+        error: e.message,
+      });
     } finally {
       fs.writeFileSync(rulesPath, original);
     }
@@ -419,7 +556,9 @@ function mutateGame(game, opts) {
   const ran = selected.length;
   const detected = killed; // timeouts count against score as not-killed
   const score = scoreOf(detected, ran);
-  console.log(`  → killed ${killed}/${ran}  survived ${survived}  timeout ${timeout}  error ${error}  score ${score ?? 'n/a'}%`);
+  console.log(
+    `  → killed ${killed}/${ran}  survived ${survived}  timeout ${timeout}  error ${error}  score ${score ?? 'n/a'}%`
+  );
 
   return {
     game,
@@ -479,7 +618,9 @@ function main() {
 
   console.log('Mutation report (rules engines) — report-only, not CI-gated');
   console.log(`games=${games.join(',')}`);
-  console.log(`maxMutantsPerGame=${opts.max === 0 ? 'all' : opts.max} timeoutMs=${opts.timeoutMs}`);
+  console.log(
+    `maxMutantsPerGame=${opts.max === 0 ? 'all' : opts.max} timeoutMs=${opts.timeoutMs}`
+  );
 
   const results = [];
   const started = Date.now();
@@ -513,9 +654,15 @@ function main() {
   console.log(`\nWrote ${path.relative(ROOT, opts.jsonOut)}`);
 }
 
-try {
-  main();
-} catch (err) {
-  console.error(err);
-  process.exit(1);
+const isMain =
+  Boolean(process.argv[1]) &&
+  import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+
+if (isMain) {
+  try {
+    main();
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
 }
