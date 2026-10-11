@@ -21,9 +21,10 @@ npm run verify
 
 That runs `lint` → `lint:ratchet` → `format:check` → `typecheck` → `typecheck:ratchet` → `check:boundaries`. CI then runs report-only `npm run check:copy-pins -- --fail` with `continue-on-error: true` (outside `package.json` `verify`; does not fail the required lint job).
 
-Then the rest of the required local gates:
+Then the rest of the required local gates (matching the other blocking CI jobs):
 
 ```bash
+npm audit --audit-level=high   # blocking CI audit job
 npm run test:unit
 npm run test:e2e:chromium    # required CI e2e path
 npm run build
