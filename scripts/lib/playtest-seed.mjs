@@ -16,7 +16,8 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseHelpOnlyArgv } from './help-only-cli.mjs';
 
-export const PLAYTEST_SEED_ENV = 'PLAYTEST_SEED';
+/** Env key for `resolvePlaytestSeed` (internal; not a public export). */
+const PLAYTEST_SEED_ENV = 'PLAYTEST_SEED';
 /** Default when `PLAYTEST_SEED` is unset/empty. */
 export const DEFAULT_PLAYTEST_SEED = 0x70a71e57;
 
