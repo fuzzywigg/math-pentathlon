@@ -14,9 +14,13 @@
  *
  * Optional path:
  *   node scripts/report-coverage-map.mjs path/to/coverage-summary.json
+ *   node scripts/report-coverage-map.mjs --dry-run
  *
  * CLI (q-mp-906): `--help`/`-h` exit 0 with usage; args starting with `-`
  * are rejected (exit 2) before path lookup — never treat `--help` as a path.
+ *
+ * Default invocation (no --dry-run) still writes the md/svg docs intentionally.
+ * --help / -h and --dry-run must not write those files (q-mp-977).
  */
 
 import fs from 'node:fs';
@@ -30,22 +34,25 @@ export const DEFAULT_SUMMARY = 'coverage/coverage-summary.json';
 export const OUT_SVG = 'docs/dev/coverage-map.svg';
 export const OUT_MD = 'docs/dev/coverage-map.md';
 
-export const USAGE = `Usage: node scripts/report-coverage-map.mjs [coverage-summary.json]
+export const USAGE = `Usage: node scripts/report-coverage-map.mjs [options] [coverage-summary.json]
 
 Options:
+  --dry-run     Compute and print summary counts without writing docs
   -h, --help    Show this help and exit 0
 
-Reads vitest json-summary (default: coverage/coverage-summary.json) and writes
-docs/dev/coverage-map.{md,svg}. Flag-like argv is rejected before path lookup.
+Reads vitest json-summary (default: coverage/coverage-summary.json).
+Default (no --dry-run) writes docs/dev/coverage-map.{md,svg}.
+Flag-like argv is rejected before path lookup.
 `;
 
 /**
- * Parse CLI argv (slice(2) form). Hermetic — no I/O, no process.exit (q-mp-906).
+ * Parse CLI argv (slice(2) form). Hermetic — no I/O, no process.exit (q-mp-906 / q-mp-977).
  *
  * @param {string[]} argv
  * @returns {{
  *   ok: true,
  *   help: boolean,
+ *   dryRun: boolean,
  *   summaryPath: string | undefined,
  * } | {
  *   ok: false,
@@ -54,11 +61,16 @@ docs/dev/coverage-map.{md,svg}. Flag-like argv is rejected before path lookup.
  */
 export function parseArgs(argv) {
   let help = false;
+  let dryRun = false;
   /** @type {string | undefined} */
   let summaryPath;
   for (const a of argv) {
     if (a === '--help' || a === '-h') {
       help = true;
+      continue;
+    }
+    if (a === '--dry-run') {
+      dryRun = true;
       continue;
     }
     if (a.startsWith('-')) {
@@ -69,7 +81,7 @@ export function parseArgs(argv) {
     }
     summaryPath = a;
   }
-  return { ok: true, help, summaryPath };
+  return { ok: true, help, dryRun, summaryPath };
 }
 
 /**
@@ -468,10 +480,12 @@ function isMissingSummaryError(err) {
  *   summary?: Record<string, FileCov>,
  *   now?: string,
  *   root?: string,
+ *   dryRun?: boolean,
  * }} [opts]
  */
 export function writeReport(opts = {}) {
   const summaryPath = path.resolve(ROOT, opts.summaryPath ?? DEFAULT_SUMMARY);
+  const dryRun = opts.dryRun === true;
   /** @type {Record<string, FileCov>} */
   let summary;
   if (opts.summary != null) {
@@ -496,10 +510,12 @@ export function writeReport(opts = {}) {
   });
   const svgPath = path.join(ROOT, OUT_SVG);
   const mdPath = path.join(ROOT, OUT_MD);
-  fs.mkdirSync(path.dirname(svgPath), { recursive: true });
-  fs.writeFileSync(svgPath, svg, 'utf8');
-  fs.writeFileSync(mdPath, md, 'utf8');
-  return { rows, svgPath, mdPath, summaryPath };
+  if (!dryRun) {
+    fs.mkdirSync(path.dirname(svgPath), { recursive: true });
+    fs.writeFileSync(svgPath, svg, 'utf8');
+    fs.writeFileSync(mdPath, md, 'utf8');
+  }
+  return { rows, svgPath, mdPath, summaryPath, dryRun, svg, md };
 }
 
 function main() {
@@ -514,14 +530,17 @@ function main() {
     console.log(USAGE.trimEnd());
     return;
   }
-  const { rows, svgPath, mdPath, summaryPath } = writeReport({
+  const { rows, svgPath, mdPath, summaryPath, dryRun } = writeReport({
     summaryPath: parsed.summaryPath,
+    dryRun: parsed.dryRun,
   });
+  const verb = dryRun ? 'would write' : 'wrote';
+  const suffix = dryRun ? ' (dry-run; not writing)' : '';
   console.log(
-    `report:coverage-map — ${rows.length} director${rows.length === 1 ? 'y' : 'ies'} from ${path.relative(ROOT, summaryPath)}`
+    `report:coverage-map — ${rows.length} director${rows.length === 1 ? 'y' : 'ies'} from ${path.relative(ROOT, summaryPath)}${suffix}`
   );
-  console.log(`  wrote ${path.relative(ROOT, svgPath)}`);
-  console.log(`  wrote ${path.relative(ROOT, mdPath)}`);
+  console.log(`  ${verb} ${path.relative(ROOT, svgPath)}`);
+  console.log(`  ${verb} ${path.relative(ROOT, mdPath)}`);
 }
 
 const isMain =
