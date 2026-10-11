@@ -6,11 +6,28 @@
  * long tasks >50ms, and layout-forcing DOM reads under CPU 4× + tablet viewport.
  *
  * Does not replace the leak/remount report in docs/runtime-perf-*.md.
+ *
+ * This file is a library module. Direct CLI entry prints usage only:
+ *   node scripts/render-perf-mode.mjs [--help]
+ * Unknown flags exit 2. Measurement contracts are unchanged — run via:
+ *   PERF_MODE=render npm run perf:runtime
  */
 
 import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { requireEnvNumber } from './lib/env-number.mjs';
+import { parseHelpOnlyArgv } from './lib/help-only-cli.mjs';
+
+export const RENDER_PERF_MODE_USAGE = `Usage: node scripts/render-perf-mode.mjs [--help]
+
+Library module for PERF_MODE=render measurements (imported by scripts/runtime-perf.mjs).
+Not a standalone harness — run measurements with:
+
+  PERF_MODE=render npm run perf:runtime
+
+Options:
+  -h, --help    Show this help and exit`;
 
 export const TABLET_VIEWPORT = { width: 768, height: 1024 };
 export const CPU_THROTTLE = requireEnvNumber('PERF_CPU_THROTTLE', 4);
@@ -545,3 +562,29 @@ export async function writeRenderReport(root, results, meta) {
 }
 
 export { HOVER_GAMES };
+
+/**
+ * CLI entry when this file is executed directly (q-mp-919).
+ * Import-as-library path is unchanged (no side effects on import).
+ *
+ * @param {string[]} [argv]
+ */
+export function main(argv = process.argv.slice(2)) {
+  const parsed = parseHelpOnlyArgv(argv);
+  if (parsed.kind === 'error') {
+    console.error(`Unknown flag: ${parsed.flag}`);
+    console.error(RENDER_PERF_MODE_USAGE);
+    process.exit(2);
+  }
+  // --help / -h, bare main, or stray positionals: usage only (not runnable).
+  console.log(RENDER_PERF_MODE_USAGE);
+  process.exit(0);
+}
+
+const isMain =
+  Boolean(process.argv[1]) &&
+  import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
+
+if (isMain) {
+  main();
+}
