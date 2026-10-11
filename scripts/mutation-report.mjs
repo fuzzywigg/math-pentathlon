@@ -108,12 +108,53 @@ function listGames() {
 }
 
 /**
+ * Convert a mutation test glob path to a basename RegExp (* → .*).
+ * Shared by expandExistingTests and hermetic fixture asserts (q-mp-1273).
+ *
+ * @param {string} globPath
+ * @returns {RegExp}
+ */
+export function mutationTestGlobToRegExp(globPath) {
+  const base = path.basename(globPath);
+  return new RegExp(
+    '^' + base.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$'
+  );
+}
+
+/**
+ * True when basename matches any mutation test glob (* → .*).
+ *
+ * @param {string[]} globs
+ * @param {string} basename
+ * @returns {boolean}
+ */
+export function anyMutationGlobMatchesBasename(globs, basename) {
+  return globs.some((g) => mutationTestGlobToRegExp(g).test(basename));
+}
+
+/**
  * Focused rules-unit globs; excludes AI / scoring / difficulty suites by name
  * (enforced in expandExistingTests via isExcludedMutationSuiteName).
  *
- * Exported for hermetic unit coverage (q-mp-1264).
+ * Exported for hermetic unit coverage (q-mp-1264, q-mp-1273).
  */
 export function testGlobsForGame(game) {
+  // q-mp-1273: hex ⊂ hex-a-gone — loose overnight/burn `hex-*rules*` / `hex*rules*`
+  // patterns match hex-a-gone suite names. Require a `hex-rules` / `hex-end-rules`
+  // token so hex-a-gone cannot ride hex mutation runs. Keep 1264 frac-fact path.
+  if (game === 'hex') {
+    return [
+      'tests/unit/hex-rules.test.ts',
+      'tests/unit/hex-rules.*.test.ts',
+      'tests/unit/hex-end-rules*.test.ts',
+      'tests/unit/hex-official-rules.test.ts',
+      'tests/unit/overnight-wave*-hex-rules*.test.ts',
+      'tests/unit/overnight-wave*-hex-end-rules*.test.ts',
+      'tests/unit/burn-wave*-hex-rules*.test.ts',
+      'tests/unit/burn-wave*-hex-end-rules*.test.ts',
+      'tests/unit/mutation-hex-rules.test.ts',
+    ];
+  }
   const globs = [
     `tests/unit/${game}-rules.test.ts`,
     `tests/unit/${game}-rules.*.test.ts`,
@@ -196,10 +237,7 @@ export function expandExistingTests(globs) {
       continue;
     }
     const dir = path.dirname(g);
-    const base = path.basename(g);
-    const re = new RegExp(
-      '^' + base.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$'
-    );
+    const re = mutationTestGlobToRegExp(g);
     const absDir = path.join(ROOT, dir);
     if (!fs.existsSync(absDir)) continue;
     for (const name of fs.readdirSync(absDir)) {

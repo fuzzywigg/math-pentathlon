@@ -13,6 +13,8 @@
  *
  * Also covers frac-fact test globs (q-mp-1264): expandExistingTests must drop
  * *difficulty* overnight suites while keeping other wave54 rules files.
+ * Also covers hex globs (q-mp-1273): overnight/burn patterns must not match
+ * hex-a-gone suite basenames while still matching real hex-rules files.
  * Leave games dedupe (#1365/1232) and Vitest classify (#1351/1217) alone.
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -21,6 +23,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { classifyVitestRunResult } from '../../scripts/lib/mutation-report-vitest-status.mjs';
 import {
+  anyMutationGlobMatchesBasename,
   baselineAllowsMutantRuns,
   expandExistingTests,
   isExcludedMutationSuiteName,
@@ -333,5 +336,83 @@ describe('testGlobsForGame / expandExistingTests (q-mp-1264)', () => {
     expect(wave54).not.toContain(
       'tests/unit/overnight-wave54-frac-rules-difficulty-operand-denoms.test.ts'
     );
+  });
+});
+
+describe('testGlobsForGame hex vs hex-a-gone (q-mp-1273)', () => {
+  const hexGlobs = testGlobsForGame('hex');
+
+  it('uses hex-rules / hex-end-rules overnight+burn tokens (not loose hex-*rules*)', () => {
+    expect(hexGlobs).toContain('tests/unit/overnight-wave*-hex-rules*.test.ts');
+    expect(hexGlobs).toContain('tests/unit/burn-wave*-hex-rules*.test.ts');
+    expect(hexGlobs).toContain(
+      'tests/unit/overnight-wave*-hex-end-rules*.test.ts'
+    );
+    expect(hexGlobs).toContain('tests/unit/burn-wave*-hex-end-rules*.test.ts');
+    expect(hexGlobs).not.toContain(
+      'tests/unit/overnight-wave*-hex-*rules*.test.ts'
+    );
+    expect(hexGlobs).not.toContain('tests/unit/burn-wave*-hex*rules*.test.ts');
+  });
+
+  it('fixture basenames: hex-a-gone overnight/burn do not match; hex-rules do', () => {
+    expect(
+      anyMutationGlobMatchesBasename(
+        hexGlobs,
+        'overnight-wave54-hex-a-gone-rules-x.test.ts'
+      )
+    ).toBe(false);
+    expect(
+      anyMutationGlobMatchesBasename(
+        hexGlobs,
+        'burn-wave41-hex-a-gone-rules.test.ts'
+      )
+    ).toBe(false);
+    expect(
+      anyMutationGlobMatchesBasename(
+        hexGlobs,
+        'overnight-wave10-hex-rules-foo.test.ts'
+      )
+    ).toBe(true);
+    expect(
+      anyMutationGlobMatchesBasename(hexGlobs, 'burn-wave12-hex-rules.test.ts')
+    ).toBe(true);
+    expect(
+      anyMutationGlobMatchesBasename(
+        hexGlobs,
+        'overnight-wave1-hex-end-rules.test.ts'
+      )
+    ).toBe(true);
+    expect(anyMutationGlobMatchesBasename(hexGlobs, 'hex-rules.test.ts')).toBe(
+      true
+    );
+    expect(
+      anyMutationGlobMatchesBasename(hexGlobs, 'hex-a-gone-rules.test.ts')
+    ).toBe(false);
+  });
+
+  it('live expand for hex keeps hex-rules and has zero hex-a-gone hits', () => {
+    const tests = expandExistingTests(hexGlobs);
+    expect(tests).toContain('tests/unit/hex-rules.test.ts');
+    expect(tests.every((t) => !t.includes('hex-a-gone'))).toBe(true);
+  });
+
+  it('hex-a-gone globs still match hex-a-gone overnight/burn fixtures', () => {
+    const hagGlobs = testGlobsForGame('hex-a-gone');
+    expect(
+      anyMutationGlobMatchesBasename(
+        hagGlobs,
+        'overnight-wave54-hex-a-gone-rules-x.test.ts'
+      )
+    ).toBe(true);
+    expect(
+      anyMutationGlobMatchesBasename(
+        hagGlobs,
+        'burn-wave41-hex-a-gone-rules.test.ts'
+      )
+    ).toBe(true);
+    expect(
+      anyMutationGlobMatchesBasename(hagGlobs, 'burn-wave12-hex-rules.test.ts')
+    ).toBe(false);
   });
 });
