@@ -4,6 +4,7 @@
  * Delay constants unchanged; only clearTimeout + generation gating.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { mountPair } from '../helpers/mount-pair';
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -18,9 +19,7 @@ describe('q-mp-145 hex-a-gone destroyGame clears AI timers', () => {
   it('armed AI delay is cleared; advancing timers does not throw', async () => {
     const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
     const mod = await import('../../src/games/hex-a-gone/game-controller');
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     mod.initGame(board, status);
     mod.newGameVsAI('easy');
 
@@ -48,9 +47,7 @@ describe('q-mp-145 star-track destroyGame clears AI timers', () => {
   it('clearTimeout when AI delay armed via draw→select handoff', async () => {
     const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
     const mod = await import('../../src/games/star-track/game-controller');
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     mod.initGame(board, status);
     mod.newGameVsAI('easy');
 
@@ -77,9 +74,7 @@ describe('q-mp-145 queens-guards destroyGame clears AI paint-delay timers', () =
   it('pending paint delay cleared; advancing timers does not start AI after leave', async () => {
     const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
     const mod = await import('../../src/games/queens-guards/game-controller');
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     mod.initGame(board, status);
     mod.newGameVsAI('easy');
 
@@ -103,9 +98,7 @@ describe('q-mp-145 kings-quadraphages destroyGame cancels AI delays', () => {
     const mod = await import(
       '../../src/games/kings-quadraphages/game-controller'
     );
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     mod.initGame(board, status);
     // AI plays first → executeAITurn arms AI_THINKING_DELAY.
     mod.newGameVsAI('easy', false);
