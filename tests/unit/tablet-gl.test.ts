@@ -20,6 +20,12 @@ import {
 
 describe('tablet-gl helpers', () => {
   const originalWebdriver = navigator.webdriver;
+  // unit-shared uses isolate:false — restore document.hidden so later suites
+  // do not see a stuck stub from Object.defineProperty (q-mp-1346).
+  const originalDocumentHidden = Object.getOwnPropertyDescriptor(
+    document,
+    'hidden'
+  );
 
   beforeEach(() => {
     localStorage.clear();
@@ -35,6 +41,11 @@ describe('tablet-gl helpers', () => {
       configurable: true,
       get: () => originalWebdriver,
     });
+    if (originalDocumentHidden) {
+      Object.defineProperty(document, 'hidden', originalDocumentHidden);
+    } else {
+      Reflect.deleteProperty(document, 'hidden');
+    }
     vi.restoreAllMocks();
   });
 
