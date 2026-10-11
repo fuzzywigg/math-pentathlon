@@ -16,6 +16,11 @@ import { isCallaEndStatus } from './lib/calla-end-status.mjs';
 import { applyDeepPlaytestCli } from './lib/deep-playtest-cli.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
+import {
+  installPageSeededRandom,
+  resolvePlaytestSeed,
+} from './lib/playtest-seed.mjs';
+import { joinPlaytestGameUrl } from './lib/playtest-url.mjs';
 
 const USAGE = `Usage: node scripts/calla-deep-playtest.mjs
 
@@ -25,6 +30,7 @@ Requires Vite on PLAYTEST_BASE_URL (default http://localhost:5173).
 Env:
   PLAYTEST_BASE_URL   Base URL (default http://localhost:5173)
   CALLA_GAMES_PER     Games per difficulty×viewport (default 10)
+  PLAYTEST_SEED       Move/AI RNG seed (default 0x70a71e57); written to results
 
 Options:
   -h, --help          Show this help and exit (no browser launch)`;
@@ -32,6 +38,7 @@ Options:
 applyDeepPlaytestCli(process.argv.slice(2), USAGE);
 
 const BASE = process.env.PLAYTEST_BASE_URL || 'http://localhost:5173';
+const SEED = resolvePlaytestSeed(process.env);
 const GAMES_PER = requireEnvNumber('CALLA_GAMES_PER', 10);
 const OUT_DIR = path.resolve('docs/playtest/calla-deep-2026-10-07');
 const ART_DIR = artifactPath('calla-deep-playtest');
@@ -56,7 +63,9 @@ async function dismissOwl(page) {
 }
 
 async function startVsAi(page, difficulty) {
-  await page.goto(`${BASE}/#/game/calla`, { waitUntil: 'domcontentloaded' });
+  await page.goto(joinPlaytestGameUrl(BASE, 'calla'), {
+    waitUntil: 'domcontentloaded',
+  });
   await waitForGameReady(page);
   await dismissOwl(page);
   await page.locator('#new-game-btn').click();
@@ -293,6 +302,7 @@ async function runViewport(name, viewportOpts) {
     deviceScaleFactor: name === 'tablet' ? 2 : 1,
   });
   const page = await context.newPage();
+  await installPageSeededRandom(page, SEED);
   const results = [];
 
   for (const difficulty of DIFFICULTIES) {
@@ -382,8 +392,9 @@ for (const [name, opts] of Object.entries(VIEWPORTS)) {
 const summary = summarize(all);
 const outJson = path.join(OUT_DIR, 'results.json');
 const artJson = path.join(ART_DIR, 'results.json');
-fs.writeFileSync(outJson, JSON.stringify({ summary, results: all }, null, 2));
-fs.writeFileSync(artJson, JSON.stringify({ summary, results: all }, null, 2));
+const payload = { seed: SEED, summary, results: all };
+fs.writeFileSync(outJson, JSON.stringify(payload, null, 2));
+fs.writeFileSync(artJson, JSON.stringify(payload, null, 2));
 
 console.log('\n=== SUMMARY ===');
 console.log(JSON.stringify(summary, null, 2));

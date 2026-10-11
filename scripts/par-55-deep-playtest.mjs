@@ -22,6 +22,11 @@ import {
 } from './lib/deep-playtest-end.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
+import {
+  installPageSeededRandom,
+  resolvePlaytestSeed,
+} from './lib/playtest-seed.mjs';
+import { joinPlaytestGameUrl } from './lib/playtest-url.mjs';
 
 const USAGE = `Usage: node scripts/par-55-deep-playtest.mjs
 
@@ -33,6 +38,7 @@ Env:
   PAR55_GAMES     Games per difficulty×viewport (default 10)
   PAR55_QUICK     Force 1 game per difficulty×viewport when set to 1/true/yes
                   (0/false/empty fall through to PAR55_GAMES)
+  PLAYTEST_SEED   Move/AI RNG seed (default 0x70a71e57); written to results
 
 Options:
   -h, --help      Show this help and exit (no browser launch)`;
@@ -40,6 +46,7 @@ Options:
 applyDeepPlaytestCli(process.argv.slice(2), USAGE);
 
 const BASE = process.env.PLAYTEST_BASE || 'http://127.0.0.1:5173';
+const SEED = resolvePlaytestSeed(process.env);
 const OUT = path.resolve('docs/playtest/par-55-deep-2026-10-07');
 const ART = resolveArtifactDir();
 // q-mp-1260: only 1/true/yes enable quick mode; '0'/'false' use PAR55_GAMES.
@@ -100,7 +107,9 @@ async function expectHidden(locator) {
 }
 
 async function startVsAi(page, difficulty) {
-  await page.goto(`${BASE}/#/game/par-55`, { waitUntil: 'domcontentloaded' });
+  await page.goto(joinPlaytestGameUrl(BASE, 'par-55'), {
+    waitUntil: 'domcontentloaded',
+  });
   await waitForGameReady(page);
   await dismissOwl(page);
   await page.locator('#new-game-btn').click();
@@ -318,6 +327,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
     locale: 'en-US',
   });
   const page = await context.newPage();
+  await installPageSeededRandom(page, SEED);
   const consoleErrors = [];
   const pageErrors = [];
   page.on('console', (msg) => {
@@ -524,6 +534,7 @@ async function main() {
       locale: 'en-US',
     });
     const page = await context.newPage();
+    await installPageSeededRandom(page, SEED);
     const race = await probeNewGameRace(page, 'medium');
     fs.writeFileSync(
       path.join(OUT, 'new-game-race.json'),
@@ -557,6 +568,7 @@ async function main() {
 
   const summary = {
     generatedAt: new Date().toISOString(),
+    seed: SEED,
     gamesPerDiff: GAMES_PER_DIFF,
     total: results.length,
     byOutcome: {},

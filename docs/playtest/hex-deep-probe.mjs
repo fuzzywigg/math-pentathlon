@@ -8,10 +8,16 @@ import { chromium, devices } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  installPageSeededRandom,
+  resolvePlaytestSeed,
+} from '../../scripts/lib/playtest-seed.mjs';
+import { joinPlaytestGameUrl } from '../../scripts/lib/playtest-url.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT = join(__dirname, 'hex-deep-2026-10-07');
 const BASE = process.env.HEX_PLAYTEST_URL || 'http://127.0.0.1:5173';
+const SEED = resolvePlaytestSeed(process.env);
 const PROBE = process.argv.includes('--probe');
 const GAMES_PER = PROBE ? 1 : 10;
 
@@ -39,7 +45,7 @@ async function dismissOwl(page) {
 }
 
 async function startVsAi(page, difficulty) {
-  await page.goto(`${BASE}/#/game/hex`);
+  await page.goto(joinPlaytestGameUrl(BASE, 'hex'));
   await page.getByTestId('game-loading').waitFor({ state: 'hidden', timeout: 20_000 }).catch(() => {});
   await page.locator('#new-game-btn').waitFor({ state: 'visible', timeout: 20_000 });
   await dismissOwl(page);
@@ -119,6 +125,7 @@ async function playOneGame(browser, viewportName, difficulty, gameIndex, shotFla
     isMobile: vp.isMobile,
   });
   const page = await context.newPage();
+  await installPageSeededRandom(page, SEED);
   const errors = [];
   page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
   page.on('console', (msg) => {
@@ -307,7 +314,13 @@ async function main() {
   await browser.close();
 
   const summary = summarize(results);
-  const payload = { generatedAt: new Date().toISOString(), probe: PROBE, results, summary };
+  const payload = {
+    generatedAt: new Date().toISOString(),
+    seed: SEED,
+    probe: PROBE,
+    results,
+    summary,
+  };
   writeFileSync(join(OUT, 'results.json'), JSON.stringify(payload, null, 2));
   writeFileSync(join(OUT, 'summary.json'), JSON.stringify(summary, null, 2));
   console.log('\n=== SUMMARY ===');
