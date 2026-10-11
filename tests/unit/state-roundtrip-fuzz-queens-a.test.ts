@@ -1,7 +1,8 @@
 /**
  * State round-trip fuzz shard — queens-guards, primary play seed, early moves
- * (q-mp-1108 / q-mp-1291). Seed-A late moves live in *-queens-a2.test.ts so the
- * ~8s AI-heavy case can parallelize without dropping checkpoints.
+ * (q-mp-1108 / q-mp-1291). Seed-A late mid/final moves live in *-queens-a2 /
+ * *-queens-a3.test.ts (q-mp-1343) so the AI-heavy case can parallelize without
+ * dropping checkpoints.
  */
 import { describe, it } from 'vitest';
 
