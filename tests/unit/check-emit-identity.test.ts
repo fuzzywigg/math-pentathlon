@@ -6,7 +6,9 @@
  */
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
-import { resolve } from 'node:path';
+import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { resolve, join } from 'node:path';
 import {
   transpileToJs,
   stripCommentsAndCollapseWhitespace,
@@ -26,6 +28,9 @@ import {
   resolveDefaultMergeBase,
   DEFAULT_TIP_REMOTE,
   DEFAULT_TIP_FALLBACK_REMOTE,
+  normalizeRepoRelativePath,
+  dedupePreserveOrder,
+  pathNotInRepoErrorMessage,
 } from '../../scripts/check-emit-identity.mjs';
 
 const EMIT_SCRIPT = resolve(process.cwd(), 'scripts/check-emit-identity.mjs');
@@ -691,5 +696,147 @@ export const n: N = 1;
     expect(result.ok).toBe(true);
     expect(result.results).toEqual([]);
     expect(result.error).toBeUndefined();
+  });
+
+  it('normalizeRepoRelativePath strips ./ and maps abs under root (q-mp-1429/1430)', () => {
+    expect(normalizeRepoRelativePath('./src/games/hex/ai.ts')).toEqual({
+      ok: true,
+      path: 'src/games/hex/ai.ts',
+    });
+    const abs = resolve('src/games/hex/ai.ts');
+    expect(normalizeRepoRelativePath(abs)).toEqual({
+      ok: true,
+      path: 'src/games/hex/ai.ts',
+    });
+    expect(normalizeRepoRelativePath('src/games/hex/ai.ts')).toEqual({
+      ok: true,
+      path: 'src/games/hex/ai.ts',
+    });
+    const escaped = normalizeRepoRelativePath('/tmp/outside.ts');
+    expect(escaped.ok).toBe(false);
+    if (!escaped.ok) {
+      expect(escaped.message).toContain('path escapes repository root');
+      expect(escaped.message).toContain(USAGE);
+    }
+    expect(pathNotInRepoErrorMessage('/tmp/x')).toMatch(
+      /^error: path escapes repository root: \/tmp\/x/
+    );
+  });
+
+  it('dedupePreserveOrder keeps first occurrence (q-mp-1430)', () => {
+    expect(
+      dedupePreserveOrder([
+        'src/games/hex/ai.ts',
+        'src/games/fiar/ai.ts',
+        'src/games/hex/ai.ts',
+      ])
+    ).toEqual(['src/games/hex/ai.ts', 'src/games/fiar/ai.ts']);
+  });
+
+  it('loadFilesFromList normalizes ./ , abs paths, and dedupes (q-mp-1429/1430)', () => {
+    const abs = resolve('src/games/hex/ai.ts');
+    const loaded = loadFilesFromList('/virtual/list.txt', {
+      existsSync: () => true,
+      statSync: () => ({ isFile: () => true }),
+      readFileSync: () =>
+        `src/games/hex/ai.ts\n./src/games/hex/ai.ts\n${abs}\nsrc/games/hex/ai.ts\n`,
+    });
+    expect(loaded).toEqual({
+      ok: true,
+      files: ['src/games/hex/ai.ts'],
+    });
+
+    const escape = loadFilesFromList('/virtual/escape.txt', {
+      existsSync: () => true,
+      statSync: () => ({ isFile: () => true }),
+      readFileSync: () => '/tmp/outside-emit.ts\n',
+    });
+    expect(escape.ok).toBe(false);
+    if (!escape.ok) {
+      expect(escape.message).toContain('path escapes repository root');
+    }
+  });
+
+  it('explicit --files-from empty/comment-only does not discover (q-mp-1428)', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'emit-1428-'));
+    const listPath = join(dir, 'comment-only.txt');
+    writeFileSync(listPath, '# only a comment\n\n# another\n');
+    try {
+      const opts = parseArgs(['--base', 'HEAD', '--files-from', listPath]);
+      expect(opts.filesFrom).toBe(true);
+      expect(opts.files).toEqual([]);
+
+      let discovered = false;
+      const result = await runEmitIdentityCheck(opts, {
+        listAiTouchedFiles: () => {
+          discovered = true;
+          return { ok: true, files: ['src/games/hex/ai.ts'] };
+        },
+      });
+      expect(discovered).toBe(false);
+      expect(result.ok).toBe(true);
+      expect(result.results).toEqual([]);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('omitting --files-from still discovers via listAiTouchedFiles (q-mp-1428)', async () => {
+    let discovered = false;
+    const result = await runEmitIdentityCheck(
+      {
+        base: 'HEAD',
+        head: 'WORKING_TREE',
+        files: [],
+        normalize: false,
+        minify: false,
+        json: false,
+        filesFrom: false,
+      },
+      {
+        listAiTouchedFiles: () => {
+          discovered = true;
+          return { ok: true, files: [] };
+        },
+      }
+    );
+    expect(discovered).toBe(true);
+    expect(result.ok).toBe(true);
+  });
+
+  it('parseArgs merges positionals + files-from with ./ strip and dedupe (q-mp-1430)', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'emit-1430-'));
+    const listPath = join(dir, 'dup.txt');
+    writeFileSync(
+      listPath,
+      'src/games/hex/ai.ts\n./src/games/hex/ai.ts\nsrc/games/hex/ai.ts\n'
+    );
+    try {
+      const opts = parseArgs([
+        '--base',
+        'HEAD',
+        '--files-from',
+        listPath,
+        'src/games/hex/ai.ts',
+        './src/games/fiar/ai.ts',
+      ]);
+      expect(opts.filesFrom).toBe(true);
+      expect(opts.files).toEqual([
+        'src/games/hex/ai.ts',
+        'src/games/fiar/ai.ts',
+      ]);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('runEmitIdentityCheck accepts absolute-under-root via normalized files (q-mp-1429)', async () => {
+    const abs = resolve('src/games/hex/ai.ts');
+    const opts = parseArgs(['--base', 'HEAD', abs]);
+    expect(opts.files).toEqual(['src/games/hex/ai.ts']);
+    const result = await runEmitIdentityCheck(opts);
+    expect(result.results).toHaveLength(1);
+    expect(result.results[0]?.status).toBe('identical');
+    expect(result.results[0]?.file).toBe('src/games/hex/ai.ts');
   });
 });
