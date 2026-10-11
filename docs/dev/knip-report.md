@@ -8,11 +8,14 @@
 ## Commands
 
 ```bash
-npm run report:knip              # knip vs baseline; exit 0; CI annotations on growth
+npm run report:knip              # knip vs baseline; default exit 0; CI annotations on growth
+npm run report:knip -- --fail    # opt-in: exit 1 on unused growth (or when baseline enforce:true)
 npm run report:knip -- --json    # machine-readable metrics + diff
 npm run report:knip -- --write-baseline  # refresh knip-baseline.json from current tip
 npm run report:dead-code         # fuller inventory (knip + CSS + helpers → docs/dev/dead-code-inventory.*)
 ```
+
+Exit codes (aligned with `scripts/report-knip.mjs` on this tip): **default** and CI job stay exit **0** (warnings/notices only). **`--fail`** or baseline **`enforce: true`** → exit **1** when any tracked unused metric grows. Unknown flags → exit **2**. Missing or unparseable `knip-baseline.json` is treated as no baseline (NOTICE) and still exits **0** under the default path — schema/corrupt-baseline hardening is HOLD-CHECK (`q-mp-1019` / `q-mp-1036`); do not edit baselines here.
 
 `report:knip` invokes pinned `knip@5.88.1` via `npx` (not a lockfile/`devDependencies` entry — knip’s transitive tree currently fails `npm audit`; keep the app lockfile at 0 vulnerabilities). No apt. No network inside unit/e2e tests.
 
