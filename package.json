@@ -47,6 +47,8 @@
     "docs:lifecycle-visuals": "playwright test -c playwright.lifecycle-visuals.config.ts",
     "perf:runtime": "node scripts/runtime-perf.mjs",
     "audit:memory": "node scripts/memory-leak-audit.mjs",
+    "flake:unit": "node scripts/flake-rate-unit-loop.mjs",
+    "flake:e2e": "node scripts/flake-rate-e2e-loop.mjs",
     "test": "npm run test:unit && npm run test:e2e:chromium",
     "verify": "npm run lint && npm run lint:ratchet && npm run format:check && npm run typecheck && npm run typecheck:ratchet && npm run check:boundaries",
     "check:dev-docs": "node scripts/check-dev-doc-links.mjs",
