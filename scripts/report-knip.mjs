@@ -77,7 +77,13 @@ export function summarizeKnip(knip) {
     duplicates: 0,
   };
   metrics.unusedFiles = (knip.files || []).length;
-  for (const issue of knip.issues || []) {
+  // Knip JSON reporter uses issues: []; object / non-array shapes must not
+  // throw mid-report (q-mp-1106). Yield zeroed issue metrics instead.
+  const issues = knip.issues;
+  if (!Array.isArray(issues)) {
+    return metrics;
+  }
+  for (const issue of issues) {
     metrics.unusedExports += countIssueField(issue.exports);
     metrics.unusedTypes += countIssueField(issue.types);
     metrics.unusedDependencies += countIssueField(issue.dependencies);
