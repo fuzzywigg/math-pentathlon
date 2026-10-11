@@ -9,21 +9,89 @@
  *   4. Test-helper reachability (including side-effect imports)
  *   5. Grep + registry / dynamic-import verification for every candidate
  *
- * Always exits 0 (report-only). Writes docs/dev/dead-code-inventory.md.
+ * Always exits 0 on a successful report run (report-only). Writes
+ * docs/dev/dead-code-inventory.md + .json by default.
  * Disposition column: removed (this PR) / kept / deferred (safe unused test-helper exports).
  *
- * Usage: npm run report:dead-code
+ * Usage:
+ *   node scripts/report-dead-code.mjs
+ *   node scripts/report-dead-code.mjs --help
+ *   node scripts/report-dead-code.mjs --dry-run
+ *   npm run report:dead-code
+ *
+ * Default invocation (no --dry-run) still writes the md/json docs intentionally.
+ * --help / -h and --dry-run must not write those files (q-mp-896).
  */
 
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
-const OUT_MD = path.join(ROOT, 'docs/dev/dead-code-inventory.md');
-const OUT_JSON = path.join(ROOT, 'docs/dev/dead-code-inventory.json');
+
+/** Relative inventory artifact paths (from repo root). */
+export const OUT_MD_REL = 'docs/dev/dead-code-inventory.md';
+export const OUT_JSON_REL = 'docs/dev/dead-code-inventory.json';
+
+const OUT_MD = path.join(ROOT, OUT_MD_REL);
+const OUT_JSON = path.join(ROOT, OUT_JSON_REL);
+
+export const USAGE = `Usage: node scripts/report-dead-code.mjs [options]
+
+Options:
+  --dry-run        Compute and print summary counts without writing docs
+  -h, --help       Show this help
+
+Default (no --dry-run) writes docs/dev/dead-code-inventory.{md,json}.
+`;
+
+/**
+ * Parse CLI argv (slice(2) form). Hermetic — no I/O, no process.exit (q-mp-896).
+ *
+ * @param {string[]} argv
+ * @returns {{
+ *   ok: true,
+ *   help: boolean,
+ *   dryRun: boolean,
+ * } | {
+ *   ok: false,
+ *   message: string,
+ * }}
+ */
+export function parseArgs(argv) {
+  let help = false;
+  let dryRun = false;
+  for (const a of argv) {
+    if (a === '--help' || a === '-h') {
+      help = true;
+    } else if (a === '--dry-run') {
+      dryRun = true;
+    } else if (a.startsWith('-')) {
+      return { ok: false, message: `Unknown flag: ${a}` };
+    } else {
+      return { ok: false, message: `Unexpected argument: ${a}` };
+    }
+  }
+  return { ok: true, help, dryRun };
+}
+
+/**
+ * Write inventory artifacts unless dry-run. Hermetic aside from fs writes.
+ *
+ * @param {{ md: string, jsonText: string, dryRun?: boolean }} opts
+ * @returns {{ wrote: boolean, outMd: string, outJson: string }}
+ */
+export function writeInventoryArtifacts(opts) {
+  const dryRun = opts.dryRun === true;
+  if (!dryRun) {
+    fs.mkdirSync(path.dirname(OUT_MD), { recursive: true });
+    fs.writeFileSync(OUT_MD, opts.md, 'utf8');
+    fs.writeFileSync(OUT_JSON, opts.jsonText, 'utf8');
+  }
+  return { wrote: !dryRun, outMd: OUT_MD, outJson: OUT_JSON };
+}
 
 /** Tip-fold keepers restored after #497 — do not recommend removal. */
 const TIP_FOLD_KEEPERS = new Set([
@@ -869,7 +937,11 @@ function scanUnreferencedSrcFiles(dynamicImports) {
   return unref;
 }
 
-function main() {
+/**
+ * @param {{ dryRun?: boolean }} [opts]
+ */
+function main(opts = {}) {
+  const dryRun = opts.dryRun === true;
   console.log('dead-code inventory — running knip…');
   const knip = runKnip();
   console.log('dead-code inventory — depcheck…');
@@ -991,15 +1063,14 @@ function main() {
   };
 
   const md = renderMarkdown(summary, rows, dynamicImports);
-  fs.mkdirSync(path.dirname(OUT_MD), { recursive: true });
-  fs.writeFileSync(OUT_MD, md, 'utf8');
-  fs.writeFileSync(
-    OUT_JSON,
-    JSON.stringify({ summary, rows }, null, 2),
-    'utf8'
-  );
+  const jsonText = JSON.stringify({ summary, rows }, null, 2);
+  writeInventoryArtifacts({ md, jsonText, dryRun });
 
-  console.log(`\nWrote ${relRoot(OUT_MD)} (${rows.length} candidates)`);
+  const verb = dryRun ? 'Would write' : 'Wrote';
+  const suffix = dryRun ? ' (dry-run; not writing)' : '';
+  console.log(
+    `\n${verb} ${relRoot(OUT_MD)} (${rows.length} candidates)${suffix}`
+  );
   console.log(
     `Safe-to-remove yes: ${summary.safeYes}; review/no: ${rows.length - summary.safeYes}`
   );
@@ -1139,4 +1210,30 @@ function renderMarkdown(summary, rows, dynamicImports) {
   return lines.join('\n');
 }
 
-main();
+function cliMain() {
+  const parsed = parseArgs(process.argv.slice(2));
+  if (!parsed.ok) {
+    console.error(parsed.message);
+    console.error(USAGE.trimEnd());
+    process.exitCode = 2;
+    return;
+  }
+  if (parsed.help) {
+    console.log(USAGE.trimEnd());
+    return;
+  }
+  main({ dryRun: parsed.dryRun });
+}
+
+const isMain =
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+
+if (isMain) {
+  try {
+    cliMain();
+  } catch (err) {
+    console.error('report:dead-code error:', err);
+    process.exitCode = 1;
+  }
+}
