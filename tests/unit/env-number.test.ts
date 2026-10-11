@@ -217,10 +217,12 @@ describe('deep-playtest GAMES_* env rejection (q-mp-908)', () => {
     }
   });
 
-  it('par-55-deep-playtest preserves PAR55_QUICK truthy short-circuit before PAR55_GAMES', () => {
+  it('par-55-deep-playtest gates PAR55_QUICK via isPar55QuickEnabled before PAR55_GAMES', () => {
     // Static: avoid spawning a real playtest when QUICK would force launch.
+    // q-mp-1260: '0'/'false' must not truthy-short-circuit to 1 game.
     const src = readFileSync(PAR55_PLAYTEST, 'utf8');
-    expect(src).toMatch(/process\.env\.PAR55_QUICK\s*\?\s*1\s*:/);
+    expect(src).toMatch(/isPar55QuickEnabled\(\s*process\.env\.PAR55_QUICK\s*\)/);
     expect(src).toMatch(/requireEnvNumber\(\s*['"]PAR55_GAMES['"]/);
+    expect(src).not.toMatch(/process\.env\.PAR55_QUICK\s*\?\s*1\s*:/);
   });
 });

@@ -13,6 +13,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { resolveArtifactDir } from './lib/artifact-dir.mjs';
 import { applyDeepPlaytestCli } from './lib/deep-playtest-cli.mjs';
+import {
+  END_RE_SOURCE,
+  isDeepPlaytestDrawStatus,
+  isDeepPlaytestEndStatus,
+} from './lib/deep-playtest-end.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
 
@@ -138,17 +143,20 @@ async function measureTargets(page) {
 }
 
 function isEnded(statusText) {
-  return /wins!|draw|tie/i.test(statusText || '');
+  // q-mp-1259: word boundaries — avoid "Drawing" / "patience" false-ends.
+  return isDeepPlaytestEndStatus(statusText);
 }
 
 /** Condition wait: post-roll affordances (pass / playable / end / AI). */
 async function waitAfterRoll(page) {
   await page
     .waitForFunction(
-      () => {
+      (endReSource) => {
+        const endRe = new RegExp(endReSource, 'i');
         const status =
           document.querySelector('.sd-status')?.textContent?.trim() ?? '';
-        if (/wins!|draw|tie/i.test(status)) return true;
+        // q-mp-1259: word boundaries via END_RE_SOURCE.
+        if (endRe.test(status)) return true;
         if (document.querySelector('.sd-pass-btn')) return true;
         if (document.querySelectorAll('.sd-hand-domino-playable').length > 0)
           return true;
@@ -156,6 +164,7 @@ async function waitAfterRoll(page) {
         if (/computer/i.test(status)) return true;
         return false;
       },
+      END_RE_SOURCE,
       { timeout: 5_000 }
     )
     .catch(() => {});
@@ -165,14 +174,16 @@ async function waitAfterRoll(page) {
 async function waitForValidCellsOrBail(page) {
   await page
     .waitForFunction(
-      () => {
+      (endReSource) => {
+        const endRe = new RegExp(endReSource, 'i');
         const status =
           document.querySelector('.sd-status')?.textContent?.trim() ?? '';
-        if (/wins!|draw|tie/i.test(status)) return true;
+        if (endRe.test(status)) return true;
         if (document.querySelectorAll('.sd-cell-valid').length > 0) return true;
         if (document.querySelector('.sd-pass-btn')) return true;
         return false;
       },
+      END_RE_SOURCE,
       { timeout: 5_000 }
     )
     .catch(() => {});
@@ -182,10 +193,11 @@ async function waitForValidCellsOrBail(page) {
 async function waitForHumanAffordOrEnd(page, timeoutMs = 5_000) {
   await page
     .waitForFunction(
-      () => {
+      (endReSource) => {
+        const endRe = new RegExp(endReSource, 'i');
         const status =
           document.querySelector('.sd-status')?.textContent?.trim() ?? '';
-        if (/wins!|draw|tie/i.test(status)) return true;
+        if (endRe.test(status)) return true;
         const thinking = !!document.querySelector('.sd-computer-thinking');
         if (thinking || /computer/i.test(status)) return false;
         const roll = document.querySelector('.sd-roll-btn');
@@ -195,6 +207,7 @@ async function waitForHumanAffordOrEnd(page, timeoutMs = 5_000) {
           document.querySelectorAll('.sd-hand-domino-playable').length > 0;
         return canRoll || pass || playable;
       },
+      END_RE_SOURCE,
       { timeout: timeoutMs }
     )
     .catch(() => {});
@@ -204,12 +217,15 @@ async function waitForHumanAffordOrEnd(page, timeoutMs = 5_000) {
 async function waitForAiThinkOrProgress(page) {
   await page
     .waitForFunction(
-      () => {
+      (endReSource) => {
+        const endRe = new RegExp(endReSource, 'i');
         const status =
           document.querySelector('.sd-status')?.textContent?.trim() ?? '';
-        if (/wins!|draw|tie|computer|thinking/i.test(status)) return true;
+        if (endRe.test(status) || /computer|thinking/i.test(status))
+          return true;
         return !!document.querySelector('.sd-computer-thinking');
       },
+      END_RE_SOURCE,
       { timeout: 5_000 }
     )
     .catch(() => {});
@@ -260,7 +276,8 @@ async function waitForHumanOrEnd(page, deadline) {
   const remaining = Math.max(250, deadline - Date.now());
   try {
     const handle = await page.waitForFunction(
-      () => {
+      (endReSource) => {
+        const endRe = new RegExp(endReSource, 'i');
         const status =
           document.querySelector('.sd-status')?.textContent?.trim() ?? '';
         const thinking = !!document.querySelector('.sd-computer-thinking');
@@ -271,7 +288,8 @@ async function waitForHumanOrEnd(page, deadline) {
           '.sd-hand-domino-playable'
         ).length;
         const computerText = /computer/i.test(status);
-        const ended = /wins!|draw|tie/i.test(status);
+        // q-mp-1259: word boundaries via END_RE_SOURCE.
+        const ended = endRe.test(status);
         const humanReady =
           !computerText && !thinking && (canRoll || pass || playable > 0);
         if (ended || humanReady) {
@@ -287,6 +305,7 @@ async function waitForHumanOrEnd(page, deadline) {
         }
         return false;
       },
+      END_RE_SOURCE,
       { timeout: remaining }
     );
     const info = await handle.jsonValue();
@@ -340,7 +359,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
       const gate = await waitForHumanOrEnd(page, Date.now() + STALL_MS);
       lastStatus = gate.status;
       if (gate.kind === 'ended') {
-        outcome = /draw|tie/i.test(gate.status)
+        outcome = isDeepPlaytestDrawStatus(gate.status)
           ? 'draw'
           : /red/i.test(gate.status)
             ? 'ai-win'
@@ -384,7 +403,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
           }
           lastStatus = after.status;
           if (isEnded(after.status)) {
-            outcome = /draw|tie/i.test(after.status)
+            outcome = isDeepPlaytestDrawStatus(after.status)
               ? 'draw'
               : /red/i.test(after.status)
                 ? 'ai-win'
@@ -411,7 +430,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
         .catch(() => '');
       lastStatus = post?.trim() ?? '';
       if (isEnded(lastStatus)) {
-        outcome = /draw|tie/i.test(lastStatus)
+        outcome = isDeepPlaytestDrawStatus(lastStatus)
           ? 'draw'
           : /red/i.test(lastStatus)
             ? 'ai-win'

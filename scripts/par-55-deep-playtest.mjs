@@ -6,7 +6,7 @@
  * Usage: node scripts/par-55-deep-playtest.mjs
  * Requires Vite on http://127.0.0.1:5173
  *
- * Env: PAR55_GAMES (default 10), PLAYTEST_BASE, PAR55_QUICK=1 (1 game per combo)
+ * Env: PAR55_GAMES (default 10), PLAYTEST_BASE, PAR55_QUICK=1|true|yes (1 game per combo)
  *
  * Options: -h, --help (exits before mkdir / browser launch)
  */
@@ -15,6 +15,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { resolveArtifactDir } from './lib/artifact-dir.mjs';
 import { applyDeepPlaytestCli } from './lib/deep-playtest-cli.mjs';
+import {
+  isDeepPlaytestEndStatus,
+  isDeepPlaytestTieStatus,
+  isPar55QuickEnabled,
+} from './lib/deep-playtest-end.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
 
@@ -26,7 +31,8 @@ Requires Vite on PLAYTEST_BASE (default http://127.0.0.1:5173).
 Env:
   PLAYTEST_BASE   Base URL (default http://127.0.0.1:5173)
   PAR55_GAMES     Games per difficulty×viewport (default 10)
-  PAR55_QUICK=1   Force 1 game per difficulty×viewport
+  PAR55_QUICK     Force 1 game per difficulty×viewport when set to 1/true/yes
+                  (0/false/empty fall through to PAR55_GAMES)
 
 Options:
   -h, --help      Show this help and exit (no browser launch)`;
@@ -36,8 +42,8 @@ applyDeepPlaytestCli(process.argv.slice(2), USAGE);
 const BASE = process.env.PLAYTEST_BASE || 'http://127.0.0.1:5173';
 const OUT = path.resolve('docs/playtest/par-55-deep-2026-10-07');
 const ART = resolveArtifactDir();
-// PAR55_QUICK truthy → 1 game per combo (unchanged); else validate PAR55_GAMES.
-const GAMES_PER_DIFF = process.env.PAR55_QUICK
+// q-mp-1260: only 1/true/yes enable quick mode; '0'/'false' use PAR55_GAMES.
+const GAMES_PER_DIFF = isPar55QuickEnabled(process.env.PAR55_QUICK)
   ? 1
   : requireEnvNumber('PAR55_GAMES', 10);
 const MAX_HUMAN_TURNS = 120;
@@ -169,7 +175,8 @@ async function measureTargets(page) {
 }
 
 function isEnded(statusText) {
-  return /wins!|tie/i.test(statusText || '');
+  // q-mp-1259: word boundaries — avoid "patience" false-ends.
+  return isDeepPlaytestEndStatus(statusText);
 }
 
 async function waitForHumanOrEnd(page, deadline) {
@@ -341,7 +348,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
       const gate = await waitForHumanOrEnd(page, Date.now() + STALL_MS);
       lastStatus = gate.status;
       if (gate.kind === 'ended') {
-        outcome = /tie/i.test(gate.status)
+        outcome = isDeepPlaytestTieStatus(gate.status)
           ? 'draw'
           : /red/i.test(gate.status)
             ? 'ai-win'
@@ -376,7 +383,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
           const st = await page.locator('.par55-status').textContent();
           lastStatus = st?.trim() ?? '';
           if (isEnded(lastStatus)) {
-            outcome = /tie/i.test(lastStatus)
+            outcome = isDeepPlaytestTieStatus(lastStatus)
               ? 'draw'
               : /red/i.test(lastStatus)
                 ? 'ai-win'
@@ -404,7 +411,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
           maxAiThinkMs = Math.max(maxAiThinkMs, Date.now() - thinkStart);
           lastStatus = back.status;
           if (back.kind === 'ended') {
-            outcome = /tie/i.test(back.status)
+            outcome = isDeepPlaytestTieStatus(back.status)
               ? 'draw'
               : /red/i.test(back.status)
                 ? 'ai-win'
@@ -416,7 +423,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
         }
         if (isEnded(st || '')) {
           lastStatus = st?.trim() ?? '';
-          outcome = /tie/i.test(lastStatus)
+          outcome = isDeepPlaytestTieStatus(lastStatus)
             ? 'draw'
             : /red/i.test(lastStatus)
               ? 'ai-win'
@@ -455,7 +462,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
         .catch(() => '');
       lastStatus = statusNow?.trim() ?? '';
       if (isEnded(lastStatus)) {
-        outcome = /tie/i.test(lastStatus)
+        outcome = isDeepPlaytestTieStatus(lastStatus)
           ? 'draw'
           : /red/i.test(lastStatus)
             ? 'ai-win'

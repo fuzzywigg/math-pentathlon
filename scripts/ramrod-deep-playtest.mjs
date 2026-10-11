@@ -13,6 +13,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { resolveArtifactDir } from './lib/artifact-dir.mjs';
 import { applyDeepPlaytestCli } from './lib/deep-playtest-cli.mjs';
+import {
+  END_RE_SOURCE,
+  isDeepPlaytestEndStatus,
+  isDeepPlaytestTieStatus,
+} from './lib/deep-playtest-end.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
 
@@ -93,10 +98,12 @@ async function expectHidden(locator) {
 async function waitForHumanAffordanceOrEnd(page, timeoutMs = 5_000) {
   await page
     .waitForFunction(
-      () => {
+      (endReSource) => {
+        const endRe = new RegExp(endReSource, 'i');
         const status =
           document.querySelector('.ramrod-status')?.textContent?.trim() ?? '';
-        if (/wins|tie/i.test(status)) return true;
+        // q-mp-1259: word boundaries via END_RE_SOURCE.
+        if (endRe.test(status)) return true;
         if (document.querySelector('.ramrod-winner-banner')) return true;
         if (document.querySelector('.ramrod-deadlock-hint')) return true;
         if (
@@ -110,6 +117,7 @@ async function waitForHumanAffordanceOrEnd(page, timeoutMs = 5_000) {
           (b) => b.textContent?.includes('Pass Turn')
         );
       },
+      END_RE_SOURCE,
       { timeout: timeoutMs }
     )
     .catch(() => {});
@@ -331,14 +339,16 @@ async function playHumanTurn(page) {
 }
 
 function isEnded(statusText) {
-  return /wins|tie/i.test(statusText || '');
+  // q-mp-1259: word boundaries — avoid "patience" false-ends.
+  return isDeepPlaytestEndStatus(statusText);
 }
 
 async function waitForHumanOrEnd(page, deadline) {
   const timeout = Math.max(0, deadline - Date.now());
   try {
     const handle = await page.waitForFunction(
-      () => {
+      (endReSource) => {
+        const endRe = new RegExp(endReSource, 'i');
         const status =
           document.querySelector('.ramrod-status')?.textContent?.trim() ?? '';
         const thinking = !!document.querySelector('.ramrod-computer-thinking');
@@ -350,7 +360,8 @@ async function waitForHumanOrEnd(page, deadline) {
         ).length;
         const computerText = /computer|thinking/i.test(status);
         const banner = !!document.querySelector('.ramrod-winner-banner');
-        const ended = banner || /wins|tie/i.test(status);
+        // q-mp-1259: word boundaries via END_RE_SOURCE.
+        const ended = banner || endRe.test(status);
         const human = !computerText && !thinking && (pass || selectable > 0);
         if (ended) {
           return {
@@ -376,6 +387,7 @@ async function waitForHumanOrEnd(page, deadline) {
         }
         return false;
       },
+      END_RE_SOURCE,
       { timeout }
     );
     return await handle.jsonValue();
@@ -437,7 +449,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
       const gate = await waitForHumanOrEnd(page, Date.now() + STALL_MS);
       lastStatus = gate.status;
       if (gate.kind === 'ended') {
-        outcome = /tie/i.test(gate.status)
+        outcome = isDeepPlaytestTieStatus(gate.status)
           ? 'draw'
           : /Red wins/i.test(gate.status)
             ? 'ai-win'
@@ -514,7 +526,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
           }
           lastStatus = after.status;
           if (isEnded(after.status)) {
-            outcome = /tie/i.test(after.status)
+            outcome = isDeepPlaytestTieStatus(after.status)
               ? 'draw'
               : /Red wins/i.test(after.status)
                 ? 'ai-win'
@@ -530,7 +542,8 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
       let sawThink = false;
       const flash = await page
         .waitForFunction(
-          () => {
+          (endReSource) => {
+            const endRe = new RegExp(endReSource, 'i');
             const status =
               document.querySelector('.ramrod-status')?.textContent?.trim() ??
               '';
@@ -540,7 +553,8 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
             if (/computer|thinking/i.test(status) || thinking) {
               return { kind: 'think', status, thinking };
             }
-            if (/wins|tie/i.test(status)) {
+            // q-mp-1259: word boundaries via END_RE_SOURCE.
+            if (endRe.test(status)) {
               return { kind: 'ended', status, thinking };
             }
             if (/Blue's turn/.test(status)) {
@@ -548,6 +562,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
             }
             return false;
           },
+          END_RE_SOURCE,
           { timeout: 1_600 }
         )
         .then((h) => h.jsonValue())
@@ -562,7 +577,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
         maxAiPauseMs = Math.max(maxAiPauseMs, Date.now() - thinkStart);
         lastStatus = endGate.status;
         if (endGate.kind === 'ended') {
-          outcome = /tie/i.test(endGate.status)
+          outcome = isDeepPlaytestTieStatus(endGate.status)
             ? 'draw'
             : /Red wins/i.test(endGate.status)
               ? 'ai-win'
@@ -580,7 +595,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
           .catch(() => '');
         lastStatus = post?.trim() ?? '';
         if (isEnded(lastStatus)) {
-          outcome = /tie/i.test(lastStatus)
+          outcome = isDeepPlaytestTieStatus(lastStatus)
             ? 'draw'
             : /Red wins/i.test(lastStatus)
               ? 'ai-win'
