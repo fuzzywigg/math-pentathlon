@@ -40,6 +40,25 @@ function restoreDocumentHidden(): void {
   }
 }
 
+// unit-shared uses isolate:false — restore navigator.connection so later suites
+// do not see a stuck throwing getter from Object.defineProperty (q-mp-1458).
+const originalNavigatorConnection = Object.getOwnPropertyDescriptor(
+  navigator,
+  'connection'
+);
+
+function restoreNavigatorConnection(): void {
+  if (originalNavigatorConnection) {
+    Object.defineProperty(navigator, 'connection', originalNavigatorConnection);
+  } else {
+    try {
+      delete (navigator as Navigator & { connection?: unknown }).connection;
+    } catch {
+      Reflect.deleteProperty(navigator, 'connection');
+    }
+  }
+}
+
 function stubPointer(root: HTMLElement): void {
   vi.spyOn(root, 'getBoundingClientRect').mockReturnValue({
     x: 300,
@@ -205,6 +224,7 @@ describe('burn-1008 ui-cov-r2 idle-warm default imports', () => {
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
     restoreDocumentHidden();
+    restoreNavigatorConnection();
   });
 
   it('defaultImportShell + defaultImportGame warm hex and kings', async () => {
