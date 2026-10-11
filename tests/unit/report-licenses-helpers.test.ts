@@ -52,14 +52,33 @@ describe('report-licenses helpers', () => {
       'copyleft_or_review'
     );
     expect(classifyLicense('Python-2.0')).toBe('copyleft_or_review');
+    // CPL SPDX + Common Public License prose (q-mp-1103)
+    expect(classifyLicense('CPL-1.0')).toBe('copyleft_or_review');
+    expect(classifyLicense('Common Public License 1.0')).toBe(
+      'copyleft_or_review'
+    );
+    // Eclipse Public License prose (q-mp-1104); SPDX EPL-* already covered
+    expect(classifyLicense('EPL-1.0')).toBe('copyleft_or_review');
+    expect(classifyLicense('EPL-2.0')).toBe('copyleft_or_review');
+    expect(classifyLicense('Eclipse Public License - v 2.0')).toBe(
+      'copyleft_or_review'
+    );
+    expect(classifyLicense('Eclipse Public License v1.0')).toBe(
+      'copyleft_or_review'
+    );
     expect(classifyLicense('')).toBe('unknown');
     expect(classifyLicense('UNLICENSED')).toBe('unknown');
+    // Bare / URL Custom* must not be ok (q-mp-1102)
+    expect(classifyLicense('Custom')).toBe('unknown');
+    expect(classifyLicense('custom')).toBe('unknown');
+    expect(classifyLicense('Custom: https://x.test/lic')).toBe('unknown');
     // OR forms with unknown/proprietary tokens must not be ok (q-mp-1080)
     expect(classifyLicense('UNLICENSED OR MIT')).toBe('unknown');
     expect(classifyLicense('MIT OR UNLICENSED')).toBe('unknown');
     expect(classifyLicense('PROPRIETARY OR MIT')).toBe('unknown');
     expect(classifyLicense('NONE OR Apache-2.0')).toBe('unknown');
     expect(classifyLicense('UNKNOWN OR MIT')).toBe('unknown');
+    expect(classifyLicense('Custom OR MIT')).toBe('unknown');
     expect(classifyLicense('MIT')).toBe('ok');
     expect(classifyLicense('Apache-2.0')).toBe('ok');
     expect(classifyLicense('(MIT OR CC0-1.0)')).toBe('ok');
@@ -67,6 +86,12 @@ describe('report-licenses helpers', () => {
     expect(classifyLicense('Elastic-2.0')).toBe('ok');
     expect(classifyLicense('LicenseRef-Proprietary')).toBe('ok');
     expect(classifyLicense('Commercial')).toBe('ok');
+    // q-mp-1105 HOLD-CHECK: CDDL long prose / MS-RL stay ok here (SPDX CDDL ok→review)
+    expect(classifyLicense('CDDL-1.1')).toBe('copyleft_or_review');
+    expect(classifyLicense('Common Development and Distribution License')).toBe(
+      'ok'
+    );
+    expect(classifyLicense('MS-RL')).toBe('ok');
   });
 
   it('extracts npm names from lock paths including nested scoped packages', () => {

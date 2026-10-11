@@ -193,6 +193,11 @@ const COPYLEFT_OR_REVIEW_PATTERNS = [
   // `\bLGPL` covers SPDX LGPL-2.1 and legacy LGPLv2.1 / LGPLv3 (q-mp-1079).
   /\bLGPL/i,
   /\bEPL\b/i,
+  // Eclipse Public License prose (q-mp-1104); SPDX EPL-* already via `\bEPL\b`.
+  /\bEclipse\s+Public\s+License\b/i,
+  // CPL SPDX + Common Public License prose (q-mp-1103). Distinct from denied CPAL.
+  /\bCPL(?:-|\b)/i,
+  /\bCommon\s+Public\s+License\b/i,
   /\bCDDL\b/i,
   /\bEUPL\b/i,
   /\bOSL\b/i,
@@ -203,6 +208,8 @@ const COPYLEFT_OR_REVIEW_PATTERNS = [
  * Unknown / proprietary tokens (full-string on the whole expression or on
  * each OR/AND alternative — see `hasUnknownLicenseToken`, q-mp-1080).
  * Source-available / proprietary prose policy is HOLD-CHECK q-mp-1081.
+ * Bare / URL `Custom*` npm license strings → unknown (q-mp-1102); not
+ * `Commercial` (1081 leave-ok).
  */
 const UNKNOWN_LICENSE_PATTERNS = [
   /^$/i,
@@ -211,6 +218,8 @@ const UNKNOWN_LICENSE_PATTERNS = [
   /^SEE\s+LICENSE/i,
   /^PROPRIETARY$/i,
   /^NONE$/i,
+  // npm "Custom" / "Custom: https://…" (q-mp-1102).
+  /^CUSTOM(?:\s*:.*)?$/i,
 ];
 
 /** Bundled static assets under public/ that ship with the built app. */
