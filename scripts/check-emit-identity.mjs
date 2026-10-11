@@ -16,7 +16,8 @@
  * Exit codes:
  *   0 — every compared file emits identically
  *   1 — any emit mismatch
- *   2 — usage error (unknown flag, bad --files-from path; no stack)
+ *   2 — usage / git-ref error (unknown flag, bad --files-from path,
+ *       non-zero `git diff` for an invalid --base/--head; no stack)
  */
 
 import { spawnSync } from 'node:child_process';
@@ -532,22 +533,85 @@ export async function compareFileEmit(opts) {
 }
 
 /**
+ * Friendly error when `git diff --name-only` fails (unknown --base/--head).
+ * @param {string} baseRef
+ * @param {string} headRef
+ * @param {string} [detail] stderr or spawn error text
+ * @param {number | null} [status] git exit status when available
+ * @returns {string}
+ */
+export function gitDiffNameOnlyErrorMessage(
+  baseRef,
+  headRef,
+  detail = '',
+  status = null
+) {
+  const statusPart = status == null ? '' : ` (exit ${status})`;
+  const lines = [
+    `error: git diff failed for --base ${baseRef} --head ${headRef}${statusPart}`,
+  ];
+  const trimmed = String(detail || '').trim();
+  if (trimmed) lines.push(trimmed);
+  lines.push(USAGE);
+  lines.push('  --base <ref>       Git ref for the "before" side');
+  return lines.join('\n');
+}
+
+/**
+ * List ai modules touched between base and head (or working tree).
+ * Fail-closed when `git diff` is non-zero (unknown ref / bad revision).
+ *
+ * @param {string} baseRef
+ * @param {string} headRef
+ * @param {{
+ *   spawnSync?: typeof spawnSync,
+ *   cwd?: string,
+ * }} [deps]
+ * @returns {{ ok: true, files: string[] } | { ok: false, message: string }}
+ */
+export function listAiTouchedFiles(baseRef, headRef, deps = {}) {
+  const spawn = deps.spawnSync ?? spawnSync;
+  const cwd = deps.cwd ?? ROOT;
+  const args =
+    headRef === 'WORKING_TREE'
+      ? ['diff', '--name-only', baseRef, '--', 'src/games']
+      : ['diff', '--name-only', baseRef, headRef, '--', 'src/games'];
+  const r = spawn('git', args, { cwd, encoding: 'utf8' });
+  if (r.error || r.status !== 0) {
+    const detail = r.error
+      ? String(r.error.message || r.error)
+      : String(r.stderr || '');
+    return {
+      ok: false,
+      message: gitDiffNameOnlyErrorMessage(
+        baseRef,
+        headRef,
+        detail,
+        r.error ? null : (r.status ?? null)
+      ),
+    };
+  }
+  const files = (r.stdout || '')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => /\/ai(\.|-|\.worker)/.test(l) && l.endsWith('.ts'));
+  return { ok: true, files: [...new Set(files)].sort() };
+}
+
+/**
  * Default file set: ai modules touched between base and head (or working tree).
+ * Throws when `git diff` fails so callers cannot treat an invalid base as empty.
+ * Prefer {@link listAiTouchedFiles} for Result-shaped handling.
  * @param {string} baseRef
  * @param {string} headRef
  * @returns {string[]}
  */
 export function defaultAiTouchedFiles(baseRef, headRef) {
-  const args =
-    headRef === 'WORKING_TREE'
-      ? ['diff', '--name-only', baseRef, '--', 'src/games']
-      : ['diff', '--name-only', baseRef, headRef, '--', 'src/games'];
-  const r = spawnSync('git', args, { cwd: ROOT, encoding: 'utf8' });
-  const files = (r.stdout || '')
-    .split('\n')
-    .map((l) => l.trim())
-    .filter((l) => /\/ai(\.|-|\.worker)/.test(l) && l.endsWith('.ts'));
-  return [...new Set(files)].sort();
+  const listed = listAiTouchedFiles(baseRef, headRef);
+  if (!listed.ok) {
+    throw new Error(listed.message);
+  }
+  return listed.files;
 }
 
 /**
@@ -636,12 +700,24 @@ under src/games/.`);
 
 /**
  * @param {ReturnType<typeof parseArgs>} opts
- * @returns {Promise<{ ok: boolean, results: Awaited<ReturnType<typeof compareFileEmit>>[] }>}
+ * @param {{
+ *   listAiTouchedFiles?: typeof listAiTouchedFiles,
+ * }} [deps]
+ * @returns {Promise<{
+ *   ok: boolean,
+ *   results: Awaited<ReturnType<typeof compareFileEmit>>[],
+ *   error?: string,
+ * }>}
  */
-export async function runEmitIdentityCheck(opts) {
+export async function runEmitIdentityCheck(opts, deps = {}) {
   let files = opts.files;
   if (files.length === 0) {
-    files = defaultAiTouchedFiles(opts.base, opts.head);
+    const listFn = deps.listAiTouchedFiles ?? listAiTouchedFiles;
+    const listed = listFn(opts.base, opts.head);
+    if (!listed.ok) {
+      return { ok: false, results: [], error: listed.message };
+    }
+    files = listed.files;
   }
   if (files.length === 0) {
     console.log(
@@ -681,7 +757,28 @@ function isMain() {
 
 if (isMain()) {
   const opts = parseArgs(process.argv.slice(2));
-  const { ok, results } = await runEmitIdentityCheck(opts);
+  const { ok, results, error } = await runEmitIdentityCheck(opts);
+
+  if (error) {
+    if (opts.json) {
+      console.log(
+        JSON.stringify(
+          {
+            ok: false,
+            base: opts.base,
+            head: opts.head,
+            error,
+            results: [],
+          },
+          null,
+          2
+        )
+      );
+    } else {
+      console.error(error);
+    }
+    process.exit(2);
+  }
 
   if (opts.json) {
     console.log(
