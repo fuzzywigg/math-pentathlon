@@ -53,6 +53,7 @@ Artifacts: `/opt/cursor/artifacts/flake-hunt/`.
 - **Symptom:** `navigate` expected `/game/kings-quadraphages` but **0 calls** (seed `909`).
 - **Root cause:** Under `isolate: false`, sibling `vi.restoreAllMocks()` tears down hoisted `vi.mock(router)`.
 - **Fix:** Targeted restores in graph/Calla/Kwatro suites; move this file into `unit-isolated`.
+- **Current tip:** Still in `unit-isolated` (with `keyboard-a11y-game-selector`); see `docs/unit-flakes-2026-10-07.md` for the three-project layout and historical causal A/B.
 
 ### 5. Tablet Hard AI bench summary order (shuffle)
 
