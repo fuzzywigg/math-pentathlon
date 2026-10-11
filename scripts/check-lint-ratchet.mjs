@@ -18,6 +18,7 @@
  * cleaning up; never raise without tip-owner approval.
  */
 
+import { randomBytes } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -29,8 +30,24 @@ const CEILINGS_PATH = path.join(ROOT, 'docs/dev/lint-ratchet-ceilings.json');
 
 /** @typedef {{ rules: Record<string, number>, notes?: string }} CeilingFile */
 
-/** @type {CeilingFile} */
-const ceilings = JSON.parse(fs.readFileSync(CEILINGS_PATH, 'utf8'));
+/**
+ * Unique probe config path so concurrent lint:ratchet / report:lint-buckets
+ * cannot clobber or unlink the same file mid-eslint (q-mp-1275).
+ * Kept under the repo root so flat-config relative `./eslint.config.js`
+ * resolves; always delete in `finally` (before process.exit).
+ *
+ * @param {string} [root]
+ * @param {number} [pid]
+ * @param {string} [entropy]
+ * @returns {string}
+ */
+export function makeLintRatchetProbeConfigPath(
+  root = ROOT,
+  pid = process.pid,
+  entropy = randomBytes(6).toString('hex')
+) {
+  return path.join(root, `.eslint.ratchet.probe.${pid}.${entropy}.config.js`);
+}
 
 /**
  * Probe config: same base as eslint.config.js, but forces ceilinged rules so
@@ -48,10 +65,6 @@ const ceilings = JSON.parse(fs.readFileSync(CEILINGS_PATH, 'utf8'));
  * - eqeqeq stricter always (live ignores null; q-mp-194 ceiling 1 — fiar/rules HOLD)
  * - @typescript-eslint/return-await always (live unset; q-mp-316 ceiling 3 — fab/fiar/queens ai-client HOLD)
  */
-// Keep the probe config under the repo root so flat-config `import.meta.dirname`
-// / relative imports to eslint.config.js resolve; always delete in `finally`.
-const probeConfigPath = path.join(ROOT, '.eslint.ratchet.probe.config.js');
-
 const probeSource = `
 import base from './eslint.config.js';
 
@@ -78,77 +91,98 @@ export default [
 ];
 `;
 
-fs.writeFileSync(probeConfigPath, probeSource, 'utf8');
+function main() {
+  /** @type {CeilingFile} */
+  const ceilings = JSON.parse(fs.readFileSync(CEILINGS_PATH, 'utf8'));
 
-try {
-  const result = spawnSync(
-    'npx',
-    [
-      'eslint',
-      'src',
-      '-c',
-      probeConfigPath,
-      '--format',
-      'json',
-      '--no-error-on-unmatched-pattern',
-    ],
-    {
-      cwd: ROOT,
-      encoding: 'utf8',
-      maxBuffer: 64 * 1024 * 1024,
-      shell: process.platform === 'win32',
-    }
-  );
+  const probeConfigPath = makeLintRatchetProbeConfigPath();
+  fs.writeFileSync(probeConfigPath, probeSource, 'utf8');
 
-  /** @type {Array<{ filePath: string, messages: Array<{ ruleId: string | null }> }>} */
-  let report;
+  let exitCode = 0;
   try {
-    report = JSON.parse(result.stdout || '[]');
-  } catch {
-    console.error('lint:ratchet failed to parse eslint JSON output');
-    console.error((result.stderr || result.stdout || '').slice(0, 4000));
-    process.exit(1);
-  }
+    const result = spawnSync(
+      'npx',
+      [
+        'eslint',
+        'src',
+        '-c',
+        probeConfigPath,
+        '--format',
+        'json',
+        '--no-error-on-unmatched-pattern',
+      ],
+      {
+        cwd: ROOT,
+        encoding: 'utf8',
+        maxBuffer: 64 * 1024 * 1024,
+        shell: process.platform === 'win32',
+      }
+    );
 
-  /** @type {Record<string, number>} */
-  const counts = {};
-  for (const rule of Object.keys(ceilings.rules)) {
-    counts[rule] = 0;
-  }
+    /** @type {Array<{ filePath: string, messages: Array<{ ruleId: string | null }> }>} */
+    let report;
+    try {
+      report = JSON.parse(result.stdout || '[]');
+    } catch {
+      console.error('lint:ratchet failed to parse eslint JSON output');
+      console.error((result.stderr || result.stdout || '').slice(0, 4000));
+      exitCode = 1;
+      report = null;
+    }
 
-  for (const file of report) {
-    for (const message of file.messages) {
-      if (!message.ruleId || !(message.ruleId in counts)) continue;
-      counts[message.ruleId] += 1;
+    if (report) {
+      /** @type {Record<string, number>} */
+      const counts = {};
+      for (const rule of Object.keys(ceilings.rules)) {
+        counts[rule] = 0;
+      }
+
+      for (const file of report) {
+        for (const message of file.messages) {
+          if (!message.ruleId || !(message.ruleId in counts)) continue;
+          counts[message.ruleId] += 1;
+        }
+      }
+
+      console.log(
+        'Lint ratchet ceilings (docs/dev/lint-ratchet-ceilings.json)'
+      );
+      let failed = false;
+      for (const [rule, ceiling] of Object.entries(ceilings.rules)) {
+        const count = counts[rule] ?? 0;
+        const status = count <= ceiling ? 'ok' : 'FAIL';
+        if (count > ceiling) failed = true;
+        const headroom = ceiling - count;
+        console.log(
+          `  ${status.padEnd(4)} ${rule}: ${count} / ceiling ${ceiling}` +
+            (headroom > 0 ? ` (−${headroom} headroom; lower the ceiling)` : '')
+        );
+      }
+
+      if (failed) {
+        console.error(
+          '\nLint ratchet failed: a counted rule exceeded its ceiling. Fix new violations or (with tip-owner approval) adjust docs/dev/lint-ratchet-ceilings.json after a measured cleanup.'
+        );
+        exitCode = 1;
+      } else {
+        console.log('Lint ratchet passed.');
+      }
+    }
+  } finally {
+    // process.exit skips finally on Node 22+; unlink here before exit below.
+    try {
+      fs.unlinkSync(probeConfigPath);
+    } catch {
+      // ignore cleanup errors
     }
   }
+  process.exit(exitCode);
+}
 
-  console.log('Lint ratchet ceilings (docs/dev/lint-ratchet-ceilings.json)');
-  let failed = false;
-  for (const [rule, ceiling] of Object.entries(ceilings.rules)) {
-    const count = counts[rule] ?? 0;
-    const status = count <= ceiling ? 'ok' : 'FAIL';
-    if (count > ceiling) failed = true;
-    const headroom = ceiling - count;
-    console.log(
-      `  ${status.padEnd(4)} ${rule}: ${count} / ceiling ${ceiling}` +
-        (headroom > 0 ? ` (−${headroom} headroom; lower the ceiling)` : '')
-    );
-  }
+const isMain =
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 
-  if (failed) {
-    console.error(
-      '\nLint ratchet failed: a counted rule exceeded its ceiling. Fix new violations or (with tip-owner approval) adjust docs/dev/lint-ratchet-ceilings.json after a measured cleanup.'
-    );
-    process.exit(1);
-  }
-
-  console.log('Lint ratchet passed.');
-  process.exit(0);
-} finally {
-  try {
-    fs.unlinkSync(probeConfigPath);
-  } catch {
-    // ignore cleanup errors
-  }
+if (isMain) {
+  main();
 }
