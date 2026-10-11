@@ -37,8 +37,10 @@ const ROOT = path.resolve(__dirname, '..');
 /** Walk root: whole docs/ tree (was docs/dev/ only before q-mp-857). */
 const DOCS_DIR = path.join(ROOT, 'docs');
 
-const PATH_RE =
-  /`((?:src|tests|docs|scripts)\/[A-Za-z0-9_./@+-]+\.(?:ts|tsx|js|mjs|css|md|json))`/g;
+/** Backtick repo paths under src|tests|docs|scripts. Includes .mts / .d.mts
+ * (type companions cited e.g. in docs/dev/type-ratchet-batch-8.md; q-mp-1177). */
+export const PATH_RE =
+  /`((?:src|tests|docs|scripts)\/[A-Za-z0-9_./@+-]+\.(?:ts|tsx|js|mjs|mts|css|md|json))`/g;
 const TABLE_ROW_RE =
   /^\|\s*`([^`]+)`\s*\|\s*`((?:src|tests|docs|scripts)\/[^`]+)`\s*\|/;
 const MODULE_ROW_RE =
