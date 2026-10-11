@@ -1,4 +1,4 @@
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it, expect } from 'vitest';
@@ -399,24 +399,23 @@ describe('check-build helpers', () => {
   it('scanEnvLeakage scans .mjs and .cjs assets (q-mp-1356)', () => {
     const dist = mkdtempSync(join(tmpdir(), 'check-build-leak-mjs-'));
     try {
-      const assets = join(dist, 'assets');
-      mkdirSync(assets);
+      // Flat fixture — ratchet node-minimal.d.ts has no mkdirSync.
       writeFileSync(join(dist, 'keep.json'), 'const x="/workspace/skip";\n');
-      writeFileSync(join(assets, 'a.js'), 'const x="/workspace/secret";\n');
-      writeFileSync(join(assets, 'b.mjs'), 'const x="/workspace/secret";\n');
-      writeFileSync(join(assets, 'c.cjs'), 'const x="/workspace/secret";\n');
-      writeFileSync(join(assets, 'ok.mjs'), 'const x="relative/path";\n');
+      writeFileSync(join(dist, 'a.js'), 'const x="/workspace/secret";\n');
+      writeFileSync(join(dist, 'b.mjs'), 'const x="/workspace/secret";\n');
+      writeFileSync(join(dist, 'c.cjs'), 'const x="/workspace/secret";\n');
+      writeFileSync(join(dist, 'ok.mjs'), 'const x="relative/path";\n');
       const findings = scanEnvLeakage(dist);
       expect(findings).toEqual(
         expect.arrayContaining([
-          { path: 'assets/a.js', finding: 'absolute /workspace path' },
-          { path: 'assets/b.mjs', finding: 'absolute /workspace path' },
-          { path: 'assets/c.cjs', finding: 'absolute /workspace path' },
+          { path: 'a.js', finding: 'absolute /workspace path' },
+          { path: 'b.mjs', finding: 'absolute /workspace path' },
+          { path: 'c.cjs', finding: 'absolute /workspace path' },
         ])
       );
       expect(findings).toHaveLength(3);
       expect(findings.some((f) => f.path === 'keep.json')).toBe(false);
-      expect(findings.some((f) => f.path === 'assets/ok.mjs')).toBe(false);
+      expect(findings.some((f) => f.path === 'ok.mjs')).toBe(false);
     } finally {
       rmSync(dist, { recursive: true, force: true });
     }
