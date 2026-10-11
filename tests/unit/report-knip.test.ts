@@ -59,6 +59,20 @@ describe('report-knip helpers', () => {
     }
   });
 
+  it('summarizeKnip does not throw when issues is a non-array object (q-mp-1106)', () => {
+    const metrics = summarizeKnip({
+      files: ['src/orphan.ts'],
+      issues: { exports: [{ name: 'unusedA' }] },
+    });
+    expect(metrics.unusedFiles).toBe(1);
+    expect(metrics.unusedExports).toBe(0);
+    expect(metrics.unusedTypes).toBe(0);
+    expect(metrics.unusedDependencies).toBe(0);
+    expect(metrics.unusedDevDependencies).toBe(0);
+    expect(metrics.unlisted).toBe(0);
+    expect(metrics.duplicates).toBe(0);
+  });
+
   it('diffMetrics flags growth vs baseline (ratchet-down posture)', () => {
     const baseline = {
       unusedFiles: 0,

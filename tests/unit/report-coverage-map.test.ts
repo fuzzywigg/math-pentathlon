@@ -173,6 +173,46 @@ describe('report-coverage-map helpers (q-mp-075)', () => {
     expect(md).not.toMatch(/120\.00/);
   });
 
+  it('clamps pct-only values to [0, 100] for display/rank (q-mp-1085)', () => {
+    const rows = aggregateByDirectory(
+      {
+        'src/games/hex/rules.ts': {
+          lines: { pct: 150 },
+          branches: { pct: -10 },
+          functions: { pct: 150 },
+          statements: { pct: 150 },
+        },
+        'src/games/ramrod/board.ts': {
+          lines: { total: 100, covered: 50, pct: 50 },
+          branches: { total: 10, covered: 5, pct: 50 },
+          functions: { total: 5, covered: 2, pct: 40 },
+          statements: { total: 100, covered: 50, pct: 50 },
+        },
+      },
+      { root: '/workspace' }
+    );
+
+    expect(rows.map((r) => r.dir)).toEqual([
+      'src/games/ramrod',
+      'src/games/hex',
+    ]);
+    expect(rows[1]).toMatchObject({
+      dir: 'src/games/hex',
+      files: 1,
+      lines: { covered: null, total: null, pct: 100 },
+      branches: { covered: null, total: null, pct: 0 },
+    });
+    const md = renderCoverageMapMarkdown(rows);
+    expect(md).toContain('| `src/games/hex` | 100.00 | 0.00 | 1 |');
+    expect(md).not.toMatch(/150\.00/);
+    expect(md).not.toMatch(/-10\.00/);
+    // Counts path unchanged (q-mp-1039 already clamps covered>total).
+    expect(rows[0]).toMatchObject({
+      dir: 'src/games/ramrod',
+      lines: { covered: 50, total: 100, pct: 50 },
+    });
+  });
+
   it('maps coverage percentages to heat colors', () => {
     expect(heatColor(96)).toBe('#1b7f4a');
     expect(heatColor(91)).toBe('#3d9b5c');

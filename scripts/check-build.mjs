@@ -10,8 +10,8 @@
  *   - base-path absolute URLs are root-relative (`/...`)
  *   - no absolute workspace paths or obvious env leakage in JS/CSS/HTML
  *
- * Always exits 0 (report-only) on the default path. Writes
- * test-results/build/summary.md (+ JSON).
+ * Default report-only path exits 0. Writes test-results/build/summary.md
+ * (+ JSON). Unknown flags and misuse exit 2; --help/-h exit 0.
  *
  * Usage:
  *   npm run check:build
@@ -67,14 +67,22 @@ export const OFFLINE_EXTS = new Set([
 /**
  * Parse Workbox precache entries from generated sw.js.
  * Accepts url/revision in either key order and ' or " quotes (q-mp-1058).
+ * Also accepts JSON-quoted keys `"url"` / `"revision"` (q-mp-1087).
+ * Optional trailing commas (q-mp-1098) and whitespace around bare/JSON keys
+ * and colons (q-mp-1099).
  * @param {string} swSource
  * @returns {{ url: string, revision: string | null }[]}
  */
 export function parsePrecacheManifest(swSource) {
   const entries = [];
+  // Optional " or ' around keys (JSON or bare identifiers).
   // url-first or revision-first; string values may use ' or "; revision may be null.
-  const re =
-    /\{\s*(?:url:\s*(["'])([^"']+)\1\s*,\s*revision:\s*(?:(["'])([^"']*)\3|null)|revision:\s*(?:(["'])([^"']*)\5|null)\s*,\s*url:\s*(["'])([^"']+)\7)\s*\}/g;
+  // Optional WS around keys/colons; optional trailing comma before `}`.
+  const key = (name) => `(?:["']${name}["']|${name})`;
+  const re = new RegExp(
+    `\\{\\s*(?:${key('url')}\\s*:\\s*(["'])([^"']+)\\1\\s*,\\s*${key('revision')}\\s*:\\s*(?:(["'])([^"']*)\\3|null)|${key('revision')}\\s*:\\s*(?:(["'])([^"']*)\\5|null)\\s*,\\s*${key('url')}\\s*:\\s*(["'])([^"']+)\\7)\\s*,?\\s*\\}`,
+    'g'
+  );
   for (const match of swSource.matchAll(re)) {
     if (match[2] !== undefined) {
       entries.push({

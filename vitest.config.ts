@@ -110,6 +110,10 @@ const nodePureFiles = [
   'tests/unit/ai-determinism-shard-e.test.ts',
   'tests/unit/ai-calibration-difficulty-order.test.ts',
   'tests/unit/state-roundtrip-fuzz.test.ts',
+  // q-mp-1108: parallel shards (queens seeds + other games) — keep on unit-node.
+  'tests/unit/state-roundtrip-fuzz-queens-a.test.ts',
+  'tests/unit/state-roundtrip-fuzz-queens-b.test.ts',
+  'tests/unit/state-roundtrip-fuzz-games.test.ts',
   'tests/unit/engine-property-invariants.test.ts',
   'tests/unit/ai-worker-parity-fab.test.ts',
   'tests/unit/ai-worker-parity-queens-hex.test.ts',
@@ -174,6 +178,8 @@ const nodePureFiles = [
   'tests/unit/render-perf-mode-cli-help.test.ts',
   // check:perf early --help / unknown flags (q-mp-917); spawnSync CLI check needs node env.
   'tests/unit/check-perf-cli-args.test.ts',
+  // check:perf LH timeout child kill (q-mp-1090); hermetic mock child needs node env.
+  'tests/unit/check-perf-lh-timeout-kill.test.ts',
   // page-settle double-rAF helper (q-mp-920); hermetic fake page.evaluate needs node.
   'tests/unit/page-settle.test.ts',
   // memory-leak-audit page-ready adoption (q-mp-923); spawnSync --check/--help.

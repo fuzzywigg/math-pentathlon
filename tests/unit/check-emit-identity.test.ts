@@ -75,7 +75,9 @@ export const n: N = 1;
     );
 
     const singleQuotes = "export const s = 'a  b';";
-    expect(stripCommentsAndCollapseWhitespace(singleQuotes)).toContain("'a  b'");
+    expect(stripCommentsAndCollapseWhitespace(singleQuotes)).toContain(
+      "'a  b'"
+    );
   });
 
   it('stripCommentsAndCollapseWhitespace keeps whitespace inside templates (q-mp-1053)', () => {
@@ -99,6 +101,41 @@ export const n: N = 1;
       file: 'sample.ts',
       baseSource: 'export const s = "hello  world";\n',
       headSource: 'export const s = "hello world";\n',
+      normalize: true,
+    });
+    expect(result.status).toBe('differ');
+  });
+
+  it('stripCommentsAndCollapseWhitespace keeps whitespace inside regex (q-mp-1086)', () => {
+    const doubleSpaced = 'const r=/a  b/g;';
+    const singleSpaced = 'const r=/a b/g;';
+    expect(stripCommentsAndCollapseWhitespace(doubleSpaced)).not.toBe(
+      stripCommentsAndCollapseWhitespace(singleSpaced)
+    );
+    expect(stripCommentsAndCollapseWhitespace(doubleSpaced)).toContain(
+      '/a  b/g'
+    );
+    expect(stripCommentsAndCollapseWhitespace(singleSpaced)).toContain(
+      '/a b/g'
+    );
+
+    // Character class may contain `/` without ending the literal.
+    const classed = 'const r=/a[ / ]b/;';
+    expect(stripCommentsAndCollapseWhitespace(classed)).toContain('/a[ / ]b/');
+
+    // Division must still collapse insignificant spaces.
+    const divWs = 'const n = a  /  b;';
+    const divTight = 'const n = a / b;';
+    expect(stripCommentsAndCollapseWhitespace(divWs)).toBe(
+      stripCommentsAndCollapseWhitespace(divTight)
+    );
+  });
+
+  it('compareFileEmit --normalize differs when only regex bodies differ (q-mp-1086)', async () => {
+    const result = await compareFileEmit({
+      file: 'sample.ts',
+      baseSource: 'export const r = /a  b/g;\n',
+      headSource: 'export const r = /a b/g;\n',
       normalize: true,
     });
     expect(result.status).toBe('differ');

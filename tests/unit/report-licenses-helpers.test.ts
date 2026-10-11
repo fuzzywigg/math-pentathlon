@@ -13,7 +13,10 @@ import {
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const rootDir = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../..'
+);
 
 describe('report-licenses helpers', () => {
   it('normalizes string and SPDX object licenses', () => {
@@ -33,18 +36,62 @@ describe('report-licenses helpers', () => {
     expect(classifyLicense('GNU GPL')).toBe('denied');
     expect(classifyLicense('AGPL-3.0-only')).toBe('denied');
     expect(classifyLicense('SSPL-1.0')).toBe('denied');
+    expect(classifyLicense('BUSL-1.1')).toBe('denied');
+    // Legacy / prose copyleft beyond short GPL (q-mp-1079)
+    expect(classifyLicense('AGPLv3')).toBe('denied');
+    expect(classifyLicense('GNU General Public License v3.0')).toBe('denied');
+    expect(classifyLicense('GNU General Public License v2.0')).toBe('denied');
+    expect(classifyLicense('Server Side Public License')).toBe('denied');
+    expect(classifyLicense('Business Source License 1.1')).toBe('denied');
     expect(classifyLicense('MPL-2.0')).toBe('copyleft_or_review');
     expect(classifyLicense('LGPL-2.1')).toBe('copyleft_or_review');
+    expect(classifyLicense('LGPLv2.1')).toBe('copyleft_or_review');
+    expect(classifyLicense('LGPLv3')).toBe('copyleft_or_review');
+    expect(classifyLicense('MPLv2')).toBe('copyleft_or_review');
+    expect(classifyLicense('Mozilla Public License 2.0')).toBe(
+      'copyleft_or_review'
+    );
     expect(classifyLicense('Python-2.0')).toBe('copyleft_or_review');
+    // CPL SPDX + Common Public License prose (q-mp-1103)
+    expect(classifyLicense('CPL-1.0')).toBe('copyleft_or_review');
+    expect(classifyLicense('Common Public License 1.0')).toBe(
+      'copyleft_or_review'
+    );
+    // Eclipse Public License prose (q-mp-1104); SPDX EPL-* already covered
+    expect(classifyLicense('EPL-1.0')).toBe('copyleft_or_review');
+    expect(classifyLicense('EPL-2.0')).toBe('copyleft_or_review');
+    expect(classifyLicense('Eclipse Public License - v 2.0')).toBe(
+      'copyleft_or_review'
+    );
+    expect(classifyLicense('Eclipse Public License v1.0')).toBe(
+      'copyleft_or_review'
+    );
     expect(classifyLicense('')).toBe('unknown');
     expect(classifyLicense('UNLICENSED')).toBe('unknown');
+    // Bare / URL Custom* must not be ok (q-mp-1102)
+    expect(classifyLicense('Custom')).toBe('unknown');
+    expect(classifyLicense('custom')).toBe('unknown');
+    expect(classifyLicense('Custom: https://x.test/lic')).toBe('unknown');
+    // OR forms with unknown/proprietary tokens must not be ok (q-mp-1080)
+    expect(classifyLicense('UNLICENSED OR MIT')).toBe('unknown');
+    expect(classifyLicense('MIT OR UNLICENSED')).toBe('unknown');
+    expect(classifyLicense('PROPRIETARY OR MIT')).toBe('unknown');
+    expect(classifyLicense('NONE OR Apache-2.0')).toBe('unknown');
+    expect(classifyLicense('UNKNOWN OR MIT')).toBe('unknown');
+    expect(classifyLicense('Custom OR MIT')).toBe('unknown');
     expect(classifyLicense('MIT')).toBe('ok');
     expect(classifyLicense('Apache-2.0')).toBe('ok');
     expect(classifyLicense('(MIT OR CC0-1.0)')).toBe('ok');
-    // Long-form prose left to q-mp-1079; short legacy forms only here
-    expect(classifyLicense('GNU General Public License v3.0')).toBe('ok');
-    expect(classifyLicense('AGPLv3')).toBe('ok');
-    expect(classifyLicense('LGPLv2.1')).toBe('ok');
+    // q-mp-1081 HOLD-CHECK: source-available / proprietary prose stay ok here
+    expect(classifyLicense('Elastic-2.0')).toBe('ok');
+    expect(classifyLicense('LicenseRef-Proprietary')).toBe('ok');
+    expect(classifyLicense('Commercial')).toBe('ok');
+    // q-mp-1105 HOLD-CHECK: CDDL long prose / MS-RL stay ok here (SPDX CDDL ok→review)
+    expect(classifyLicense('CDDL-1.1')).toBe('copyleft_or_review');
+    expect(classifyLicense('Common Development and Distribution License')).toBe(
+      'ok'
+    );
+    expect(classifyLicense('MS-RL')).toBe('ok');
   });
 
   it('extracts npm names from lock paths including nested scoped packages', () => {

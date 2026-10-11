@@ -43,12 +43,57 @@ function isObject(value) {
 }
 
 /**
+ * js-yaml (YAML 1.2 / JSON schema) keeps YAML 1.1 bool tokens (`yes` / `on` /
+ * `no` / `off`, any case) and quoted `"true"` / `"false"` as strings. Accept
+ * native booleans, the case-sensitive quoted `"true"` / `"false"` spellings
+ * (q-mp-1078), and YAML 1.1-style yes/on/no/off (q-mp-1097).
+ *
+ * @param {unknown} value
+ * @returns {boolean}
+ */
+export function isYamlTrue(value) {
+  if (value === true || value === 'true') return true;
+  if (typeof value !== 'string') return false;
+  const token = value.toLowerCase();
+  return token === 'yes' || token === 'on';
+}
+
+/**
+ * @param {unknown} value
+ * @returns {boolean}
+ */
+export function isYamlFalse(value) {
+  if (value === false || value === 'false') return true;
+  if (typeof value !== 'string') return false;
+  const token = value.toLowerCase();
+  return token === 'no' || token === 'off';
+}
+
+/**
+ * GitHub Actions accepts `on` as a mapping (`on: pull_request:`) or a
+ * sequence shorthand (`on: [pull_request]`). Treat both forms the same.
+ *
+ * @param {unknown} on
+ * @param {string} event
+ * @returns {boolean}
+ */
+export function onIncludesEvent(on, event) {
+  if (Array.isArray(on)) {
+    return on.includes(event);
+  }
+  if (!isObject(on)) return false;
+  return event in on;
+}
+
+/**
  * @param {unknown} on
  * @returns {boolean}
  */
 export function hasPullRequestTrigger(on) {
-  if (!isObject(on)) return false;
-  return 'pull_request' in on || 'pull_request_target' in on;
+  return (
+    onIncludesEvent(on, 'pull_request') ||
+    onIncludesEvent(on, 'pull_request_target')
+  );
 }
 
 /**
@@ -115,14 +160,14 @@ export function auditWorkflow(file, doc, raw) {
     if (typeof conc.group !== 'string' || conc.group.length === 0) {
       fail('concurrency.group must be a non-empty string');
     }
-    if (conc['cancel-in-progress'] !== true) {
+    if (!isYamlTrue(conc['cancel-in-progress'])) {
       fail('concurrency.cancel-in-progress must be true');
     }
   }
 
   // --- pull_request_target / secrets ---
   const on = doc.on ?? doc.true;
-  if (isObject(on) && 'pull_request_target' in on) {
+  if (onIncludesEvent(on, 'pull_request_target')) {
     fail('pull_request_target is forbidden (fork secret exfiltration risk)');
   }
   if (hasPullRequestTrigger(on)) {
@@ -183,7 +228,7 @@ export function auditWorkflow(file, doc, raw) {
         if (step.uses.startsWith('actions/checkout@')) {
           hasCheckout = true;
           const withObj = isObject(step.with) ? step.with : {};
-          if (withObj['persist-credentials'] !== false) {
+          if (!isYamlFalse(withObj['persist-credentials'])) {
             checkoutPersistOk = false;
           }
         }

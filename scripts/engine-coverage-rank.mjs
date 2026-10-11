@@ -23,6 +23,10 @@
  * Contradictory numeric pct vs covered/total (q-mp-1033): when both covered and
  * total are finite numbers, display/rank pct is always derived from them so a
  * stale pct cannot invert rank order.
+ * Covered > total (q-mp-1083): clamp covered to total before derive so rank pct
+ * never exceeds 100 (same approach as report-coverage-map q-mp-1039).
+ * Pct-only numeric rows (q-mp-1084): keep pct; covered/total stay unknown (not
+ * invented 0/0) in the rank table.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -144,16 +148,31 @@ export class InvalidCoverageMetricError extends Error {
 }
 
 /**
+ * Format covered/total for the rank table. Unknown counts (pct-only) → em dash
+ * (q-mp-1084); never invent a fake 0/0 ratio beside a real pct.
+ *
+ * @param {number | null | undefined} covered
+ * @param {number | null | undefined} total
+ * @returns {string}
+ */
+export function formatCounts(covered, total) {
+  if (covered == null || total == null) return '—';
+  return `${covered}/${total}`;
+}
+
+/**
  * Normalize a lines/branches metric.
  *
  * When numeric covered + total are present, derive pct from them (q-mp-1033) —
  * including when a finite numeric pct contradicts the counts (stale istanbul
- * rows). total===0 → 100. Absent metric → zeros (legacy default for missing
- * branches). Pct-only numeric (no covered/total) keeps the supplied pct.
- * Non-numeric / missing pct without covered/total → null (q-mp-1018).
+ * rows). Covered is clamped to [0, total] before derive so pct ≤ 100
+ * (q-mp-1083). total===0 → 100. Absent metric → zeros (legacy default for
+ * missing branches). Pct-only numeric (no covered/total) keeps the supplied pct
+ * with unknown counts (q-mp-1084). Non-numeric / missing pct without
+ * covered/total → null (q-mp-1018).
  *
  * @param {unknown} m
- * @returns {{ pct: number, covered: number, total: number } | null}
+ * @returns {{ pct: number, covered: number | null, total: number | null } | null}
  */
 export function resolveMetric(m) {
   if (m == null || typeof m !== 'object') {
@@ -168,16 +187,20 @@ export function resolveMetric(m) {
   const totalOk = typeof total === 'number' && Number.isFinite(total);
 
   // q-mp-1033: covered/total win over contradictory (or matching) numeric pct.
+  // q-mp-1083: clamp covered ≤ total before derive (no >100% rank).
   if (coveredOk && totalOk) {
-    const derived = total === 0 ? 100 : (100 * covered) / total;
-    return { pct: derived, covered, total };
+    const t = Math.max(0, total);
+    const c = Math.min(t, Math.max(0, covered));
+    const derived = t === 0 ? 100 : (100 * c) / t;
+    return { pct: derived, covered: c, total: t };
   }
 
   if (typeof pct === 'number' && Number.isFinite(pct)) {
+    // q-mp-1084: do not invent 0 for missing covered/total on pct-only rows.
     return {
       pct,
-      covered: coveredOk ? covered : 0,
-      total: totalOk ? total : 0,
+      covered: coveredOk ? covered : null,
+      total: totalOk ? total : null,
     };
   }
 
@@ -240,9 +263,9 @@ export function formatRankOutput(rows) {
         i + 1,
         r.file,
         r.linePct.toFixed(2),
-        `${r.lineCov}/${r.lineTot}`,
+        formatCounts(r.lineCov, r.lineTot),
         r.branchPct.toFixed(2),
-        `${r.branchCov}/${r.branchTot}`,
+        formatCounts(r.branchCov, r.branchTot),
       ].join('\t')
     );
   });
@@ -266,7 +289,7 @@ export function formatRankOutput(rows) {
     const files = byGame.get(g);
     const primary = files.find((x) => x.kind === 'rules') ?? files[0];
     lines.push(
-      `${g}\trules-branch ${primary.branchPct.toFixed(2)}% (${primary.branchCov}/${primary.branchTot})\tline ${primary.linePct.toFixed(2)}% (${primary.lineCov}/${primary.lineTot})`
+      `${g}\trules-branch ${primary.branchPct.toFixed(2)}% (${formatCounts(primary.branchCov, primary.branchTot)})\tline ${primary.linePct.toFixed(2)}% (${formatCounts(primary.lineCov, primary.lineTot)})`
     );
     for (const f of files.filter((x) => x !== primary)) {
       lines.push(

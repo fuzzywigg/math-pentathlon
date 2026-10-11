@@ -105,6 +105,19 @@ export function validateManifest(manifest) {
 
   for (const [key, expected] of Object.entries(REQUIRED_MANIFEST)) {
     const actual = manifest[key];
+    // CSS/HTML hex colors are case-insensitive (#102A43 === #102a43).
+    if (
+      (key === 'theme_color' || key === 'background_color') &&
+      typeof actual === 'string' &&
+      typeof expected === 'string'
+    ) {
+      if (actual.toLowerCase() !== expected.toLowerCase()) {
+        errors.push(
+          `manifest.${key}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`
+        );
+      }
+      continue;
+    }
     if (actual !== expected) {
       errors.push(
         `manifest.${key}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`
@@ -184,6 +197,57 @@ function hasThemeColorForScheme(html, content, scheme) {
 }
 
 /**
+ * True when html has a link tag with rel=apple-touch-icon and the brand
+ * href — either attribute order, double or single quotes.
+ * @param {string} html
+ * @returns {boolean}
+ */
+function hasAppleTouchIcon(html) {
+  const linkRe = /<link\b[^>]*>/gi;
+  const relRe = /\brel=["']apple-touch-icon["']/i;
+  const hrefRe = new RegExp(
+    `\\bhref=["']${APPLE_TOUCH_ICON.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["']`,
+    'i'
+  );
+  let match;
+  while ((match = linkRe.exec(html)) !== null) {
+    const tag = match[0];
+    if (relRe.test(tag) && hrefRe.test(tag)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * True when html has a meta tag with the given name + content — any attribute
+ * order, double or single quotes (content may precede name).
+ * @param {string} html
+ * @param {string} name
+ * @param {string} content
+ * @returns {boolean}
+ */
+function hasAppleMobileMeta(html, name, content) {
+  const metaRe = /<meta\b[^>]*>/gi;
+  const nameRe = new RegExp(
+    `\\bname=["']${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["']`,
+    'i'
+  );
+  const contentRe = new RegExp(
+    `\\bcontent=["']${content.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["']`,
+    'i'
+  );
+  let match;
+  while ((match = metaRe.exec(html)) !== null) {
+    const tag = match[0];
+    if (nameRe.test(tag) && contentRe.test(tag)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Validate index.html install meta tags (apple + theme-color light/dark).
  * @param {string} html
  * @returns {{ ok: boolean, errors: string[] }}
@@ -195,19 +259,16 @@ export function validateIndexHtml(html) {
     return { ok: false, errors: ['index.html is empty'] };
   }
 
-  if (
-    !html.includes(`rel="apple-touch-icon" href="${APPLE_TOUCH_ICON}"`) &&
-    !html.includes(`rel='apple-touch-icon' href='${APPLE_TOUCH_ICON}'`)
-  ) {
+  if (!hasAppleTouchIcon(html)) {
     errors.push(`missing apple-touch-icon ${APPLE_TOUCH_ICON}`);
   }
 
-  if (!/apple-mobile-web-app-capable[^>]*content=["']yes["']/.test(html)) {
+  if (!hasAppleMobileMeta(html, 'apple-mobile-web-app-capable', 'yes')) {
     errors.push('missing apple-mobile-web-app-capable=yes');
   }
 
   if (
-    !/apple-mobile-web-app-title[^>]*content=["']Math Pentathlon["']/.test(html)
+    !hasAppleMobileMeta(html, 'apple-mobile-web-app-title', 'Math Pentathlon')
   ) {
     errors.push('missing apple-mobile-web-app-title=Math Pentathlon');
   }

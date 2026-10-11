@@ -74,6 +74,133 @@ describe('pwa-manifest-contract helpers', () => {
     expect(validateIndexHtml(full)).toEqual({ ok: true, errors: [] });
   });
 
+  it('validateIndexHtml accepts apple-touch-icon when href precedes rel', () => {
+    const chrome = `
+      <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
+      <meta name="theme-color" content="#102a43" media="(prefers-color-scheme: dark)" />
+      <meta name="theme-color" content="#102a43" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-title" content="Math Pentathlon" />`;
+
+    const attributeOrders = [
+      // rel then href (live index.html order)
+      `<link rel="apple-touch-icon" href="/icons/icon-180.png" />`,
+      // href before rel (ticket baseline)
+      `<link href="/icons/icon-180.png" rel="apple-touch-icon" />`,
+      // single quotes, href first
+      `<link href='/icons/icon-180.png' rel='apple-touch-icon' />`,
+      // single quotes, rel first
+      `<link rel='apple-touch-icon' href='/icons/icon-180.png' />`,
+    ];
+
+    for (const icon of attributeOrders) {
+      const html = `<html><head>${chrome}${icon}</head></html>`;
+      expect(validateIndexHtml(html)).toEqual({ ok: true, errors: [] });
+    }
+
+    const wrongHref = `<html><head>${chrome}
+      <link href="/icons/wrong.png" rel="apple-touch-icon" />
+    </head></html>`;
+    const wrong = validateIndexHtml(wrongHref);
+    expect(wrong.ok).toBe(false);
+    expect(wrong.errors.join('\n')).toMatch(
+      /missing apple-touch-icon \/icons\/icon-180\.png/
+    );
+  });
+
+  it('validateIndexHtml accepts apple-mobile meta when content precedes name', () => {
+    const chrome = `
+      <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
+      <meta name="theme-color" content="#102a43" media="(prefers-color-scheme: dark)" />
+      <meta name="theme-color" content="#102a43" />
+      <link rel="apple-touch-icon" href="/icons/icon-180.png" />`;
+
+    const attributeOrders = [
+      // name then content (live index.html order)
+      `<meta name="apple-mobile-web-app-capable" content="yes" />
+       <meta name="apple-mobile-web-app-title" content="Math Pentathlon" />`,
+      // content before name (ticket baseline)
+      `<meta content="yes" name="apple-mobile-web-app-capable" />
+       <meta content="Math Pentathlon" name="apple-mobile-web-app-title" />`,
+      // single quotes, content first
+      `<meta content='yes' name='apple-mobile-web-app-capable' />
+       <meta content='Math Pentathlon' name='apple-mobile-web-app-title' />`,
+      // mixed order across tags
+      `<meta content="yes" name="apple-mobile-web-app-capable" />
+       <meta name="apple-mobile-web-app-title" content="Math Pentathlon" />`,
+    ];
+
+    for (const apple of attributeOrders) {
+      const html = `<html><head>${chrome}${apple}</head></html>`;
+      expect(validateIndexHtml(html)).toEqual({ ok: true, errors: [] });
+    }
+
+    const wrongCapable = `<html><head>${chrome}
+      <meta content="no" name="apple-mobile-web-app-capable" />
+      <meta content="Math Pentathlon" name="apple-mobile-web-app-title" />
+    </head></html>`;
+    const wrong = validateIndexHtml(wrongCapable);
+    expect(wrong.ok).toBe(false);
+    expect(wrong.errors.join('\n')).toMatch(
+      /missing apple-mobile-web-app-capable=yes/
+    );
+  });
+
+  it('validateManifest compares theme/background hex case-insensitively', () => {
+    const icons = [
+      {
+        src: '/icons/icon-192.png',
+        sizes: '192x192',
+        purpose: 'any',
+      },
+      {
+        src: '/icons/icon-512.png',
+        sizes: '512x512',
+        purpose: 'any',
+      },
+      {
+        src: '/icons/icon-512-maskable.png',
+        sizes: '512x512',
+        purpose: 'maskable',
+      },
+    ];
+    const base = {
+      name: 'Math Pentathlon',
+      short_name: 'Math Pentathlon',
+      id: '/',
+      start_url: '/',
+      scope: '/',
+      display: 'standalone',
+      orientation: 'any',
+      lang: 'en',
+      icons,
+    };
+
+    expect(
+      validateManifest({
+        ...base,
+        theme_color: '#102a43',
+        background_color: '#102a43',
+      })
+    ).toEqual({ ok: true, errors: [] });
+
+    expect(
+      validateManifest({
+        ...base,
+        theme_color: '#102A43',
+        background_color: '#102A43',
+      })
+    ).toEqual({ ok: true, errors: [] });
+
+    const wrongHue = validateManifest({
+      ...base,
+      theme_color: '#102A44',
+      background_color: '#102a43',
+    });
+    expect(wrongHue.ok).toBe(false);
+    expect(wrongHue.errors.join('\n')).toMatch(/manifest\.theme_color/);
+  });
+
   it('validateIndexHtml accepts theme-color when media/content precede name', () => {
     const chrome = `
       <meta name="apple-mobile-web-app-capable" content="yes" />

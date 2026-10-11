@@ -3,7 +3,9 @@
  * (q-mp-842 missing-summary UX; q-mp-918 early --help / flag rejection;
  * q-mp-992 empty / non-engine summary reject;
  * q-mp-1018 derive or reject missing/non-numeric pct;
- * q-mp-1033 prefer covered/total over contradictory numeric pct).
+ * q-mp-1033 prefer covered/total over contradictory numeric pct;
+ * q-mp-1083 clamp covered>total (no >100% rank);
+ * q-mp-1084 pct-only rows must not invent 0/0 counts).
  */
 import { describe, it, expect, vi } from 'vitest';
 import {
@@ -17,6 +19,7 @@ import {
   invalidMetricMessage,
   InvalidCoverageMetricError,
   resolveMetric,
+  formatCounts,
   collectEngineRows,
   formatRankOutput,
   main,
@@ -330,11 +333,11 @@ describe('engine-coverage-rank missing / non-numeric pct (q-mp-1018)', () => {
       covered: 0,
       total: 0,
     });
-    // Pct-only numeric (no covered/total) still accepted.
+    // Pct-only numeric (no covered/total) still accepted; counts unknown (1084).
     expect(resolveMetric({ pct: 12.5 })).toEqual({
       pct: 12.5,
-      covered: 0,
-      total: 0,
+      covered: null,
+      total: null,
     });
     // String pct with numeric covered/total → derive (do not call toFixed on string).
     expect(
@@ -536,6 +539,116 @@ describe('engine-coverage-rank contradictory numeric pct (q-mp-1033)', () => {
     );
     expect(table).toContain(
       '2\tsrc/games/calla/rules.ts\t90.00\t90/100\t90.00\t90/100'
+    );
+  });
+});
+
+describe('engine-coverage-rank clamp covered>total (q-mp-1083)', () => {
+  it('resolveMetric clamps covered to total so pct ≤ 100', () => {
+    expect(resolveMetric({ covered: 12, total: 10, pct: 80 })).toEqual({
+      pct: 100,
+      covered: 10,
+      total: 10,
+    });
+    expect(resolveMetric({ covered: 12, total: 10 })).toEqual({
+      pct: 100,
+      covered: 10,
+      total: 10,
+    });
+    // Negative covered → 0 before derive.
+    expect(resolveMetric({ covered: -3, total: 10 })).toEqual({
+      pct: 0,
+      covered: 0,
+      total: 10,
+    });
+  });
+
+  it('preserves q-mp-1033 contradictory-pct preference after clamp', () => {
+    expect(
+      resolveMetric({ total: 100, covered: 90, skipped: 0, pct: 10 })
+    ).toEqual({ pct: 90, covered: 90, total: 100 });
+    expect(
+      resolveMetric({ total: 10, covered: 12, skipped: 0, pct: 50 })
+    ).toEqual({ pct: 100, covered: 10, total: 10 });
+  });
+
+  it('rank table never shows >100% when covered>total', () => {
+    const rows = collectEngineRows({
+      'src/games/hex/rules.ts': {
+        lines: { covered: 12, total: 10, pct: 80 },
+        branches: { covered: 5, total: 4, pct: 90 },
+      },
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0].linePct).toBe(100);
+    expect(rows[0].branchPct).toBe(100);
+    expect(rows[0].linePct).toBeLessThanOrEqual(100);
+    expect(rows[0].branchPct).toBeLessThanOrEqual(100);
+    const out = formatRankOutput(rows);
+    expect(out).toContain(
+      '1\tsrc/games/hex/rules.ts\t100.00\t10/10\t100.00\t4/4'
+    );
+    expect(out).not.toMatch(/120\.00|125\.00/);
+  });
+});
+
+describe('engine-coverage-rank pct-only counts (q-mp-1084)', () => {
+  it('formatCounts shows em dash for unknown; keeps real ratios', () => {
+    expect(formatCounts(null, null)).toBe('—');
+    expect(formatCounts(undefined, undefined)).toBe('—');
+    expect(formatCounts(9, 10)).toBe('9/10');
+    expect(formatCounts(0, 0)).toBe('0/0');
+  });
+
+  it('resolveMetric pct-only keeps pct with unknown counts', () => {
+    expect(resolveMetric({ pct: 88.5 })).toEqual({
+      pct: 88.5,
+      covered: null,
+      total: null,
+    });
+  });
+
+  it('pct-only rank rows show — not invented 0/0', () => {
+    const rows = collectEngineRows({
+      'src/games/calla/rules.ts': {
+        lines: { pct: 88.5 },
+        branches: { pct: 70 },
+      },
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0].linePct).toBe(88.5);
+    expect(rows[0].branchPct).toBe(70);
+    expect(rows[0].lineCov).toBeNull();
+    expect(rows[0].lineTot).toBeNull();
+    expect(rows[0].branchCov).toBeNull();
+    expect(rows[0].branchTot).toBeNull();
+    const out = formatRankOutput(rows);
+    expect(out).toContain(
+      '1\tsrc/games/calla/rules.ts\t88.50\t—\t70.00\t—'
+    );
+    expect(out).toContain('rules-branch 70.00% (—)\tline 88.50% (—)');
+    expect(out).not.toMatch(/88\.50\t0\/0/);
+    expect(out).not.toMatch(/70\.00\t0\/0/);
+  });
+
+  it('count rows and absent-metric 0/0 remain unchanged', () => {
+    const withCounts = collectEngineRows({
+      'src/games/hex/rules.ts': {
+        lines: { pct: 90, covered: 9, total: 10 },
+        branches: { pct: 80, covered: 8, total: 10 },
+      },
+    });
+    expect(formatRankOutput(withCounts)).toContain(
+      '1\tsrc/games/hex/rules.ts\t90.00\t9/10\t80.00\t8/10'
+    );
+    // Missing branches metric still defaults to real zeros (legacy), not —.
+    const missingBranches = collectEngineRows({
+      'src/games/calla/rules.ts': {
+        lines: { total: 100, covered: 50, skipped: 0 },
+      },
+    });
+    expect(formatRankOutput(missingBranches)).toContain(
+      '1\tsrc/games/calla/rules.ts\t50.00\t50/100\t0.00\t0/0'
     );
   });
 });
