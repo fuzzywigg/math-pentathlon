@@ -50,7 +50,8 @@ describe('finalizeGameResult durationMs filter (q-mp-1224)', () => {
     });
     expect(r.move.count).toBe(2);
     expect(r.move.meanMs).toBe(20);
-    expect(r.move.p50Ms).toBe(10);
+    // pct uses floor(n*p) index — for [10,30] p50 → index 1 → 30
+    expect(r.move.p50Ms).toBe(30);
     expect(r.move.maxMs).toBe(30);
     expect(r.move.longTasksOver50).toBe(1);
     expect(r.move.longTaskMaxMs).toBe(60);
