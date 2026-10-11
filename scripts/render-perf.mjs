@@ -30,6 +30,10 @@ import { waitDoubleRaf } from './lib/page-settle.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
 import { RENDER_PERF_USAGE } from './lib/browser-harness-script-usage.mjs';
+import {
+  HOVER_PROBE_CELL_LIMIT,
+  hoverProbeMethodBullet,
+} from './lib/render-perf-stats.mjs';
 
 applyBrowserHarnessCli(process.argv.slice(2), RENDER_PERF_USAGE);
 
@@ -463,7 +467,23 @@ async function measureDomBurst(page, gameId) {
     const nodes = Array.from(document.querySelectorAll(selector)).slice(0, 10);
     if (nodes.length === 0) return null;
     const w = window;
-    const before = { ...(w.__mpRenderStats || {}) };
+    // Observers write __mpRenderPerf (q-mp-1238); do not read a never-written stats alias.
+    const snapCounters = (bag) => {
+      if (!bag || typeof bag !== 'object') {
+        return { layoutReads: 0, longTaskCount: 0, moveCostCount: 0 };
+      }
+      const layoutRaw = bag.layoutReads;
+      const layoutReads =
+        typeof layoutRaw === 'number' && Number.isFinite(layoutRaw)
+          ? layoutRaw
+          : 0;
+      return {
+        layoutReads,
+        longTaskCount: Array.isArray(bag.longTasks) ? bag.longTasks.length : 0,
+        moveCostCount: Array.isArray(bag.moveCosts) ? bag.moveCosts.length : 0,
+      };
+    };
+    const before = snapCounters(w.__mpRenderPerf);
     const t0 = performance.now();
     for (let i = 0; i < 20; i++) {
       const el = nodes[i % nodes.length];
@@ -487,7 +507,7 @@ async function measureDomBurst(page, gameId) {
       requestAnimationFrame(() => requestAnimationFrame(r))
     );
     const totalMs = performance.now() - t0;
-    const after = { ...(w.__mpRenderStats || {}) };
+    const after = snapCounters(w.__mpRenderPerf);
     const deltaStats = {};
     for (const k of new Set([...Object.keys(before), ...Object.keys(after)])) {
       deltaStats[k] = (after[k] || 0) - (before[k] || 0);
@@ -507,50 +527,53 @@ async function measureHoverCost(page, gameId) {
 
   await ensurePlacePhaseForHover(page, gameId);
 
-  return page.evaluate(async (id) => {
-    const w = window;
-    const cells =
-      id === 'juggle'
-        ? Array.from(
-            document.querySelectorAll(
-              '.juggle-board.active .juggle-cell:not([class*="occupied"])'
-            )
-          ).slice(0, 16)
-        : Array.from(
-            document.querySelectorAll('.pent-board .interaction rect')
-          ).slice(0, 16);
-    if (cells.length < 2) return null;
+  return page.evaluate(
+    async ({ id, hoverLimit }) => {
+      const w = window;
+      const cells =
+        id === 'juggle'
+          ? Array.from(
+              document.querySelectorAll(
+                '.juggle-board.active .juggle-cell:not([class*="occupied"])'
+              )
+            ).slice(0, hoverLimit)
+          : Array.from(
+              document.querySelectorAll('.pent-board .interaction rect')
+            ).slice(0, hoverLimit);
+      if (cells.length < 2) return null;
 
-    const beforeLt = w.__mpRenderPerf.longTasks.length;
-    const beforeLayout = w.__mpRenderPerf.layoutReads;
-    const t0 = performance.now();
-    // Fire hover bursts synchronously so rebuild cost is not hidden by rAF waits.
-    for (const cell of cells) {
-      cell.dispatchEvent(
-        new MouseEvent('mouseenter', {
-          bubbles: true,
-          cancelable: true,
-          view: window,
-        })
+      const beforeLt = w.__mpRenderPerf.longTasks.length;
+      const beforeLayout = w.__mpRenderPerf.layoutReads;
+      const t0 = performance.now();
+      // Fire hover bursts synchronously so rebuild cost is not hidden by rAF waits.
+      for (const cell of cells) {
+        cell.dispatchEvent(
+          new MouseEvent('mouseenter', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+          })
+        );
+      }
+      const syncMs = performance.now() - t0;
+      await new Promise((r) =>
+        requestAnimationFrame(() => requestAnimationFrame(r))
       );
-    }
-    const syncMs = performance.now() - t0;
-    await new Promise((r) =>
-      requestAnimationFrame(() => requestAnimationFrame(r))
-    );
-    const t1 = performance.now();
-    const lt = w.__mpRenderPerf.longTasks.slice(beforeLt);
-    return {
-      hoverSamples: cells.length,
-      hoverSyncTotalMs: syncMs,
-      hoverSyncMeanMs: syncMs / cells.length,
-      hoverTotalMs: t1 - t0,
-      hoverMeanMs: syncMs / cells.length,
-      hoverLongTasks: lt.length,
-      hoverLongTaskMaxMs: lt.reduce((m, e) => Math.max(m, e.duration), 0),
-      hoverLayoutReads: w.__mpRenderPerf.layoutReads - beforeLayout,
-    };
-  }, gameId);
+      const t1 = performance.now();
+      const lt = w.__mpRenderPerf.longTasks.slice(beforeLt);
+      return {
+        hoverSamples: cells.length,
+        hoverSyncTotalMs: syncMs,
+        hoverSyncMeanMs: syncMs / cells.length,
+        hoverTotalMs: t1 - t0,
+        hoverMeanMs: syncMs / cells.length,
+        hoverLongTasks: lt.length,
+        hoverLongTaskMaxMs: lt.reduce((m, e) => Math.max(m, e.duration), 0),
+        hoverLayoutReads: w.__mpRenderPerf.layoutReads - beforeLayout,
+      };
+    },
+    { id: gameId, hoverLimit: HOVER_PROBE_CELL_LIMIT }
+  );
 }
 
 async function measureGame(browser, baseURL, gameId) {
@@ -649,7 +672,28 @@ async function measureGame(browser, baseURL, gameId) {
     result.play = await readAggregate(page);
     result.hover = await measureHoverCost(page, gameId);
     result.renderStats = await page
-      .evaluate(() => window.__mpRenderStats ?? null)
+      .evaluate(() => {
+        const bag = window.__mpRenderPerf;
+        if (!bag || typeof bag !== 'object') return null;
+        const layoutRaw = bag.layoutReads;
+        const layoutReads =
+          typeof layoutRaw === 'number' && Number.isFinite(layoutRaw)
+            ? layoutRaw
+            : 0;
+        return {
+          layoutReads,
+          longTaskCount: Array.isArray(bag.longTasks)
+            ? bag.longTasks.length
+            : 0,
+          moveCostCount: Array.isArray(bag.moveCosts)
+            ? bag.moveCosts.length
+            : 0,
+          started:
+            typeof bag.started === 'number' && Number.isFinite(bag.started)
+              ? bag.started
+              : null,
+        };
+      })
       .catch(() => null);
     result.domBurst = await measureDomBurst(page, gameId);
   } catch (err) {
@@ -720,9 +764,7 @@ async function writeCombinedMarkdown(currentMeta, currentResults) {
   lines.push(
     '- Metrics: time-to-interactive (nav → first board control), per-move cost (click → double-rAF), long tasks >50ms, layout-forcing Element geometry reads'
   );
-  lines.push(
-    '- Hover probe (juggle, pent-em-in): 12 synthetic `mouseenter` events during place phase when cells exist'
-  );
+  lines.push(hoverProbeMethodBullet(HOVER_PROBE_CELL_LIMIT));
   lines.push(
     '- Deliberately left alone: AI search/scoring/timing, #489 menu first-load, #463 runtime harness shape, #501 leak cleanup, Stars & Bars history cap, Hex Hard 450ms assert, visual baselines, gzip budgets'
   );
