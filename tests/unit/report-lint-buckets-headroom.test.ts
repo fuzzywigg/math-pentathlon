@@ -1,8 +1,8 @@
 /**
- * @vitest-environment node
- *
  * Hermetic coverage for report-lint-buckets headroom against non-numeric
  * ceilings (q-mp-1254). Does not spawn the eslint probe or write ceilings.
+ * Stays on unit-shared (no vitest.config.ts nodePureFiles edit — out of
+ * task path scope); pure helpers only.
  */
 import { describe, it, expect } from 'vitest';
 import {
