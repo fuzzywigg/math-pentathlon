@@ -3,6 +3,21 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { OwlComponent } from '../../src/ui/owl/owl-component';
 
+// Direct document assign is not undone by vi.restoreAllMocks (q-mp-1210).
+const originalElementFromPoint =
+  typeof document.elementFromPoint === 'function' &&
+  !vi.isMockFunction(document.elementFromPoint)
+    ? document.elementFromPoint
+    : undefined;
+
+function restoreElementFromPoint(): void {
+  if (originalElementFromPoint) {
+    document.elementFromPoint = originalElementFromPoint;
+  } else {
+    Reflect.deleteProperty(document, 'elementFromPoint');
+  }
+}
+
 function dispatchPointer(
   el: Element,
   type: string,
@@ -66,6 +81,7 @@ describe('Ollie drag shell (Cycle-2 A)', () => {
   afterEach(() => {
     owl.destroy();
     vi.restoreAllMocks();
+    restoreElementFromPoint();
   });
 
   it('moves Ollie with pointer capture while dragging', () => {

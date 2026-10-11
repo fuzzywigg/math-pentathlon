@@ -62,6 +62,12 @@ describe('burn-1009 ui-cov-r6 dice-demo poly callbacks', () => {
 describe('burn-1009 ui-cov-r6 owl-component coast residual', () => {
   let owl: OwlComponent;
   let root: HTMLElement;
+  // Direct document assign is not undone by vi.restoreAllMocks (q-mp-1210).
+  const originalElementFromPoint =
+    typeof document.elementFromPoint === 'function' &&
+    !vi.isMockFunction(document.elementFromPoint)
+      ? document.elementFromPoint
+      : undefined;
 
   beforeEach(() => {
     localStorage.clear();
@@ -97,6 +103,11 @@ describe('burn-1009 ui-cov-r6 owl-component coast residual', () => {
     document.body.innerHTML = '';
     localStorage.clear();
     storage.resetAll();
+    if (originalElementFromPoint) {
+      document.elementFromPoint = originalElementFromPoint;
+    } else {
+      Reflect.deleteProperty(document, 'elementFromPoint');
+    }
   });
 
   it('pointerup after fast drag coasts then rests; destroy mid-coast', async () => {
