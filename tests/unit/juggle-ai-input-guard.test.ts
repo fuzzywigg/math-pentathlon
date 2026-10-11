@@ -13,6 +13,7 @@ import {
   renderShapeSelector,
 } from '../../src/games/juggle/board-ui';
 import { SHAPE_POOLS } from '../../src/games/juggle/types';
+import { mountPair } from '../helpers/mount-pair';
 import { installDomHooks } from './helpers/dom';
 
 function stubCanvas(): void {
@@ -169,9 +170,7 @@ describe('Juggle AI-turn input guard', () => {
       __getStateForTests,
     } = await import('../../src/games/juggle/game-controller');
 
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
     newGameVsAI('easy');
 
