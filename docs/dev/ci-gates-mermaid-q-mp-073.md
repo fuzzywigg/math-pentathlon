@@ -68,7 +68,7 @@ Commands match the npm scripts / invocations in `.github/workflows/ci.yml` (plus
 
 | Job | Catches | Local reproduce |
 | --- | --- | --- |
-| `lint` | ESLint on `src`; curly `all` ratchet ceiling; Prettier drift; `tsc --noEmit`; type-ratchet Phase-2 ceiling; module-boundary import graph (`engine_imports_ui` must stay 0); (soft) player-facing copy-pin scan | `npm run verify` (= blocking chain); soft: `npm run check:copy-pins` |
+| `lint` | ESLint on `src`; 12-rule `lint:ratchet` ceilings (`docs/dev/lint-ratchet-ceilings.json`); Prettier drift; `tsc --noEmit`; type-ratchet Phase-2 ceiling; module-boundary import graph (`engine_imports_ui` must stay 0); (soft) player-facing copy-pin scan | `npm run verify` (= blocking chain); soft: `npm run check:copy-pins` |
 | `audit` | High+ npm advisory holes in the lockfile | `npm audit --audit-level=high` |
 | `build` | Production compile (`tsc && vite build`); `dist/` + `dist/health.txt`; hard **250 kB** per JS chunk under `dist/assets`; (soft) gzip budgets via `size:check -- --fail-on-new-over` + PWA manifest contract | `npm run build` then confirm `dist/` + `dist/health.txt`; soft: `npm run size:check -- --fail-on-new-over` · `npm run check:pwa-manifest` |
 | `unit` | Vitest unit suite under `tests/unit` (excl. `_tokenmaxx_archive`) — rules/state/shell regressions | `npm run test:unit` |

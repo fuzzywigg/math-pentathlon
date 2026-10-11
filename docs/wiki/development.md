@@ -38,7 +38,7 @@ npm run build
 npm run preview                  # serve dist/ after build
 npm run lint
 npm run lint:fix
-npm run lint:ratchet             # curly:all ceiling (CI lint job; ratchet only goes down)
+npm run lint:ratchet             # 12-rule ceilings (docs/dev/lint-ratchet-ceilings.json; CI lint job; ratchet only goes down)
 npm run format                   # Prettier write under src/
 npm run format:check
 npm run typecheck                # tsc --noEmit (same as CI)
