@@ -272,6 +272,26 @@ export function scanEnvLeakage(distRoot) {
 }
 
 /**
+ * Collect non-root absolute asset refs from HTML `src` / `href` attributes.
+ * Accepts double- or single-quoted attributes (q-mp-1179).
+ * @param {string} html
+ * @returns {string[]}
+ */
+export function collectHtmlNonRootAssetRefs(html) {
+  const htmlAssetRefs = [
+    ...html.matchAll(/(?:src|href)=(?:"([^"]+)"|'([^']+)')/g),
+  ].map((m) => m[1] ?? m[2]);
+  return htmlAssetRefs.filter(
+    (href) =>
+      href.startsWith('/') === false &&
+      !href.startsWith('#') &&
+      !href.startsWith('data:') &&
+      // skip-link / in-page only; module scripts must be root-absolute with base /
+      /\.(js|css|webmanifest|ico|svg|png|woff2?)$/.test(href)
+  );
+}
+
+/**
  * @param {string} distRoot
  */
 export function auditSourcemapsAndBase(distRoot) {
@@ -283,17 +303,7 @@ export function auditSourcemapsAndBase(distRoot) {
   const manifest = fs.existsSync(manifestPath)
     ? fs.readFileSync(manifestPath, 'utf8')
     : '';
-  const htmlAssetRefs = [...html.matchAll(/(?:src|href)="([^"]+)"/g)].map(
-    (m) => m[1]
-  );
-  const nonRootAbsolute = htmlAssetRefs.filter(
-    (href) =>
-      href.startsWith('/') === false &&
-      !href.startsWith('#') &&
-      !href.startsWith('data:') &&
-      // skip-link / in-page only; module scripts must be root-absolute with base /
-      /\.(js|css|webmanifest|ico|svg|png|woff2?)$/.test(href)
-  );
+  const nonRootAbsolute = collectHtmlNonRootAssetRefs(html);
   let manifestOk = true;
   /** @type {string[]} */
   const manifestIssues = [];

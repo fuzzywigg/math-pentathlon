@@ -26,6 +26,8 @@ export function auditPrecache(distRoot: string): unknown;
 
 export function scanEnvLeakage(distRoot: string): unknown;
 
+export function collectHtmlNonRootAssetRefs(html: string): string[];
+
 export function auditSourcemapsAndBase(distRoot: string): unknown;
 
 export function parseCliArgs(argv: string[]): {

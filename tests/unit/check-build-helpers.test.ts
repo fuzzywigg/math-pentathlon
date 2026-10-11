@@ -5,6 +5,7 @@ import {
   offlineNeededPaths,
   listChunkNames,
   PRECACHE_FONT_IGNORES,
+  collectHtmlNonRootAssetRefs,
 } from '../../scripts/check-build.mjs';
 
 describe('check-build helpers', () => {
@@ -213,5 +214,24 @@ describe('check-build helpers', () => {
     for (const u of urls) counts.set(u, (counts.get(u) || 0) + 1);
     const duplicates = [...counts.entries()].filter(([, n]) => n > 1);
     expect(duplicates).toEqual([['favicon.ico', 2]]);
+  });
+
+  it('collects single-quoted and double-quoted non-root asset refs (q-mp-1179)', () => {
+    const html = [
+      '<script src="./a.js"></script>',
+      "<script src='./b.js'></script>",
+      '<link href="./c.css">',
+      "<link href='./d.css'>",
+      '<script src="/root.js"></script>',
+      "<link href='/root.css'>",
+      '<a href="#skip">skip</a>',
+      '<img src="data:image/gif;base64,AA">',
+    ].join('');
+    expect(collectHtmlNonRootAssetRefs(html)).toEqual([
+      './a.js',
+      './b.js',
+      './c.css',
+      './d.css',
+    ]);
   });
 });
