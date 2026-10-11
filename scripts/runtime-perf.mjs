@@ -26,6 +26,7 @@ import { fileURLToPath } from 'node:url';
 import { gotoGame, startHuman } from './lib/page-ready.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
+import { RUNTIME_PERF_USAGE } from './lib/browser-harness-script-usage.mjs';
 import {
   getCpuThrottle,
   getMoveTargetRender,
@@ -39,19 +40,7 @@ import {
   writeRenderReport,
 } from './render-perf-mode.mjs';
 
-const USAGE = `Usage: node scripts/runtime-perf.mjs
-
-Report-only runtime perf harness (Playwright + CDP).
-Prefer: npm run perf:runtime
-
-Options:
-  -h, --help       Show this help and exit (no browser launch)
-
-Env:
-  PERF_BASE_URL / PERF_GAMES / PERF_MOVES / PERF_NAV_CYCLES / PERF_FRAME_MS
-  PERF_MODE / PERF_PHASE / PERF_DATE / PERF_FIXED_GAMES / PERF_FIX_NOTES`;
-
-applyBrowserHarnessCli(process.argv.slice(2), USAGE);
+applyBrowserHarnessCli(process.argv.slice(2), RUNTIME_PERF_USAGE);
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');

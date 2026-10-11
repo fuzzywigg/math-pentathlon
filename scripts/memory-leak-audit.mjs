@@ -25,21 +25,10 @@ import { fileURLToPath } from 'node:url';
 import { dismissOwl } from './lib/dismiss-owl.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
+import { MEMORY_LEAK_AUDIT_USAGE } from './lib/browser-harness-script-usage.mjs';
 import { waitForGameReady, startHuman } from './lib/page-ready.mjs';
 
-const USAGE = `Usage: node scripts/memory-leak-audit.mjs
-
-Memory-leak audit (Playwright + CDP heap snapshots) for available games.
-Prefer: npm run audit:memory
-
-Options:
-  -h, --help       Show this help and exit (no browser launch)
-
-Env:
-  MEM_LEAK_LABEL / MEM_LEAK_GAMES / MEM_LEAK_CYCLES / MEM_LEAK_PORT
-  MEM_LEAK_BASE_URL / MEM_LEAK_DATE`;
-
-applyBrowserHarnessCli(process.argv.slice(2), USAGE);
+applyBrowserHarnessCli(process.argv.slice(2), MEMORY_LEAK_AUDIT_USAGE);
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
