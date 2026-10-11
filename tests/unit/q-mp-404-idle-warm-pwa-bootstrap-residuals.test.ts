@@ -27,6 +27,21 @@ import { bootstrapPwa } from '../../src/pwa/bootstrap';
 import { bootstrapOwl } from '../../src/pwa/bootstrap-owl';
 import { resetPwaReloadGuardForTests } from '../../src/pwa/register';
 
+// unit-shared uses isolate:false — restore document.hidden so later suites
+// do not see a stuck stub from Object.defineProperty (q-mp-1364).
+const originalDocumentHidden = Object.getOwnPropertyDescriptor(
+  document,
+  'hidden'
+);
+
+function restoreDocumentHidden(): void {
+  if (originalDocumentHidden) {
+    Object.defineProperty(document, 'hidden', originalDocumentHidden);
+  } else {
+    Reflect.deleteProperty(document, 'hidden');
+  }
+}
+
 function clearIdleWarmDom(): void {
   document.documentElement.removeAttribute(IDLE_WARM_DONE_ATTR);
   Object.defineProperty(document, 'hidden', {
@@ -48,6 +63,7 @@ describe('q-mp-404 idle-warm — double-warm / schedule residuals', () => {
   afterEach(() => {
     vi.restoreAllMocks();
     clearIdleWarmDom();
+    restoreDocumentHidden();
   });
 
   it('double scheduleIdleGameWarm registers two independent schedules', () => {
@@ -119,6 +135,7 @@ describe('q-mp-404 idle-warm — mid-shell / both-reject abort residuals', () =>
   afterEach(() => {
     vi.restoreAllMocks();
     clearIdleWarmDom();
+    restoreDocumentHidden();
   });
 
   it('Save-Data flip during shell await aborts game warm and still marks done', async () => {
@@ -215,14 +232,14 @@ describe('q-mp-404 bootstrapPwa — schedule fallback residuals', () => {
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (window as any).requestIdleCallback;
-    const setTimeoutSpy = vi
-      .spyOn(window, 'setTimeout')
-      .mockImplementation(((cb: TimerHandler) => {
-        if (typeof cb === 'function') {
-          cb();
-        }
-        return 1 as unknown as number;
-      }) as typeof setTimeout);
+    const setTimeoutSpy = vi.spyOn(window, 'setTimeout').mockImplementation(((
+      cb: TimerHandler
+    ) => {
+      if (typeof cb === 'function') {
+        cb();
+      }
+      return 1 as unknown as number;
+    }) as typeof setTimeout);
     const registerSW = vi.fn(() => vi.fn());
     bootstrapPwa({ enabled: true, registerSW });
     const delay = setTimeoutSpy.mock.calls.find(
@@ -254,8 +271,7 @@ describe('q-mp-404 bootstrapOwl — soft-fail / schedule residuals', () => {
       importOwl: async () => {
         throw new Error('owl core chunk offline');
       },
-      importOwlUi: async () =>
-        ({ owlComponent: { init: vi.fn() } }) as never,
+      importOwlUi: async () => ({ owlComponent: { init: vi.fn() } }) as never,
     });
 
     await vi.waitFor(() => {
@@ -292,8 +308,7 @@ describe('q-mp-404 bootstrapOwl — soft-fail / schedule residuals', () => {
             },
           },
         }) as never,
-      importOwlUi: async () =>
-        ({ owlComponent: { init } }) as never,
+      importOwlUi: async () => ({ owlComponent: { init } }) as never,
     });
 
     await vi.waitFor(() => {
@@ -342,20 +357,18 @@ describe('q-mp-404 bootstrapOwl — soft-fail / schedule residuals', () => {
   it('defaultSchedule setTimeout fallback delay is exactly 800ms', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (window as any).requestIdleCallback;
-    const setTimeoutSpy = vi
-      .spyOn(window, 'setTimeout')
-      .mockImplementation(((cb: TimerHandler) => {
-        if (typeof cb === 'function') {
-          cb();
-        }
-        return 1 as unknown as number;
-      }) as typeof setTimeout);
+    const setTimeoutSpy = vi.spyOn(window, 'setTimeout').mockImplementation(((
+      cb: TimerHandler
+    ) => {
+      if (typeof cb === 'function') {
+        cb();
+      }
+      return 1 as unknown as number;
+    }) as typeof setTimeout);
     bootstrapOwl({
       enabled: true,
-      importOwl: async () =>
-        ({ owlSystem: { initialize: vi.fn() } }) as never,
-      importOwlUi: async () =>
-        ({ owlComponent: { init: vi.fn() } }) as never,
+      importOwl: async () => ({ owlSystem: { initialize: vi.fn() } }) as never,
+      importOwlUi: async () => ({ owlComponent: { init: vi.fn() } }) as never,
     });
     const delay = setTimeoutSpy.mock.calls.find(
       (c) => typeof c[0] === 'function'

@@ -17,6 +17,24 @@ import {
   scheduleIdleGameWarm,
 } from '../../src/pwa/idle-warm';
 
+// unit-shared uses isolate:false — restore document.hidden so later suites
+// do not see a stuck stub from Object.defineProperty (q-mp-1364).
+const originalDocumentHidden = Object.getOwnPropertyDescriptor(
+  document,
+  'hidden'
+);
+
+function restoreDocumentHidden(): void {
+  if (typeof document === 'undefined') {
+    return;
+  }
+  if (originalDocumentHidden) {
+    Object.defineProperty(document, 'hidden', originalDocumentHidden);
+  } else {
+    Reflect.deleteProperty(document, 'hidden');
+  }
+}
+
 function clearIdleWarmDom(): void {
   if (typeof document === 'undefined') {
     return;
@@ -41,6 +59,7 @@ describe('q-mp-631 idle-warm — default importer residuals', () => {
   afterEach(() => {
     vi.restoreAllMocks();
     clearIdleWarmDom();
+    restoreDocumentHidden();
   });
 
   it('defaultImportShell + defaultImportGame warm hex then kings (no inject)', async () => {
@@ -76,6 +95,7 @@ describe('q-mp-631 idle-warm — markWarmDone document-undefined residual', () =
       });
     }
     clearIdleWarmDom();
+    restoreDocumentHidden();
   });
 
   it('markWarmDone early-returns when document is undefined', () => {

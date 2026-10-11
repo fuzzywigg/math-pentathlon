@@ -4,6 +4,21 @@ import {
   scheduleIdleGameWarm,
 } from '../../src/pwa/idle-warm';
 
+// unit-shared uses isolate:false — restore document.hidden so later suites
+// do not see a stuck stub from Object.defineProperty (q-mp-1364).
+const originalDocumentHidden = Object.getOwnPropertyDescriptor(
+  document,
+  'hidden'
+);
+
+function restoreDocumentHidden(): void {
+  if (originalDocumentHidden) {
+    Object.defineProperty(document, 'hidden', originalDocumentHidden);
+  } else {
+    Reflect.deleteProperty(document, 'hidden');
+  }
+}
+
 describe('mutation-ui2 idle-warm survivors', () => {
   const hadRic = Object.prototype.hasOwnProperty.call(
     window,
@@ -23,10 +38,7 @@ describe('mutation-ui2 idle-warm survivors', () => {
     vi.restoreAllMocks();
     document.documentElement.removeAttribute(IDLE_WARM_DONE_ATTR);
     // Restore globals — unit-shared uses isolate:false across files.
-    Object.defineProperty(document, 'hidden', {
-      configurable: true,
-      get: () => false,
-    });
+    restoreDocumentHidden();
     try {
       delete (navigator as Navigator & { connection?: unknown }).connection;
     } catch {
@@ -74,12 +86,12 @@ describe('mutation-ui2 idle-warm survivors', () => {
       configurable: true,
       value: undefined,
     });
-    const setTimeoutSpy = vi
-      .spyOn(window, 'setTimeout')
-      .mockImplementation(((cb: TimerHandler) => {
-        if (typeof cb === 'function') cb();
-        return 1 as unknown as number;
-      }) as typeof setTimeout);
+    const setTimeoutSpy = vi.spyOn(window, 'setTimeout').mockImplementation(((
+      cb: TimerHandler
+    ) => {
+      if (typeof cb === 'function') cb();
+      return 1 as unknown as number;
+    }) as typeof setTimeout);
     const importShell = vi.fn().mockResolvedValue({});
     const importGame = vi.fn().mockResolvedValue({});
     scheduleIdleGameWarm({ importShell, importGame });
