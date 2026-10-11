@@ -2,11 +2,12 @@
  * Queens & Guards playability e2e — touch targets, AI-seat lock, full Easy game.
  * Chromium only (matches deep playtest harness).
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from './fixtures';
 import {
   dismissOwl,
   startVsAi,
 } from './helpers/page';
+import { installE2eStability } from './helpers/stability';
 
 test.describe('Queens & Guards playability', () => {
   test.describe.configure({ mode: 'serial' });
@@ -24,6 +25,7 @@ test.describe('Queens & Guards playability', () => {
       isMobile: true,
     });
     const page = await context.newPage();
+    await installE2eStability(page);
     await page.goto('/#/game/queens-guards');
     await startVsAi(page, 'easy');
 
