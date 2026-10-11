@@ -1,7 +1,8 @@
 /**
  * Hermetic helpers for scripts/engine-coverage-rank.mjs
  * (q-mp-842 missing-summary UX; q-mp-918 early --help / flag rejection;
- * q-mp-992 empty / non-engine summary reject).
+ * q-mp-992 empty / non-engine summary reject;
+ * q-mp-1018 derive or reject missing/non-numeric pct).
  */
 import { describe, it, expect, vi } from 'vitest';
 import {
@@ -12,6 +13,9 @@ import {
   resolveSummaryPath,
   missingSummaryMessage,
   emptyEngineSummaryMessage,
+  invalidMetricMessage,
+  InvalidCoverageMetricError,
+  resolveMetric,
   collectEngineRows,
   formatRankOutput,
   main,
@@ -304,5 +308,156 @@ describe('engine-coverage-rank empty / non-engine summaries (q-mp-992)', () => {
     expect(logs).toEqual([]);
     expect(errors.join('\n')).toBe(emptyEngineSummaryMessage('/tmp/n.json'));
     expect(errors.join('\n')).not.toContain('src/main.ts');
+  });
+});
+
+describe('engine-coverage-rank missing / non-numeric pct (q-mp-1018)', () => {
+  it('resolveMetric prefers numeric pct and derives from covered/total', () => {
+    expect(resolveMetric(undefined)).toEqual({ pct: 0, covered: 0, total: 0 });
+    expect(resolveMetric({ pct: 12.5, covered: 1, total: 8 })).toEqual({
+      pct: 12.5,
+      covered: 1,
+      total: 8,
+    });
+    expect(resolveMetric({ total: 100, covered: 50, skipped: 0 })).toEqual({
+      pct: 50,
+      covered: 50,
+      total: 100,
+    });
+    expect(resolveMetric({ total: 0, covered: 0 })).toEqual({
+      pct: 100,
+      covered: 0,
+      total: 0,
+    });
+    // String pct with numeric covered/total → derive (do not call toFixed on string).
+    expect(
+      resolveMetric({ pct: '50', total: 100, covered: 50, skipped: 0 })
+    ).toEqual({ pct: 50, covered: 50, total: 100 });
+    expect(resolveMetric({ pct: '50' })).toBeNull();
+    expect(resolveMetric({ pct: null, covered: 1 })).toBeNull();
+    expect(resolveMetric({})).toBeNull();
+  });
+
+  it('invalidMetricMessage includes file, summary path, and Usage (no stack tone)', () => {
+    const msg = invalidMetricMessage('/tmp/s.json', 'src/games/calla/rules.ts');
+    expect(msg).toContain(USAGE);
+    expect(msg).toContain('/tmp/s.json');
+    expect(msg).toContain('src/games/calla/rules.ts');
+    expect(msg).toMatch(
+      /^error: coverage summary has missing or non-numeric pct for engine module:/
+    );
+    expect(msg).toMatch(/numeric pct|derive pct/i);
+    expect(msg).not.toMatch(/TypeError|toFixed|at /);
+  });
+
+  it('collectEngineRows derives pct when covered/total present without pct', () => {
+    const rows = collectEngineRows({
+      'src/games/calla/rules.ts': {
+        lines: { total: 100, covered: 50, skipped: 0 },
+      },
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0].linePct).toBe(50);
+    expect(rows[0].lineCov).toBe(50);
+    expect(rows[0].lineTot).toBe(100);
+    expect(rows[0].branchPct).toBe(0);
+    const out = formatRankOutput(rows);
+    expect(out).toContain(
+      '1\tsrc/games/calla/rules.ts\t50.00\t50/100\t0.00\t0/0'
+    );
+  });
+
+  it('collectEngineRows derives when pct is a string but covered/total are numeric', () => {
+    const rows = collectEngineRows({
+      'src/games/calla/rules.ts': {
+        lines: { total: 100, covered: 50, skipped: 0, pct: '50' },
+        branches: { total: 10, covered: 5, skipped: 0, pct: '50' },
+      },
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0].linePct).toBe(50);
+    expect(rows[0].branchPct).toBe(50);
+    expect(formatRankOutput(rows)).toContain(
+      '1\tsrc/games/calla/rules.ts\t50.00\t50/100\t50.00\t5/10'
+    );
+  });
+
+  it('collectEngineRows throws InvalidCoverageMetricError for string pct-only', () => {
+    expect(() =>
+      collectEngineRows({
+        'src/games/calla/rules.ts': {
+          lines: { pct: '50' },
+        },
+      })
+    ).toThrow(InvalidCoverageMetricError);
+    try {
+      collectEngineRows({
+        'src/games/calla/rules.ts': { lines: { pct: '50' } },
+      });
+      expect.unreachable('expected throw');
+    } catch (err) {
+      expect(err).toBeInstanceOf(InvalidCoverageMetricError);
+      expect((err as InvalidCoverageMetricError).filePath).toBe(
+        'src/games/calla/rules.ts'
+      );
+    }
+  });
+
+  it('main exits 2 with schema message for non-numeric pct (no stack / no table)', () => {
+    const logs: string[] = [];
+    const errors: string[] = [];
+    const fixture = JSON.stringify({
+      'src/games/calla/rules.ts': { lines: { pct: '50' } },
+    });
+    const code = main(['/tmp/cov-rules-strpct.json'], {
+      existsSync: (p) => p === '/tmp/cov-rules-strpct.json',
+      readFileSync: () => fixture,
+      log: (s) => logs.push(s),
+      error: (s) => errors.push(s),
+    });
+    expect(code).toBe(2);
+    expect(logs).toEqual([]);
+    expect(errors.join('\n')).toBe(
+      invalidMetricMessage(
+        '/tmp/cov-rules-strpct.json',
+        'src/games/calla/rules.ts'
+      )
+    );
+    expect(errors.join('\n')).not.toMatch(/TypeError|toFixed|at /);
+    expect(errors.join('\n')).not.toMatch(/^rank\t/);
+  });
+
+  it('main derives missing pct from covered/total and exits 0', () => {
+    const logs: string[] = [];
+    const errors: string[] = [];
+    const fixture = JSON.stringify({
+      'src/games/calla/rules.ts': {
+        lines: { total: 100, covered: 50, skipped: 0 },
+      },
+    });
+    const code = main(['/tmp/cov-rules-nopct.json'], {
+      existsSync: (p) => p === '/tmp/cov-rules-nopct.json',
+      readFileSync: () => fixture,
+      log: (s) => logs.push(s),
+      error: (s) => errors.push(s),
+    });
+    expect(code).toBe(0);
+    expect(errors).toEqual([]);
+    expect(logs.join('\n')).toContain(
+      '1\tsrc/games/calla/rules.ts\t50.00\t50/100\t0.00\t0/0'
+    );
+  });
+
+  it('valid numeric-pct summaries remain unchanged (byte-stable table shape)', () => {
+    const raw = {
+      '/abs/src/games/hex/rules.ts': {
+        lines: { pct: 90, covered: 9, total: 10 },
+        branches: { pct: 80, covered: 8, total: 10 },
+      },
+    };
+    const rows = collectEngineRows(raw);
+    expect(formatRankOutput(rows)).toContain(
+      '1\tsrc/games/hex/rules.ts\t90.00\t9/10\t80.00\t8/10'
+    );
   });
 });
