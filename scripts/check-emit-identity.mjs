@@ -135,13 +135,13 @@ export async function transpileToJs(
 }
 
 /**
- * Optional normalize: collapse runs of whitespace outside string/template
- * literals. Default comparison is raw byte equality of esbuild output; this
- * helper exists for callers that need whitespace-insensitive checks only.
+ * Optional normalize: collapse runs of whitespace outside string/template/
+ * regex literals. Default comparison is raw byte equality of esbuild output;
+ * this helper exists for callers that need whitespace-insensitive checks only.
  *
- * String (`'` / `"`) and template (`\``) contents are preserved byte-for-byte
- * (including internal spaces). Whitespace inside `${…}` template expressions
- * is collapsed recursively. Regex literals are not special-cased here.
+ * String (`'` / `"`), template (`\``), and regex (`/…/`) contents are preserved
+ * byte-for-byte (including internal spaces). Whitespace inside `${…}` template
+ * expressions is collapsed recursively (string/template/regex-aware).
  * @param {string} js
  * @returns {string}
  */
@@ -195,26 +195,134 @@ function skipTemplateLiteral(js, i) {
 }
 
 /**
+ * Keywords / punctuator contexts where `/…/` starts a RegExp, not division.
+ * Single-char prev is handled separately; these cover `return /x/`, etc.
+ */
+const REGEX_PREFIX_KEYWORDS = new Set([
+  'return',
+  'case',
+  'throw',
+  'delete',
+  'typeof',
+  'void',
+  'await',
+  'yield',
+  'new',
+  'in',
+  'of',
+  'instanceof',
+  'else',
+  'do',
+]);
+
+/**
+ * @param {string} js
+ * @param {number} i index of `/` candidate
+ * @param {boolean} afterRegex prior token was a completed regex literal
+ * @returns {boolean}
+ */
+function canStartRegexAt(js, i, afterRegex) {
+  if (afterRegex) return true;
+  let j = i - 1;
+  while (
+    j >= 0 &&
+    (js[j] === ' ' || js[j] === '\t' || js[j] === '\n' || js[j] === '\r')
+  ) {
+    j--;
+  }
+  if (j < 0) return true;
+  const c = js[j];
+  // Division / member after value-like tokens.
+  if (
+    c === ')' ||
+    c === ']' ||
+    c === '.' ||
+    c === '"' ||
+    c === "'" ||
+    c === '`'
+  ) {
+    return false;
+  }
+  if (/[0-9]/.test(c)) return false;
+  if (/[A-Za-z_$]/.test(c)) {
+    let k = j;
+    while (k >= 0 && /[A-Za-z0-9_$]/.test(js[k])) k--;
+    const word = js.slice(k + 1, j + 1);
+    return REGEX_PREFIX_KEYWORDS.has(word);
+  }
+  return true;
+}
+
+/**
+ * @param {string} js
+ * @param {number} i index of opening `/`
+ * @returns {number} index after closing `/` and optional flags
+ */
+function skipRegexLiteral(js, i) {
+  i++; // past opening /
+  let inClass = false;
+  while (i < js.length) {
+    const c = js[i];
+    if (c === '\\' && i + 1 < js.length) {
+      i += 2;
+      continue;
+    }
+    if (c === '[') {
+      inClass = true;
+      i++;
+      continue;
+    }
+    if (c === ']' && inClass) {
+      inClass = false;
+      i++;
+      continue;
+    }
+    if (c === '/' && !inClass) {
+      i++;
+      while (i < js.length && /[dgimsuvy]/.test(js[i])) i++;
+      return i;
+    }
+    // Unterminated regex: stop at newline (same as JS lexer).
+    if (c === '\n' || c === '\r') return i;
+    i++;
+  }
+  return i;
+}
+
+/**
  * @param {string} js
  * @param {number} i index of first char inside `${`
  * @returns {number} index of the matching `}`
  */
 function findTemplateExprClosingBrace(js, i) {
   let depth = 1;
+  let afterRegex = false;
   while (i < js.length && depth > 0) {
     const ch = js[i];
     if (ch === "'" || ch === '"') {
       i = skipQuotedLiteral(js, i);
+      afterRegex = false;
       continue;
     }
     if (ch === '`') {
       i = skipTemplateLiteral(js, i);
+      afterRegex = false;
       continue;
     }
-    if (ch === '{') depth++;
-    else if (ch === '}') {
+    if (ch === '/' && canStartRegexAt(js, i, afterRegex)) {
+      i = skipRegexLiteral(js, i);
+      afterRegex = true;
+      continue;
+    }
+    if (ch === '{') {
+      depth++;
+      afterRegex = false;
+    } else if (ch === '}') {
       depth--;
       if (depth === 0) return i;
+      afterRegex = false;
+    } else if (ch !== ' ' && ch !== '\t' && ch !== '\n' && ch !== '\r') {
+      afterRegex = false;
     }
     i++;
   }
@@ -222,7 +330,7 @@ function findTemplateExprClosingBrace(js, i) {
 }
 
 /**
- * Collapse insignificant whitespace outside string/template literals.
+ * Collapse insignificant whitespace outside string/template/regex literals.
  * Mirrors prior global replaces: `[ \t]+` → space, trim spaces beside `\n`,
  * collapse runs of newlines — but only in code regions.
  * @param {string} js
@@ -233,6 +341,7 @@ function collapseWhitespaceOutsideLiterals(js) {
   let i = 0;
   /** @type {'code' | 'space' | 'newline'} */
   let ws = 'code';
+  let afterRegex = false;
 
   function flushWs() {
     if (ws === 'newline') {
@@ -257,6 +366,7 @@ function collapseWhitespaceOutsideLiterals(js) {
     }
     flushWs();
     out += c;
+    afterRegex = false;
   }
 
   while (i < js.length) {
@@ -266,12 +376,14 @@ function collapseWhitespaceOutsideLiterals(js) {
       const end = skipQuotedLiteral(js, i);
       out += js.slice(i, end);
       i = end;
+      afterRegex = false;
       continue;
     }
     if (c === '`') {
       flushWs();
       out += '`';
       i++;
+      afterRegex = false;
       while (i < js.length) {
         const t = js[i];
         if (t === '\\' && i + 1 < js.length) {
@@ -302,6 +414,14 @@ function collapseWhitespaceOutsideLiterals(js) {
         out += t;
         i++;
       }
+      continue;
+    }
+    if (c === '/' && canStartRegexAt(js, i, afterRegex)) {
+      flushWs();
+      const end = skipRegexLiteral(js, i);
+      out += js.slice(i, end);
+      i = end;
+      afterRegex = true;
       continue;
     }
     emitCodeChar(c);
