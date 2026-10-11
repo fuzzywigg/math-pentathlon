@@ -5,17 +5,20 @@
  * Usage (dev server on :5173):
  *   node tests/playtest/star-track-deep-playtest.mjs
  *
- * Writes JSON + PNGs under docs/playtest/ and /opt/cursor/artifacts/star-track-playtest/
+ * Writes JSON + PNGs under docs/playtest/ and the shared artifact root
+ * (`MP_ARTIFACT_DIR` / cloud / local fallback) at `…/star-track-playtest/`.
  */
 import { chromium, devices } from '@playwright/test';
 import { mkdirSync, writeFileSync, copyFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { artifactPath } from '../../scripts/lib/artifact-dir.mjs';
+import { dismissOwl } from '../../scripts/lib/dismiss-owl.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '../..');
 const DOCS = join(ROOT, 'docs/playtest');
-const ARTIFACTS = '/opt/cursor/artifacts/star-track-playtest';
+const ARTIFACTS = artifactPath('star-track-playtest');
 const BASE = process.env.PLAYTEST_BASE_URL ?? 'http://127.0.0.1:5173';
 const STALL_MS = 12_000;
 const GAME_TIMEOUT_MS = 90_000;
@@ -35,13 +38,6 @@ const VIEWPORTS = {
 
 const DIFFICULTIES = ['easy', 'medium', 'hard'];
 const GAMES_PER_CELL = 10;
-
-async function dismissOwl(page) {
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) (el).style.pointerEvents = 'none';
-  });
-}
 
 async function waitGameReady(page) {
   await page.getByTestId('game-loading').waitFor({ state: 'hidden', timeout: 15_000 }).catch(() => {});
