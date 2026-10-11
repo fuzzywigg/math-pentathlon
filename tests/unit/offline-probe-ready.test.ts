@@ -1,6 +1,8 @@
 /**
- * Hermetic coverage for offline probe ready helpers (q-mp-1261 / q-mp-1262 / q-mp-1337):
+ * Hermetic coverage for offline probe ready helpers
+ * (q-mp-1261 / q-mp-1262 / q-mp-1337 / q-mp-1376):
  * - HTTP 404 must not count as ready
+ * - Contradicting mocks (`ok: true` + non-2xx status) are not ready
  * - PROBE_BROWSERS trims (and lower-cases) comma-separated names
  * - Allowlist Playwright projects; alias chrome→chromium; reject unknown
  *
@@ -22,16 +24,40 @@ const PROBE_SCRIPTS = [
   'scripts/probe-offline-resilience-dev.mjs',
 ] as const;
 
-describe('isHttpResponseReady (q-mp-1261)', () => {
+describe('isHttpResponseReady (q-mp-1261 / q-mp-1376)', () => {
   it('accepts 2xx via Response.ok', () => {
     expect(isHttpResponseReady({ ok: true, status: 200 })).toBe(true);
     expect(isHttpResponseReady({ ok: true, status: 204 })).toBe(true);
+    expect(isHttpResponseReady({ ok: true, status: 299 })).toBe(true);
   });
 
   it('rejects HTTP 404 and other non-ok statuses', () => {
     expect(isHttpResponseReady({ ok: false, status: 404 })).toBe(false);
     expect(isHttpResponseReady({ ok: false, status: 500 })).toBe(false);
     expect(isHttpResponseReady({ ok: false, status: 0 })).toBe(false);
+  });
+
+  it('rejects contradicting mocks where ok is true but status is not 2xx (q-mp-1376)', () => {
+    expect(isHttpResponseReady({ ok: true, status: 404 })).toBe(false);
+    expect(isHttpResponseReady({ ok: true, status: 199 })).toBe(false);
+    expect(isHttpResponseReady({ ok: true, status: 300 })).toBe(false);
+    expect(isHttpResponseReady({ ok: true, status: 500 })).toBe(false);
+  });
+
+  it('keeps ok:false + 2xx status as not ready (align ok)', () => {
+    expect(isHttpResponseReady({ ok: false, status: 200 })).toBe(false);
+  });
+
+  it('when status is absent, keeps ok === true for Response-like objects', () => {
+    expect(isHttpResponseReady({ ok: true })).toBe(true);
+    expect(isHttpResponseReady({ ok: false })).toBe(false);
+  });
+
+  it('treats non-finite status as absent (ok === true still ready)', () => {
+    expect(isHttpResponseReady({ ok: true, status: Number.NaN })).toBe(true);
+    expect(
+      isHttpResponseReady({ ok: true, status: Number.POSITIVE_INFINITY })
+    ).toBe(true);
   });
 
   it('rejects nullish / missing ok', () => {
