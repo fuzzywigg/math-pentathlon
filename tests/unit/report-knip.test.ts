@@ -1,12 +1,13 @@
 /**
- * Unit coverage for knip report-only metric helpers (q-mp-118).
- * No network: exercises pure summarize / diff helpers only.
+ * Unit coverage for knip report-only metric helpers (q-mp-118 / q-mp-1036).
+ * No network: exercises pure summarize / diff / baseline-schema helpers only.
  */
 import { describe, it, expect } from 'vitest';
 import {
   countIssueField,
   summarizeKnip,
   diffMetrics,
+  validateBaselineMetrics,
   METRIC_KEYS,
 } from '../../scripts/report-knip.mjs';
 
@@ -88,5 +89,49 @@ describe('report-knip helpers', () => {
     ]);
     expect(same).toContain('unusedFiles');
     expect(same).not.toContain('unusedExports');
+  });
+
+  it('validateBaselineMetrics accepts a full numeric metrics object', () => {
+    const metrics = {
+      unusedFiles: 0,
+      unusedExports: 3,
+      unusedTypes: 36,
+      unusedDependencies: 0,
+      unusedDevDependencies: 0,
+      unlisted: 3,
+      duplicates: 0,
+    };
+    const result = validateBaselineMetrics(metrics);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.metrics).toEqual(metrics);
+  });
+
+  it('validateBaselineMetrics rejects incomplete metrics (q-mp-1036)', () => {
+    const result = validateBaselineMetrics({ unusedExports: 3 });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.message).toMatch(/incomplete|missing numeric/i);
+      expect(result.message).not.toMatch(/no baseline file/i);
+      expect(result.message).not.toMatch(/growth/i);
+    }
+  });
+
+  it('validateBaselineMetrics rejects null / empty-string / non-numeric values', () => {
+    const full = {
+      unusedFiles: 0,
+      unusedExports: 3,
+      unusedTypes: 36,
+      unusedDependencies: 0,
+      unusedDevDependencies: 0,
+      unlisted: 3,
+      duplicates: 0,
+    };
+    for (const bad of [null, '', '3', Number.NaN, Number.POSITIVE_INFINITY]) {
+      const result = validateBaselineMetrics({ ...full, unusedTypes: bad });
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.message).toMatch(/schema invalid|finite number/i);
+      }
+    }
   });
 });

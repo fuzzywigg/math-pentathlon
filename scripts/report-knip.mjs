@@ -89,6 +89,41 @@ export function summarizeKnip(knip) {
 }
 
 /**
+ * Require every METRIC_KEYS entry to be a finite number (q-mp-1036).
+ * Incomplete / null / "" / non-numeric values must not coerce to 0 and invent growth.
+ *
+ * @param {unknown} metrics
+ * @returns {{ ok: true, metrics: Record<string, number> } | { ok: false, message: string }}
+ */
+export function validateBaselineMetrics(metrics) {
+  if (metrics == null || typeof metrics !== 'object' || Array.isArray(metrics)) {
+    return {
+      ok: false,
+      message:
+        'report:knip — baseline metrics schema invalid: metrics must be an object with numeric METRIC_KEYS',
+    };
+  }
+  /** @type {Record<string, unknown>} */
+  const record = /** @type {Record<string, unknown>} */ (metrics);
+  for (const key of METRIC_KEYS) {
+    if (!Object.prototype.hasOwnProperty.call(record, key)) {
+      return {
+        ok: false,
+        message: `report:knip — baseline metrics incomplete: missing numeric "${key}"`,
+      };
+    }
+    const value = record[key];
+    if (typeof value !== 'number' || !Number.isFinite(value)) {
+      return {
+        ok: false,
+        message: `report:knip — baseline metrics schema invalid: "${key}" must be a finite number`,
+      };
+    }
+  }
+  return { ok: true, metrics: /** @type {Record<string, number>} */ (record) };
+}
+
+/**
  * @param {Record<string, number>} current
  * @param {Record<string, number>} baseline
  * @returns {{ growth: Array<{key:string,baseline:number,current:number,delta:number}>, shrink: Array<{key:string,baseline:number,current:number,delta:number}>, same: string[] }}
@@ -162,15 +197,64 @@ function runKnip() {
 }
 
 /**
- * @returns {{ knipVersion: string, enforce: boolean, metrics: Record<string, number>, note?: string } | null}
+ * Load docs/dev/knip-baseline.json.
+ *
+ * - Missing file → `{ kind: 'missing' }` (NOTICE + exit 0; compare skipped).
+ * - Unparseable JSON → `{ kind: 'corrupt', message }` (exit 1; never "no baseline file").
+ * - Parsed object with no `metrics` key / null metrics → `{ kind: 'absent-metrics' }`
+ *   (leave q-mp-1019 `{}` → “no baseline file” alone).
+ * - Present `metrics` missing keys or non-numeric → `{ kind: 'schema', message }` (exit 1).
+ *
+ * @returns {{
+ *   kind: 'missing'
+ * } | {
+ *   kind: 'corrupt' | 'schema',
+ *   message: string
+ * } | {
+ *   kind: 'absent-metrics',
+ *   doc: { knipVersion?: string, enforce?: boolean, metrics?: unknown, note?: string }
+ * } | {
+ *   kind: 'ok',
+ *   doc: { knipVersion?: string, enforce?: boolean, metrics: Record<string, number>, note?: string },
+ *   metrics: Record<string, number>
+ * }}
  */
 function loadBaseline() {
-  if (!fs.existsSync(BASELINE_PATH)) return null;
+  if (!fs.existsSync(BASELINE_PATH)) return { kind: 'missing' };
+  let doc;
   try {
-    return JSON.parse(fs.readFileSync(BASELINE_PATH, 'utf8'));
-  } catch {
-    return null;
+    doc = JSON.parse(fs.readFileSync(BASELINE_PATH, 'utf8'));
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
+    return {
+      kind: 'corrupt',
+      message: `report:knip — baseline JSON unparseable at ${path.relative(ROOT, BASELINE_PATH)}: ${detail}`,
+    };
   }
+  if (doc == null || typeof doc !== 'object' || Array.isArray(doc)) {
+    return {
+      kind: 'schema',
+      message: `report:knip — baseline schema invalid at ${path.relative(ROOT, BASELINE_PATH)}: root must be an object`,
+    };
+  }
+  /** @type {{ knipVersion?: string, enforce?: boolean, metrics?: unknown, note?: string }} */
+  const baselineDoc = doc;
+  // q-mp-1019 leave-alone: `{}` / missing metrics still behaves as “no baseline file”.
+  if (!Object.prototype.hasOwnProperty.call(baselineDoc, 'metrics')) {
+    return { kind: 'absent-metrics', doc: baselineDoc };
+  }
+  if (baselineDoc.metrics == null) {
+    return { kind: 'absent-metrics', doc: baselineDoc };
+  }
+  const validated = validateBaselineMetrics(baselineDoc.metrics);
+  if (!validated.ok) {
+    return { kind: 'schema', message: validated.message };
+  }
+  return {
+    kind: 'ok',
+    doc: { ...baselineDoc, metrics: validated.metrics },
+    metrics: validated.metrics,
+  };
 }
 
 /**
@@ -258,8 +342,19 @@ function main() {
   }
 
   const metrics = summarizeKnip(knip);
-  const baselineDoc = loadBaseline();
-  const baselineMetrics = baselineDoc?.metrics ?? null;
+  const loaded = loadBaseline();
+  // Corrupt / incomplete baselines must fail before any fake growth WARNING (q-mp-1036).
+  // --write-baseline may still refresh a broken file; validate only when comparing.
+  if (
+    !args.writeBaseline &&
+    (loaded.kind === 'corrupt' || loaded.kind === 'schema')
+  ) {
+    console.error(loaded.message);
+    process.exit(1);
+  }
+  const baselineDoc =
+    loaded.kind === 'ok' || loaded.kind === 'absent-metrics' ? loaded.doc : null;
+  const baselineMetrics = loaded.kind === 'ok' ? loaded.metrics : null;
   const enforce = Boolean(args.fail || baselineDoc?.enforce);
 
   if (args.writeBaseline) {
@@ -296,10 +391,16 @@ function main() {
         `knip unused shrink: ${s.key} ${s.baseline}→${s.current} (${s.delta})`
       );
     }
-  } else {
+  } else if (loaded.kind === 'missing' || loaded.kind === 'absent-metrics') {
     annotate(
       'notice',
       `knip report (no baseline file): exports=${metrics.unusedExports}, types=${metrics.unusedTypes}, files=${metrics.unusedFiles}`
+    );
+  } else if (args.writeBaseline) {
+    // Refreshed a corrupt/schema-invalid file; no prior baseline to compare.
+    annotate(
+      'notice',
+      `knip report (baseline rewritten): exports=${metrics.unusedExports}, types=${metrics.unusedTypes}, files=${metrics.unusedFiles}`
     );
   }
 
