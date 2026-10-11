@@ -359,7 +359,6 @@ export function collectHtmlNonRootAssetRefs(html) {
     }
   }
   return htmlAssetRefs.filter((href) => {
-
     // Protocol-relative `//host/…` is not root-absolute (q-mp-1228).
     const isRootAbsolute = href.startsWith('/') && !href.startsWith('//');
     if (isRootAbsolute) return false;
