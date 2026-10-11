@@ -2,14 +2,15 @@
  * @vitest-environment node
  *
  * Hermetic coverage for mutation-report Vitest status classification
- * (q-mp-1038, q-mp-1156, q-mp-1182). Filter-miss / no-test phrases must score
- * as error, not killed. Empty harness testFiles → no-tests remains a separate
- * path (q-mp-1025).
+ * (q-mp-1038, q-mp-1156, q-mp-1182, q-mp-1205). Filter-miss / no-test phrases
+ * must score as error, not killed. Non-timeout exitCode null → error
+ * (q-mp-1205). Empty harness testFiles → no-tests remains a separate path
+ * (q-mp-1025).
  */
 import { describe, it, expect } from 'vitest';
 import { classifyVitestRunResult } from '../../scripts/lib/mutation-report-vitest-status.mjs';
 
-describe('classifyVitestRunResult (q-mp-1038, q-mp-1156, q-mp-1182)', () => {
+describe('classifyVitestRunResult (q-mp-1038, q-mp-1156, q-mp-1182, q-mp-1205)', () => {
   it('maps Vitest "No test files found" (exit 1) to error, not killed', () => {
     const status = classifyVitestRunResult({
       exitCode: 1,
@@ -92,6 +93,34 @@ describe('classifyVitestRunResult (q-mp-1038, q-mp-1156, q-mp-1182)', () => {
         exitCode: null,
         stdout: '',
         stderr: '',
+      })
+    ).toBe('timeout');
+  });
+
+  it('maps non-timeout exitCode null to error, not killed (q-mp-1205)', () => {
+    expect(
+      classifyVitestRunResult({
+        exitCode: null,
+        stdout: '',
+        stderr: 'spawn ENOENT',
+      })
+    ).toBe('error');
+    expect(
+      classifyVitestRunResult({
+        exitCode: null,
+        stdout: '',
+        stderr: '',
+      })
+    ).toBe('error');
+  });
+
+  it('keeps timedOut ahead of null exitCode (q-mp-1205)', () => {
+    expect(
+      classifyVitestRunResult({
+        timedOut: true,
+        exitCode: null,
+        stdout: '',
+        stderr: 'spawn ENOENT',
       })
     ).toBe('timeout');
   });
