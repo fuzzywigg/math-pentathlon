@@ -5,15 +5,28 @@
  *
  * Usage: node tests/playtest/fab-a-diffy-deep.mjs
  * Requires: npm run dev on :5173 (or PLAYTEST_BASE_URL).
+ *
+ * Env:
+ *   PLAYTEST_BASE_URL         Base URL (default http://localhost:5173)
+ *   PLAYTEST_GAMES_PER        Games per difficulty×viewport (default 10; rejects NaN / ≤0)
+ *   PLAYTEST_ONLY_VP          Filter viewport: desktop | tablet
+ *   PLAYTEST_ONLY_DIFF        Filter difficulty: easy | medium | hard
+ *   PLAYTEST_SKIP_EXTRA_SHOTS Skip dedicated shots when 1 / true / yes
  */
 import { chromium } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import { artifactPath } from '../../scripts/lib/artifact-dir.mjs';
 import { dismissOwl } from '../../scripts/lib/dismiss-owl.mjs';
+import { requireEnvNumber } from '../../scripts/lib/env-number.mjs';
+import {
+  isSkipExtraShotsEnabled,
+  resolveFabDifficulties,
+  resolveFabViewports,
+} from './fab-a-diffy-env.mjs';
 
 const BASE = process.env.PLAYTEST_BASE_URL || 'http://localhost:5173';
-const GAMES_PER = Number(process.env.PLAYTEST_GAMES_PER || 10);
+const GAMES_PER = requireEnvNumber('PLAYTEST_GAMES_PER', 10);
 const OUT_DIR = path.resolve('docs/playtest');
 const SHOT_DIR = path.join(OUT_DIR, 'fab-a-diffy-deep-2026-10-07');
 const ART_DIR = artifactPath('fab-a-diffy-playtest');
@@ -22,16 +35,30 @@ const ALL_VIEWPORTS = {
   desktop: { width: 1280, height: 800 },
   tablet: { width: 768, height: 1024 },
 };
-const ONLY_VP = process.env.PLAYTEST_ONLY_VP;
-const ONLY_DIFF = process.env.PLAYTEST_ONLY_DIFF;
-const VIEWPORTS = ONLY_VP
-  ? { [ONLY_VP]: ALL_VIEWPORTS[ONLY_VP] }
-  : ALL_VIEWPORTS;
 
-const DIFFICULTIES = ONLY_DIFF ? [ONLY_DIFF] : ['easy', 'medium', 'hard'];
+const vpResolved = resolveFabViewports(
+  process.env.PLAYTEST_ONLY_VP,
+  ALL_VIEWPORTS
+);
+if (!vpResolved.ok) {
+  console.error(vpResolved.message);
+  process.exit(2);
+}
+const ONLY_VP = vpResolved.onlyVp;
+const VIEWPORTS = vpResolved.viewports;
+
+const diffResolved = resolveFabDifficulties(process.env.PLAYTEST_ONLY_DIFF);
+if (!diffResolved.ok) {
+  console.error(diffResolved.message);
+  process.exit(2);
+}
+const ONLY_DIFF = diffResolved.onlyDiff;
+const DIFFICULTIES = diffResolved.difficulties;
 
 async function startVsAi(page, difficulty) {
-  await page.goto(`${BASE}/#/game/fab-a-diffy`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`${BASE}/#/game/fab-a-diffy`, {
+    waitUntil: 'domcontentloaded',
+  });
   await page.waitForSelector('#new-game-btn', { timeout: 20_000 });
   await dismissOwl(page);
   await page.locator('#new-game-btn').click();
@@ -52,7 +79,12 @@ async function waitNotThinking(page, timeout = 25_000) {
 /** Find a valid human claim via DOM probing. */
 async function humanClaim(page) {
   await waitNotThinking(page);
-  if (await page.locator('.fab-winner-banner').isVisible().catch(() => false)) {
+  if (
+    await page
+      .locator('.fab-winner-banner')
+      .isVisible()
+      .catch(() => false)
+  ) {
     return 'ended';
   }
   const passBtn = page.locator('.fab-btn-secondary', { hasText: 'Pass Turn' });
@@ -61,7 +93,9 @@ async function humanClaim(page) {
     return 'pass';
   }
 
-  const clear = page.locator('.fab-btn-secondary', { hasText: 'Clear Selection' });
+  const clear = page.locator('.fab-btn-secondary', {
+    hasText: 'Clear Selection',
+  });
   const ids = await page.$$eval(
     '.fab-bar-wrapper:not(.fab-bar-disabled)',
     (els) => els.map((e) => e.getAttribute('data-bar-id')).filter(Boolean)
@@ -72,7 +106,12 @@ async function humanClaim(page) {
     for (let j = 0; j < ids.length; j++) {
       if (i === j) continue;
       await waitNotThinking(page);
-      if (await page.locator('.fab-winner-banner').isVisible().catch(() => false)) {
+      if (
+        await page
+          .locator('.fab-winner-banner')
+          .isVisible()
+          .catch(() => false)
+      ) {
         return 'ended';
       }
       if (await clear.isVisible().catch(() => false)) {
@@ -81,18 +120,24 @@ async function humanClaim(page) {
       const b1 = page.locator(`[data-bar-id="${ids[i]}"]`);
       const b2 = page.locator(`[data-bar-id="${ids[j]}"]`);
       if ((await b1.count()) === 0 || (await b2.count()) === 0) continue;
-      if (await b1.evaluate((el) => el.classList.contains('fab-bar-disabled'))) {
+      if (
+        await b1.evaluate((el) => el.classList.contains('fab-bar-disabled'))
+      ) {
         continue;
       }
       await b1.click({ force: true });
-      if (await b2.evaluate((el) => el.classList.contains('fab-bar-disabled'))) {
-        if (await clear.isVisible().catch(() => false)) await clear.click({ force: true });
+      if (
+        await b2.evaluate((el) => el.classList.contains('fab-bar-disabled'))
+      ) {
+        if (await clear.isVisible().catch(() => false))
+          await clear.click({ force: true });
         continue;
       }
       await b2.click({ force: true });
       const validOp = page.locator('.fab-op-valid').first();
       if (!(await validOp.isVisible().catch(() => false))) {
-        if (await clear.isVisible().catch(() => false)) await clear.click({ force: true });
+        if (await clear.isVisible().catch(() => false))
+          await clear.click({ force: true });
         continue;
       }
       await validOp.click({ force: true });
@@ -103,7 +148,8 @@ async function humanClaim(page) {
         await match.click({ force: true });
         return 'claim';
       } catch {
-        if (await clear.isVisible().catch(() => false)) await clear.click({ force: true });
+        if (await clear.isVisible().catch(() => false))
+          await clear.click({ force: true });
         continue;
       }
     }
@@ -138,7 +184,12 @@ async function playOneGame(page, difficulty) {
   let maxAiThink = 0;
 
   for (let ply = 0; ply < 50; ply++) {
-    if (await page.locator('.fab-winner-banner').isVisible().catch(() => false)) {
+    if (
+      await page
+        .locator('.fab-winner-banner')
+        .isVisible()
+        .catch(() => false)
+    ) {
       break;
     }
     const result = await humanClaim(page);
@@ -281,7 +332,8 @@ async function main() {
   }
 
   // Dedicated thinking / human-turn screenshots
-  if (!process.env.PLAYTEST_SKIP_EXTRA_SHOTS) {
+  // q-mp-1277: only 1/true/yes skip; '0'/'false'/unset still take shots
+  if (!isSkipExtraShotsEnabled(process.env.PLAYTEST_SKIP_EXTRA_SHOTS)) {
     const context = await browser.newContext({ viewport: VIEWPORTS.desktop });
     const page = await context.newPage();
     await startVsAi(page, 'medium');
@@ -348,9 +400,7 @@ async function main() {
   };
 
   const suffix =
-    ONLY_VP || ONLY_DIFF
-      ? `-${ONLY_VP || 'all'}-${ONLY_DIFF || 'all'}`
-      : '';
+    ONLY_VP || ONLY_DIFF ? `-${ONLY_VP || 'all'}-${ONLY_DIFF || 'all'}` : '';
   const jsonPath = path.join(SHOT_DIR, `summary${suffix}.json`);
   fs.writeFileSync(jsonPath, JSON.stringify(summary, null, 2));
   fs.copyFileSync(jsonPath, path.join(ART_DIR, path.basename(jsonPath)));

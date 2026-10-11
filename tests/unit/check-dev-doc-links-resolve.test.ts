@@ -12,7 +12,7 @@ import {
 
 const fromDoc = path.resolve('docs/dev/sample.md');
 
-describe('PATH_RE (q-mp-1177 + q-mp-1250)', () => {
+describe('PATH_RE (q-mp-1177 + q-mp-1250 + q-mp-1271)', () => {
   /** @param {string} text */
   function matches(text) {
     return [...text.matchAll(PATH_RE)].map((m) => m[1]);
@@ -47,6 +47,31 @@ describe('PATH_RE (q-mp-1177 + q-mp-1250)', () => {
     ]);
     expect(matches('`.github/workflows/`')).toEqual([]);
     expect(matches('`.github/workflows/*`')).toEqual([]);
+  });
+
+  it('matches root config backtick paths (q-mp-1271)', () => {
+    expect(matches('`package.json`')).toEqual(['package.json']);
+    expect(matches('`package-lock.json`')).toEqual(['package-lock.json']);
+    expect(matches('`vitest.config.ts`')).toEqual(['vitest.config.ts']);
+    expect(matches('`vite.config.ts`')).toEqual(['vite.config.ts']);
+    expect(matches('`eslint.config.js`')).toEqual(['eslint.config.js']);
+    expect(matches('`knip.json`')).toEqual(['knip.json']);
+    expect(matches('`playwright.config.ts`')).toEqual(['playwright.config.ts']);
+    expect(matches('`tsconfig.json`')).toEqual(['tsconfig.json']);
+    expect(matches('`tsconfig.ratchet.json`')).toEqual([
+      'tsconfig.ratchet.json',
+    ]);
+    expect(matches('`index.html`')).toEqual(['index.html']);
+    expect(matches('`AGENTS.md`')).toEqual(['AGENTS.md']);
+    expect(matches('`CONTRIBUTING.md`')).toEqual(['CONTRIBUTING.md']);
+    // Prior prefixed paths + .github/ unchanged; globs / unrelated roots stay out.
+    expect(matches('`scripts/x.mjs`')).toEqual(['scripts/x.mjs']);
+    expect(matches('`.github/workflows/ci.yml`')).toEqual([
+      '.github/workflows/ci.yml',
+    ]);
+    expect(matches('`tsconfig*.json`')).toEqual([]);
+    expect(matches('`README.md`')).toEqual([]);
+    expect(matches('`foo.json`')).toEqual([]);
   });
 
   it('keeps prior extensions and rejects glob stars in path segment', () => {

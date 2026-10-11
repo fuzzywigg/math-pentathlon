@@ -36,6 +36,11 @@ const PAR55_PLAYTEST = resolve(
   process.cwd(),
   'scripts/par-55-deep-playtest.mjs'
 );
+const FRACTION_PINBALL_PLAYTEST = resolve(
+  process.cwd(),
+  'docs/playtest/fraction-pinball-deep-playtest.mjs'
+);
+const AI_CALIBRATION = resolve(process.cwd(), 'scripts/run-ai-calibration.ts');
 
 /** Assert a harness imports env-number and calls requireEnvNumber for `name`. */
 function expectRequireEnvNumberWiring(
@@ -121,9 +126,10 @@ describe('parseEnvNumber (q-mp-876)', () => {
   });
 
   it('allows non-integers when integer is false (q-mp-1234)', () => {
-    expect(
-      parseEnvNumber({ X: '2.5' }, 'X', 1, { integer: false })
-    ).toEqual({ ok: true, value: 2.5 });
+    expect(parseEnvNumber({ X: '2.5' }, 'X', 1, { integer: false })).toEqual({
+      ok: true,
+      value: 2.5,
+    });
   });
 });
 
@@ -221,8 +227,99 @@ describe('deep-playtest GAMES_* env rejection (q-mp-908)', () => {
     // Static: avoid spawning a real playtest when QUICK would force launch.
     // q-mp-1260: '0'/'false' must not truthy-short-circuit to 1 game.
     const src = readFileSync(PAR55_PLAYTEST, 'utf8');
-    expect(src).toMatch(/isPar55QuickEnabled\(\s*process\.env\.PAR55_QUICK\s*\)/);
+    expect(src).toMatch(
+      /isPar55QuickEnabled\(\s*process\.env\.PAR55_QUICK\s*\)/
+    );
     expect(src).toMatch(/requireEnvNumber\(\s*['"]PAR55_GAMES['"]/);
     expect(src).not.toMatch(/process\.env\.PAR55_QUICK\s*\?\s*1\s*:/);
+  });
+
+  it('fraction-pinball-deep-playtest wires PLAYTEST_GAMES through requireEnvNumber (q-mp-1279)', () => {
+    const src = readFileSync(FRACTION_PINBALL_PLAYTEST, 'utf8');
+    expect(src).toMatch(
+      /from\s+['"]\.\.\/\.\.\/scripts\/lib\/env-number\.mjs['"]/
+    );
+    expect(src).toMatch(/requireEnvNumber\(\s*['"]PLAYTEST_GAMES['"]/);
+    expect(src).not.toMatch(
+      /Number\(\s*process\.env\.PLAYTEST_GAMES\s*\|\|/
+    );
+    const requireIdx = src.search(
+      /requireEnvNumber\(\s*['"]PLAYTEST_GAMES['"]/
+    );
+    const launchIdx = src.search(/chromium\.launch|browserType\.launch/);
+    expect(requireIdx).toBeGreaterThanOrEqual(0);
+    if (launchIdx >= 0) {
+      expect(requireIdx).toBeLessThan(launchIdx);
+    }
+    for (const [raw, label] of [
+      ['abc', 'non-finite'],
+      ['false', 'non-finite'],
+      ['0', 'non-positive'],
+      ['-1', 'non-positive'],
+      ['2.5', 'non-integer'],
+    ] as const) {
+      const got = parseEnvNumber({ PLAYTEST_GAMES: raw }, 'PLAYTEST_GAMES', 10);
+      expect(got.ok, label).toBe(false);
+      if (!got.ok) {
+        expect(got.message).toMatch(
+          new RegExp(`Invalid PLAYTEST_GAMES=${JSON.stringify(raw)}`)
+        );
+      }
+    }
+    expect(parseEnvNumber({}, 'PLAYTEST_GAMES', 10)).toEqual({
+      ok: true,
+      value: 10,
+    });
+    expect(parseEnvNumber({ PLAYTEST_GAMES: '3' }, 'PLAYTEST_GAMES', 10)).toEqual(
+      {
+        ok: true,
+        value: 3,
+      }
+    );
+    // Zero-length results must not emit avgDurationMs: NaN.
+    expect(src).toMatch(/all\.length\s*===\s*0/);
+    expect(src).toMatch(/avgDurationMs/);
+  });
+});
+
+describe('ai-calibration CALIBRATION_GAMES env rejection (q-mp-1290)', () => {
+  it('run-ai-calibration wires CALIBRATION_GAMES through requireEnvNumber', () => {
+    const src = readFileSync(AI_CALIBRATION, 'utf8');
+    expect(src).toMatch(/from\s+['"]\.\/lib\/env-number\.mjs['"]/);
+    expect(src).toMatch(/requireEnvNumber\(\s*['"]CALIBRATION_GAMES['"]/);
+    expect(src).not.toMatch(/Number\(\s*process\.env\.CALIBRATION_GAMES/);
+  });
+
+  it('rejects NaN / non-positive / non-integer CALIBRATION_GAMES (default 50)', () => {
+    expect(parseEnvNumber({}, 'CALIBRATION_GAMES', 50)).toEqual({
+      ok: true,
+      value: 50,
+    });
+    expect(
+      parseEnvNumber({ CALIBRATION_GAMES: '' }, 'CALIBRATION_GAMES', 50)
+    ).toEqual({
+      ok: true,
+      value: 50,
+    });
+    expect(
+      parseEnvNumber({ CALIBRATION_GAMES: '50' }, 'CALIBRATION_GAMES', 50)
+    ).toEqual({ ok: true, value: 50 });
+    expect(
+      parseEnvNumber({ CALIBRATION_GAMES: '1' }, 'CALIBRATION_GAMES', 50)
+    ).toEqual({ ok: true, value: 1 });
+
+    for (const raw of ['abc', 'false', '0', '-1', '2.5'] as const) {
+      const got = parseEnvNumber(
+        { CALIBRATION_GAMES: raw },
+        'CALIBRATION_GAMES',
+        50
+      );
+      expect(got.ok).toBe(false);
+      if (!got.ok) {
+        expect(got.message).toMatch(
+          new RegExp(`Invalid CALIBRATION_GAMES=${JSON.stringify(raw)}`)
+        );
+      }
+    }
   });
 });

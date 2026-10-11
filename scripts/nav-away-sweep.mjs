@@ -7,11 +7,12 @@
 import { chromium } from '@playwright/test';
 import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
 import { NAV_AWAY_SWEEP_USAGE } from './lib/browser-harness-script-usage.mjs';
+import { dismissOwl } from './lib/dismiss-owl.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
 
 applyBrowserHarnessCli(process.argv.slice(2), NAV_AWAY_SWEEP_USAGE);
 
-const BASE = 'http://127.0.0.1:5173';
+const BASE = process.env.BASE_URL || 'http://127.0.0.1:5173';
 const GAMES = [
   'hex',
   'calla',
@@ -49,6 +50,7 @@ async function main() {
     try {
       await page.goto(`${BASE}/#/game/${id}`);
       await waitForGameReady(page, { timeoutMs: 15_000 });
+      await dismissOwl(page);
       await page.locator('#new-game-btn').click();
       await page.locator('.mode-option[data-mode="human-vs-ai"]').click();
       const easy = page.locator('.difficulty-btn.easy');

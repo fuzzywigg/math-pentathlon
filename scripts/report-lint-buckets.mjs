@@ -17,6 +17,7 @@
  * Docs: docs/dev/lint-bucket-report.md
  */
 
+import { randomBytes } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -27,6 +28,25 @@ const ROOT = path.resolve(__dirname, '..');
 const CEILINGS_PATH = path.join(ROOT, 'docs/dev/lint-ratchet-ceilings.json');
 
 /** @typedef {{ rules: Record<string, unknown>, notes?: string }} CeilingFile */
+
+/**
+ * Unique probe config path so concurrent lint:ratchet / report:lint-buckets
+ * cannot clobber or unlink the same file mid-eslint (q-mp-1275).
+ * Kept under the repo root so flat-config relative `./eslint.config.js`
+ * resolves; always delete in `finally` (before process.exit).
+ *
+ * @param {string} [root]
+ * @param {number} [pid]
+ * @param {string} [entropy]
+ * @returns {string}
+ */
+export function makeLintRatchetProbeConfigPath(
+  root = ROOT,
+  pid = process.pid,
+  entropy = randomBytes(6).toString('hex')
+) {
+  return path.join(root, `.eslint.ratchet.probe.${pid}.${entropy}.config.js`);
+}
 
 /**
  * Coerce a ceiling value to a finite number for headroom math (q-mp-1254).
@@ -281,7 +301,7 @@ function main() {
   }
 
   // Identical overlay to check-lint-ratchet.mjs (keep in sync when ceilings grow).
-  const probeConfigPath = path.join(ROOT, '.eslint.ratchet.probe.config.js');
+  const probeConfigPath = makeLintRatchetProbeConfigPath();
   const probeSource = `
 import base from './eslint.config.js';
 
@@ -310,6 +330,7 @@ export default [
 
   fs.writeFileSync(probeConfigPath, probeSource, 'utf8');
 
+  let exitCode = 0;
   try {
     const result = spawnSync(
       'npx',
@@ -337,88 +358,91 @@ export default [
     } catch {
       console.error('report:lint-buckets failed to parse eslint JSON output');
       console.error((result.stderr || result.stdout || '').slice(0, 4000));
-      process.exit(1);
+      exitCode = 1;
+      report = null;
     }
 
-    const summary = summarizeBuckets(report, ruleIds);
-    const selected = opts.rule ? [opts.rule] : ruleIds;
+    if (report) {
+      const summary = summarizeBuckets(report, ruleIds);
+      const selected = opts.rule ? [opts.rule] : ruleIds;
 
-    if (opts.json) {
-      /** @type {Record<string, unknown>} */
-      const payload = {
-        task: 'q-mp-280',
-        ceilingsPath: 'docs/dev/lint-ratchet-ceilings.json',
-        ceilings: ceilings.rules,
-        rules: {},
-      };
-      for (const rule of selected) {
-        const entry = summary[rule];
-        const resolved = resolveRuleHeadroom(
-          ceilings.rules[rule],
-          entry.total
-        );
+      if (opts.json) {
         /** @type {Record<string, unknown>} */
-        const rulePayload = {
-          total: entry.total,
-          ceiling: resolved.ok ? resolved.ceiling : ceilings.rules[rule],
-          headroom: resolved.headroom,
-          buckets: Object.fromEntries(topEntries(entry.buckets, opts.top)),
-          files: Object.fromEntries(topEntries(entry.files, opts.top)),
+        const payload = {
+          task: 'q-mp-280',
+          ceilingsPath: 'docs/dev/lint-ratchet-ceilings.json',
+          ceilings: ceilings.rules,
+          rules: {},
         };
-        if (!resolved.ok) {
-          rulePayload.headroomError = resolved.error;
+        for (const rule of selected) {
+          const entry = summary[rule];
+          const resolved = resolveRuleHeadroom(
+            ceilings.rules[rule],
+            entry.total
+          );
+          /** @type {Record<string, unknown>} */
+          const rulePayload = {
+            total: entry.total,
+            ceiling: resolved.ok ? resolved.ceiling : ceilings.rules[rule],
+            headroom: resolved.headroom,
+            buckets: Object.fromEntries(topEntries(entry.buckets, opts.top)),
+            files: Object.fromEntries(topEntries(entry.files, opts.top)),
+          };
+          if (!resolved.ok) {
+            rulePayload.headroomError = resolved.error;
+          }
+          payload.rules[rule] = rulePayload;
         }
-        payload.rules[rule] = rulePayload;
-      }
-      console.log(JSON.stringify(payload, null, 2));
-      process.exit(0);
-    }
-
-    console.log('Lint bucket summary (report-only; ceilings unchanged)');
-    console.log(`Ceilings: ${path.relative(ROOT, CEILINGS_PATH)}`);
-    console.log('');
-
-    for (const rule of selected) {
-      const entry = summary[rule];
-      const resolved = resolveRuleHeadroom(
-        ceilings.rules[rule],
-        entry.total
-      );
-      const ceilingLabel = resolved.ok
-        ? String(resolved.ceiling)
-        : String(ceilings.rules[rule]);
-      console.log(
-        `${rule}: ${entry.total} / ceiling ${ceilingLabel}${resolved.note}`
-      );
-
-      const buckets = topEntries(entry.buckets, opts.top);
-      if (buckets.length === 0) {
-        console.log('  (no hits)');
+        console.log(JSON.stringify(payload, null, 2));
+      } else {
+        console.log('Lint bucket summary (report-only; ceilings unchanged)');
+        console.log(`Ceilings: ${path.relative(ROOT, CEILINGS_PATH)}`);
         console.log('');
-        continue;
-      }
-      console.log('  path buckets:');
-      for (const [bucket, count] of buckets) {
-        console.log(`    ${String(count).padStart(4)}  ${bucket}`);
-      }
-      console.log(`  densest files (top ${opts.top}):`);
-      for (const [file, count] of topEntries(entry.files, opts.top)) {
-        console.log(`    ${String(count).padStart(4)}  ${file}`);
-      }
-      console.log('');
-    }
 
-    console.log(
-      'Report-only: no ceiling writes. Use npm run lint:ratchet to enforce ceilings.'
-    );
-    process.exit(0);
+        for (const rule of selected) {
+          const entry = summary[rule];
+          const resolved = resolveRuleHeadroom(
+            ceilings.rules[rule],
+            entry.total
+          );
+          const ceilingLabel = resolved.ok
+            ? String(resolved.ceiling)
+            : String(ceilings.rules[rule]);
+          console.log(
+            `${rule}: ${entry.total} / ceiling ${ceilingLabel}${resolved.note}`
+          );
+
+          const buckets = topEntries(entry.buckets, opts.top);
+          if (buckets.length === 0) {
+            console.log('  (no hits)');
+            console.log('');
+            continue;
+          }
+          console.log('  path buckets:');
+          for (const [bucket, count] of buckets) {
+            console.log(`    ${String(count).padStart(4)}  ${bucket}`);
+          }
+          console.log(`  densest files (top ${opts.top}):`);
+          for (const [file, count] of topEntries(entry.files, opts.top)) {
+            console.log(`    ${String(count).padStart(4)}  ${file}`);
+          }
+          console.log('');
+        }
+
+        console.log(
+          'Report-only: no ceiling writes. Use npm run lint:ratchet to enforce ceilings.'
+        );
+      }
+    }
   } finally {
+    // process.exit skips finally on Node 22+; unlink here before exit below.
     try {
       fs.unlinkSync(probeConfigPath);
     } catch {
       // ignore cleanup errors
     }
   }
+  process.exit(exitCode);
 }
 
 const isMain =

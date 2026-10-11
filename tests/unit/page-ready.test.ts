@@ -120,6 +120,34 @@ describe('gotoGame (q-mp-921)', () => {
     });
   });
 
+  it('joins trailing-slash baseURL without a double slash (q-mp-1280)', async () => {
+    const { page, goto } = createFakePage();
+    await gotoGame(page, 'http://127.0.0.1:5173/', 'hex', false);
+
+    expect(goto).toHaveBeenCalledWith('http://127.0.0.1:5173/#/game/hex', {
+      waitUntil: 'domcontentloaded',
+    });
+  });
+
+  it('joins trailing-slash baseURL with board3d without // before ? (q-mp-1280)', async () => {
+    const { page, goto } = createFakePage();
+    await gotoGame(page, 'http://127.0.0.1:5173/', 'hex', true);
+
+    expect(goto).toHaveBeenCalledWith(
+      'http://127.0.0.1:5173/?board3d=1#/game/hex',
+      { waitUntil: 'domcontentloaded' }
+    );
+  });
+
+  it('collapses multiple trailing slashes on baseURL (q-mp-1280)', async () => {
+    const { page, goto } = createFakePage();
+    await gotoGame(page, 'http://127.0.0.1:5173///', 'calla', false);
+
+    expect(goto).toHaveBeenCalledWith('http://127.0.0.1:5173/#/game/calla', {
+      waitUntil: 'domcontentloaded',
+    });
+  });
+
   it('waits for ready then dismisses owl (evaluate pointer-events path)', async () => {
     const { page, goto, evaluate, locators } = createFakePage();
     await gotoGame(page, 'http://localhost:5173', 'fiar');

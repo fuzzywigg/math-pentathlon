@@ -177,6 +177,43 @@ export const n: N = 1;
     expect(min.status).toBe('identical');
   });
 
+  it('minify mode ignores rename-only emit when raw emit matches (q-mp-1288)', async () => {
+    // esbuild may pick different local names after minify even when raw emit
+    // is byte-identical (type annotation erasure only).
+    const typed = 'export const x: number = 1;\n';
+    const plain = 'export const x = 1;\n';
+    const raw = await compareFileEmit({
+      file: 'rename.ts',
+      baseSource: typed,
+      headSource: plain,
+    });
+    expect(raw.status).toBe('identical');
+    const minA = await transpileToJs(typed, 'a.ts', { minify: true });
+    const minB = await transpileToJs(plain, 'b.ts', { minify: true });
+    // Fixture still produces rename-only minify drift (prove the bug surface).
+    expect(minA).not.toBe(minB);
+    expect(minA).toMatch(/export\{[a-z] as x\}/);
+    expect(minB).toMatch(/export\{[a-z] as x\}/);
+    const min = await compareFileEmit({
+      file: 'rename.ts',
+      baseSource: typed,
+      headSource: plain,
+      minify: true,
+    });
+    expect(min.status).toBe('identical');
+  });
+
+  it('minify mode still reports real emit diffs (q-mp-1288)', async () => {
+    const result = await compareFileEmit({
+      file: 'real-diff.ts',
+      baseSource: 'export const x = 1;\n',
+      headSource: 'export const x = 2;\n',
+      minify: true,
+    });
+    expect(result.status).toBe('differ');
+    expect(result.detail).toMatch(/[12]/);
+  });
+
   it('filesFromErrorMessage includes Usage and path (q-mp-869)', () => {
     expect(USAGE).toBe(
       'Usage: node scripts/check-emit-identity.mjs [options] [files...]'

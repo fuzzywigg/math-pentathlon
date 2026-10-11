@@ -104,19 +104,28 @@ Opt-in visual is **not** wired into CI. E2E visual is CI job `visual-baseline` (
 | Report Markdown (top-level)               | **15** | `docs/playtest/*.md` (tablet sweep + per-game deep reports)                                                                                                                  |
 | Artifact dirs                             | **15** | `docs/playtest/*/` (screenshots / JSON)                                                                                                                                      |
 
-Typical local run (Vite must already be up for `node` paths; named scripts follow the same `PLAYTEST_BASE_URL` convention):
+Typical local run (Vite must already be up for `node` paths). Base-URL env names are **not** unified — each harness reads the var below (defaults are localhost/`127.0.0.1:5173` when unset):
+
+| Harness | Env var | Default host form |
+| ------- | ------- | ----------------- |
+| `playtest:calla` → `scripts/calla-deep-playtest.mjs` | `PLAYTEST_BASE_URL` | `http://localhost:5173` |
+| `playtest:ramrod` / `sum-dominoes` / `stars-bars` / `par-55` → `scripts/*-deep-playtest.mjs` | `PLAYTEST_BASE` | `http://127.0.0.1:5173` |
+| `tests/playtest/fab-a-diffy-deep.mjs` | `PLAYTEST_BASE_URL` | `http://localhost:5173` |
+| `tests/playtest/star-track-deep-playtest.mjs` | `PLAYTEST_BASE_URL` | `http://127.0.0.1:5173` |
+| `docs/playtest/fraction-pinball-deep-playtest.mjs` | `PLAYTEST_BASE` | `http://localhost:5173` |
+| `docs/playtest/hex-deep-probe.mjs` | `HEX_PLAYTEST_URL` | `http://127.0.0.1:5173` |
 
 ```bash
 npm run dev   # separate terminal → http://127.0.0.1:5173
 npm run playtest:calla
-npm run playtest:ramrod
+PLAYTEST_BASE=http://127.0.0.1:5173 npm run playtest:ramrod
 npm run playtest:sum-dominoes
 npm run playtest:stars-bars
 npm run playtest:par-55
 PLAYTEST_BASE_URL=http://127.0.0.1:5173 node tests/playtest/fab-a-diffy-deep.mjs
 PLAYTEST_BASE_URL=http://127.0.0.1:5173 node tests/playtest/star-track-deep-playtest.mjs
-PLAYTEST_BASE_URL=http://127.0.0.1:5173 node docs/playtest/hex-deep-probe.mjs
-PLAYTEST_BASE_URL=http://127.0.0.1:5173 node docs/playtest/fraction-pinball-deep-playtest.mjs
+HEX_PLAYTEST_URL=http://127.0.0.1:5173 node docs/playtest/hex-deep-probe.mjs
+PLAYTEST_BASE=http://127.0.0.1:5173 node docs/playtest/fraction-pinball-deep-playtest.mjs
 ```
 
 ### Bench

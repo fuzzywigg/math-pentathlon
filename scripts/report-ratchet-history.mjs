@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
- * Report-only ratchet ceiling history chart (q-mp-074; refresh q-mp-236 / q-mp-290).
+ * Report-only ratchet ceiling history chart (q-mp-074; refresh q-mp-236 / q-mp-290;
+ * all-12 lint keys q-mp-1289).
  *
  * Walks git history for:
- *   - docs/dev/lint-ratchet-ceilings.json          → curly + void + nnnull + dup-imports
+ *   - docs/dev/lint-ratchet-ceilings.json          → all rules.* ceiling keys (12)
  *   - docs/dev/type-ratchet-phase2-baseline.json   → Phase-2 out-of-scope errors
  *   - docs/dev/module-boundaries-ceilings.json     → sum of boundary ceilings
  *
@@ -23,6 +24,8 @@
  *
  * Default invocation (no --dry-run) still writes the md/svg docs intentionally.
  * --help / -h and --dry-run must not write those files (q-mp-872).
+ *
+ * Does not edit ceiling/baseline JSON values (report/chart only).
  */
 
 import { spawnSync } from 'node:child_process';
@@ -39,12 +42,58 @@ export const TRACKED = Object.freeze({
   boundaries: 'docs/dev/module-boundaries-ceilings.json',
 });
 
-/** Lint rule keys plotted / tabulated from lint-ratchet-ceilings.json. */
+/**
+ * Lint metric field → eslint rule id in lint-ratchet-ceilings.json `rules`.
+ * Must stay in sync with every key in docs/dev/lint-ratchet-ceilings.json (q-mp-1289).
+ */
 export const LINT_RULE_KEYS = Object.freeze({
   curly: 'curly',
   voidExpression: '@typescript-eslint/no-confusing-void-expression',
   nnnull: '@typescript-eslint/no-non-null-assertion',
   dupImports: 'no-duplicate-imports',
+  radix: 'radix',
+  defaultCase: 'default-case',
+  nullish: '@typescript-eslint/prefer-nullish-coalescing',
+  optionalChain: '@typescript-eslint/prefer-optional-chain',
+  switchExhaustiveness: '@typescript-eslint/switch-exhaustiveness-check',
+  noShadow: '@typescript-eslint/no-shadow',
+  eqeqeq: 'eqeqeq',
+  returnAwait: '@typescript-eslint/return-await',
+});
+
+/** Stable order of lint metric fields (matches LINT_RULE_KEYS insertion order). */
+export const LINT_METRIC_KEYS = Object.freeze(Object.keys(LINT_RULE_KEYS));
+
+/** Short chart / table labels for each lint metric. */
+export const LINT_METRIC_LABELS = Object.freeze({
+  curly: 'curly',
+  voidExpression: 'void',
+  nnnull: 'nnnull',
+  dupImports: 'dup-imports',
+  radix: 'radix',
+  defaultCase: 'default-case',
+  nullish: 'nullish',
+  optionalChain: 'opt-chain',
+  switchExhaustiveness: 'switch-exh',
+  noShadow: 'no-shadow',
+  eqeqeq: 'eqeqeq',
+  returnAwait: 'return-await',
+});
+
+/** Distinct series colors for the 12 lint metrics (plus type/boundary below). */
+const LINT_METRIC_COLORS = Object.freeze({
+  curly: '#0b6e4f',
+  voidExpression: '#8b1e3f',
+  nnnull: '#5c4d7a',
+  dupImports: '#2a6f97',
+  radix: '#6b4226',
+  defaultCase: '#b85c38',
+  nullish: '#3d5a5b',
+  optionalChain: '#c45c26',
+  switchExhaustiveness: '#4a6741',
+  noShadow: '#7a4e2d',
+  eqeqeq: '#2f4858',
+  returnAwait: '#9a3412',
 });
 
 export const OUT_SVG = 'docs/dev/ratchet-ceiling-history.svg';
@@ -96,18 +145,25 @@ export function parseArgs(argv) {
 
 /**
  * @typedef {{ sha: string, date: string, subject: string }} GitCommitMeta
- * @typedef {{
- *   sha: string,
- *   date: string,
- *   subject: string,
- *   curly: number | null,
- *   voidExpression: number | null,
- *   nnnull: number | null,
- *   dupImports: number | null,
+ * @typedef {Record<keyof typeof LINT_RULE_KEYS, number | null>} LintMetrics
+ * @typedef {GitCommitMeta & LintMetrics & {
  *   typeOutOfScope: number | null,
  *   boundarySum: number | null,
  * }} HistoryRow
  */
+
+/**
+ * All lint metrics set to null (scaffold for extract / empty rows).
+ * @returns {LintMetrics}
+ */
+export function nullLintMetrics() {
+  /** @type {LintMetrics} */
+  const out = /** @type {LintMetrics} */ ({});
+  for (const key of LINT_METRIC_KEYS) {
+    out[/** @type {keyof typeof LINT_RULE_KEYS} */ (key)] = null;
+  }
+  return out;
+}
 
 /**
  * Coerce a JSON ceiling/rule value to a finite number.
@@ -143,49 +199,51 @@ function ruleNumber(rules, ruleKey) {
 
 /**
  * Extract lint step-down metrics from lint-ratchet-ceilings.json shape.
+ * Returns one entry per LINT_RULE_KEYS metric (all 12 live ceilings; q-mp-1289).
  * @param {unknown} json
- * @returns {{ curly: number | null, voidExpression: number | null, nnnull: number | null, dupImports: number | null }}
+ * @returns {LintMetrics}
  */
 export function extractLintMetrics(json) {
-  if (json == null || typeof json !== 'object') {
-    return {
-      curly: null,
-      voidExpression: null,
-      nnnull: null,
-      dupImports: null,
-    };
-  }
+  const out = nullLintMetrics();
+  if (json == null || typeof json !== 'object') return out;
   const rules = /** @type {Record<string, unknown>} */ (json).rules;
-  return {
-    curly: ruleNumber(rules, LINT_RULE_KEYS.curly),
-    voidExpression: ruleNumber(rules, LINT_RULE_KEYS.voidExpression),
-    nnnull: ruleNumber(rules, LINT_RULE_KEYS.nnnull),
-    dupImports: ruleNumber(rules, LINT_RULE_KEYS.dupImports),
-  };
+  for (const metric of LINT_METRIC_KEYS) {
+    const ruleKey =
+      LINT_RULE_KEYS[/** @type {keyof typeof LINT_RULE_KEYS} */ (metric)];
+    out[/** @type {keyof typeof LINT_RULE_KEYS} */ (metric)] = ruleNumber(
+      rules,
+      ruleKey
+    );
+  }
+  return out;
+}
+
+/**
+ * @param {string} kind
+ * @returns {kind is keyof typeof LINT_RULE_KEYS}
+ */
+function isLintMetricKind(kind) {
+  return Object.prototype.hasOwnProperty.call(LINT_RULE_KEYS, kind);
 }
 
 /**
  * Extract a single chart metric from a parsed ceiling/baseline JSON blob.
  * Unknown / missing shapes yield null for that metric (row still kept).
  *
- * @param {'curly' | 'voidExpression' | 'nnnull' | 'dupImports' | 'typePhase2' | 'boundaries'} kind
+ * @param {keyof typeof LINT_RULE_KEYS | 'typePhase2' | 'boundaries'} kind
  * @param {unknown} json
  * @returns {number | null}
  */
 export function extractMetric(kind, json) {
   if (json == null || typeof json !== 'object') return null;
   const obj = /** @type {Record<string, unknown>} */ (json);
+  if (isLintMetricKind(kind)) {
+    return extractLintMetrics(json)[kind];
+  }
   switch (kind) {
-    case 'curly':
-      return extractLintMetrics(json).curly;
-    case 'voidExpression':
-      return extractLintMetrics(json).voidExpression;
-    case 'nnnull':
-      return extractLintMetrics(json).nnnull;
-    case 'dupImports':
-      return extractLintMetrics(json).dupImports;
     case 'typePhase2': {
       // Match check-type-ratchet: top-level outOfScopeErrors, else nested totals.
+      // Nested totals support kept from q-mp-1247.
       const top = obj.outOfScopeErrors;
       if (typeof top === 'number' && Number.isFinite(top)) return top;
       const totals = obj.totals;
@@ -252,10 +310,7 @@ function emptyRow(meta) {
     sha: meta.sha,
     date: meta.date,
     subject: meta.subject,
-    curly: null,
-    voidExpression: null,
-    nnnull: null,
-    dupImports: null,
+    ...nullLintMetrics(),
     typeOutOfScope: null,
     boundarySum: null,
   };
@@ -267,12 +322,7 @@ function emptyRow(meta) {
  * null never wipes a prior numeric value (q-mp-1248).
  *
  * @param {{
- *   lint: Array<GitCommitMeta & {
- *     curly: number | null,
- *     voidExpression: number | null,
- *     nnnull: number | null,
- *     dupImports: number | null,
- *   }>,
+ *   lint: Array<GitCommitMeta & LintMetrics>,
  *   typePhase2: Array<GitCommitMeta & { value: number | null }>,
  *   boundaries: Array<GitCommitMeta & { value: number | null }>,
  * }} byKind
@@ -295,13 +345,10 @@ export function mergeHistory(byKind) {
     const existing = bySha.get(c.sha) ?? emptyRow(c);
     existing.date = c.date;
     existing.subject = c.subject;
-    existing.curly = keepUnlessNull(existing.curly, c.curly);
-    existing.voidExpression = keepUnlessNull(
-      existing.voidExpression,
-      c.voidExpression
-    );
-    existing.nnnull = keepUnlessNull(existing.nnnull, c.nnnull);
-    existing.dupImports = keepUnlessNull(existing.dupImports, c.dupImports);
+    for (const metric of LINT_METRIC_KEYS) {
+      const key = /** @type {keyof typeof LINT_RULE_KEYS} */ (metric);
+      existing[key] = keepUnlessNull(existing[key], c[key]);
+    }
     bySha.set(c.sha, existing);
   }
 
@@ -330,27 +377,18 @@ export function mergeHistory(byKind) {
   });
 
   // Forward-fill metrics so the chart has continuous series after first sighting.
-  /** @type {number | null} */
-  let lastCurly = null;
-  /** @type {number | null} */
-  let lastVoid = null;
-  /** @type {number | null} */
-  let lastNnnull = null;
-  /** @type {number | null} */
-  let lastDup = null;
+  /** @type {Record<string, number | null>} */
+  const lastLint = nullLintMetrics();
   /** @type {number | null} */
   let lastType = null;
   /** @type {number | null} */
   let lastBound = null;
   for (const row of rows) {
-    if (row.curly != null) lastCurly = row.curly;
-    else row.curly = lastCurly;
-    if (row.voidExpression != null) lastVoid = row.voidExpression;
-    else row.voidExpression = lastVoid;
-    if (row.nnnull != null) lastNnnull = row.nnnull;
-    else row.nnnull = lastNnnull;
-    if (row.dupImports != null) lastDup = row.dupImports;
-    else row.dupImports = lastDup;
+    for (const metric of LINT_METRIC_KEYS) {
+      const key = /** @type {keyof typeof LINT_RULE_KEYS} */ (metric);
+      if (row[key] != null) lastLint[key] = row[key];
+      else row[key] = lastLint[key];
+    }
     if (row.typeOutOfScope != null) lastType = row.typeOutOfScope;
     else row.typeOutOfScope = lastType;
     if (row.boundarySum != null) lastBound = row.boundarySum;
@@ -382,36 +420,25 @@ export function escapeXml(s) {
  */
 export function renderSvg(rows, opts = {}) {
   const title = opts.title ?? 'Ratchet ceiling history';
-  const width = 920;
-  const height = 460;
+  const width = 960;
+  const height = 520;
   const padL = 56;
   const padR = 24;
   const padT = 48;
-  const padB = 96;
+  const padB = 140;
   const plotW = width - padL - padR;
   const plotH = height - padT - padB;
 
+  /** @type {Array<{ key: keyof HistoryRow, label: string, color: string }>} */
   const series = [
-    {
-      key: /** @type {const} */ ('curly'),
-      label: 'curly',
-      color: '#0b6e4f',
-    },
-    {
-      key: /** @type {const} */ ('voidExpression'),
-      label: 'void',
-      color: '#8b1e3f',
-    },
-    {
-      key: /** @type {const} */ ('nnnull'),
-      label: 'nnnull',
-      color: '#5c4d7a',
-    },
-    {
-      key: /** @type {const} */ ('dupImports'),
-      label: 'dup-imports',
-      color: '#2a6f97',
-    },
+    ...LINT_METRIC_KEYS.map((metric) => {
+      const key = /** @type {keyof typeof LINT_RULE_KEYS} */ (metric);
+      return {
+        key,
+        label: LINT_METRIC_LABELS[key],
+        color: LINT_METRIC_COLORS[key],
+      };
+    }),
     {
       key: /** @type {const} */ ('typeOutOfScope'),
       label: 'type Phase-2 oos',
@@ -425,7 +452,7 @@ export function renderSvg(rows, opts = {}) {
   ];
 
   /**
-   * @param {'curly' | 'voidExpression' | 'nnnull' | 'dupImports' | 'typeOutOfScope' | 'boundarySum'} key
+   * @param {keyof HistoryRow} key
    */
   function seriesMax(key) {
     let m = 0;
@@ -454,12 +481,16 @@ export function renderSvg(rows, opts = {}) {
     return padT + plotH * (1 - t);
   }
 
+  const lintLabelList = LINT_METRIC_KEYS.map(
+    (k) => LINT_METRIC_LABELS[/** @type {keyof typeof LINT_RULE_KEYS} */ (k)]
+  ).join(', ');
+
   const parts = [];
   parts.push(
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeXml(title)}">`,
     `<title>${escapeXml(title)}</title>`,
-    `<desc>Normalized line chart of lint ratchet ceilings (curly, void, nnnull, dup-imports), Phase-2 type-ratchet out-of-scope errors, and module-boundary ceiling sum over git history.</desc>`,
+    `<desc>Normalized line chart of all ${LINT_METRIC_KEYS.length} lint ratchet ceilings (${escapeXml(lintLabelList)}), Phase-2 type-ratchet out-of-scope errors, and module-boundary ceiling sum over git history.</desc>`,
     `<rect width="100%" height="100%" fill="#f7f5f0"/>`,
     `<text x="${padL}" y="28" font-family="Georgia, 'Times New Roman', serif" font-size="18" fill="#1a1a1a">${escapeXml(title)}</text>`,
     `<text x="${padL}" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#555">Each series scaled to its own max (see table for raw counts)</text>`,
@@ -484,7 +515,9 @@ export function renderSvg(rows, opts = {}) {
     /** @type {string[]} */
     const pts = [];
     rows.forEach((r, i) => {
-      const y = yAt(r[s.key], max);
+      const raw = r[s.key];
+      const v = typeof raw === 'number' ? raw : null;
+      const y = yAt(v, max);
       if (y == null) return;
       pts.push(`${xAt(i).toFixed(2)},${y.toFixed(2)}`);
     });
@@ -494,7 +527,9 @@ export function renderSvg(rows, opts = {}) {
       );
     }
     rows.forEach((r, i) => {
-      const y = yAt(r[s.key], max);
+      const raw = r[s.key];
+      const v = typeof raw === 'number' ? raw : null;
+      const y = yAt(v, max);
       if (y == null) return;
       parts.push(
         `<circle cx="${xAt(i).toFixed(2)}" cy="${y.toFixed(2)}" r="3" fill="${s.color}"/>`
@@ -504,23 +539,25 @@ export function renderSvg(rows, opts = {}) {
 
   // x labels (sparse)
   const labelEvery = Math.max(1, Math.ceil(n / 8));
+  const xLabelY = padT + plotH + 18;
   rows.forEach((r, i) => {
     if (i % labelEvery !== 0 && i !== n - 1) return;
     const label = r.date.slice(0, 10);
     parts.push(
-      `<text x="${xAt(i).toFixed(2)}" y="${height - 56}" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" fill="#444">${escapeXml(label)}</text>`
+      `<text x="${xAt(i).toFixed(2)}" y="${xLabelY}" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" fill="#444">${escapeXml(label)}</text>`
     );
     parts.push(
-      `<text x="${xAt(i).toFixed(2)}" y="${height - 42}" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="9" fill="#777">${escapeXml(r.sha.slice(0, 7))}</text>`
+      `<text x="${xAt(i).toFixed(2)}" y="${xLabelY + 14}" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="9" fill="#777">${escapeXml(r.sha.slice(0, 7))}</text>`
     );
   });
 
-  // legend (two rows)
-  const mid = Math.ceil(series.length / 2);
-  for (let rowIdx = 0; rowIdx < 2; rowIdx++) {
+  // legend (three rows for 12 lint + type + boundary)
+  const legendRows = 3;
+  const perRow = Math.ceil(series.length / legendRows);
+  for (let rowIdx = 0; rowIdx < legendRows; rowIdx++) {
     let lx = padL;
-    const ly = height - 22 + rowIdx * 16;
-    const slice = series.slice(rowIdx * mid, rowIdx * mid + mid);
+    const ly = height - 48 + rowIdx * 16;
+    const slice = series.slice(rowIdx * perRow, rowIdx * perRow + perRow);
     for (const s of slice) {
       parts.push(
         `<rect x="${lx}" y="${ly - 10}" width="12" height="12" fill="${s.color}"/>`,
@@ -555,13 +592,7 @@ function cell(n) {
  *   generatedAt?: string,
  *   gitMode?: string,
  *   tipSha?: string,
- *   liveLint?: {
- *     curly: number | null,
- *     voidExpression: number | null,
- *     nnnull: number | null,
- *     dupImports: number | null,
- *     nullish?: number | null,
- *   },
+ *   liveLint?: LintMetrics,
  * }} [meta]
  */
 export function renderMarkdown(rows, meta = {}) {
@@ -569,14 +600,17 @@ export function renderMarkdown(rows, meta = {}) {
   const gitMode = meta.gitMode ?? 'git log --all';
   const tipSha = meta.tipSha ?? '';
   const live = meta.liveLint;
+  const lintLabels = LINT_METRIC_KEYS.map(
+    (k) => LINT_METRIC_LABELS[/** @type {keyof typeof LINT_RULE_KEYS} */ (k)]
+  ).join(' / ');
   const lines = [
     '# Ratchet ceiling history',
     '',
-    `Task: \`q-mp-074\` / refresh \`q-mp-236\` / \`q-mp-290\`. Generated \`${generatedAt}\` via \`${gitMode}\`.`,
+    `Task: \`q-mp-074\` / refresh \`q-mp-236\` / \`q-mp-290\` / \`q-mp-1289\`. Generated \`${generatedAt}\` via \`${gitMode}\`.`,
     '',
     'Tracks report-only ceilings over git history:',
     '',
-    '- **curly / void / nnnull / dup-imports** — `docs/dev/lint-ratchet-ceilings.json` → `rules.*`',
+    `- **lint (${LINT_METRIC_KEYS.length}): ${lintLabels}** — \`docs/dev/lint-ratchet-ceilings.json\` → \`rules.*\``,
     '- **type Phase-2 out-of-scope** — `docs/dev/type-ratchet-phase2-baseline.json` → `outOfScopeErrors`',
     '- **boundary sum** — `docs/dev/module-boundaries-ceilings.json` → sum of `ceilings.*`',
     '',
@@ -587,21 +621,25 @@ export function renderMarkdown(rows, meta = {}) {
       `## Live tip snapshot (\`${tipSha.slice(0, 7)}\`)`,
       '',
       `| Metric | Ceiling |`,
-      `| --- | ---: |`,
-      `| curly | ${cell(live.curly)} |`,
-      `| no-confusing-void-expression | ${cell(live.voidExpression)} |`,
-      `| no-non-null-assertion | ${cell(live.nnnull)} |`,
-      `| no-duplicate-imports | ${cell(live.dupImports)} |`,
-      ...(live.nullish != null
-        ? [
-            `| prefer-nullish-coalescing (HOLD; not charted) | ${cell(live.nullish)} |`,
-          ]
-        : []),
+      `| --- | ---: |`
+    );
+    for (const metric of LINT_METRIC_KEYS) {
+      const key = /** @type {keyof typeof LINT_RULE_KEYS} */ (metric);
+      const ruleId = LINT_RULE_KEYS[key];
+      lines.push(`| ${ruleId} | ${cell(live[key])} |`);
+    }
+    lines.push(
       '',
       'Chart series are normalized independently; raw counts are in the history table.',
       ''
     );
   }
+
+  const lintHeader = LINT_METRIC_KEYS.map(
+    (k) => LINT_METRIC_LABELS[/** @type {keyof typeof LINT_RULE_KEYS} */ (k)]
+  ).join(' | ');
+  const lintAlign = LINT_METRIC_KEYS.map(() => '---:').join(' | ');
+  const emptyLintCells = LINT_METRIC_KEYS.map(() => '—').join(' | ');
 
   lines.push(
     'Chart (each series normalized to its own max):',
@@ -610,19 +648,25 @@ export function renderMarkdown(rows, meta = {}) {
     '',
     'Regenerate with `npm run report:ratchet-history` (no network; reads local git only).',
     '',
-    '| SHA | Date | curly | void | nnnull | dup | type oos | boundary Σ | Subject |',
-    '| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |'
+    `| SHA | Date | ${lintHeader} | type oos | boundary Σ | Subject |`,
+    `| --- | --- | ${lintAlign} | ---: | ---: | --- |`
   );
 
   for (const r of rows) {
     const subj = r.subject.replace(/\|/g, '\\|');
+    const lintCells = LINT_METRIC_KEYS.map((metric) => {
+      const key = /** @type {keyof typeof LINT_RULE_KEYS} */ (metric);
+      return cell(r[key]);
+    }).join(' | ');
     lines.push(
-      `| \`${r.sha.slice(0, 7)}\` | ${r.date.slice(0, 10)} | ${cell(r.curly)} | ${cell(r.voidExpression)} | ${cell(r.nnnull)} | ${cell(r.dupImports)} | ${cell(r.typeOutOfScope)} | ${cell(r.boundarySum)} | ${subj} |`
+      `| \`${r.sha.slice(0, 7)}\` | ${r.date.slice(0, 10)} | ${lintCells} | ${cell(r.typeOutOfScope)} | ${cell(r.boundarySum)} | ${subj} |`
     );
   }
 
   if (rows.length === 0) {
-    lines.push('| — | — | — | — | — | — | — | — | _(no commits found)_ |');
+    lines.push(
+      `| — | — | ${emptyLintCells} | — | — | _(no commits found)_ |`
+    );
   }
 
   lines.push('');
@@ -681,25 +725,13 @@ export function collectHistory(runGit, opts = {}) {
     return metas.map((m) => {
       const shown = runGit(['show', `${m.sha}:${filePath}`]);
       if ((shown.status ?? 1) !== 0) {
-        return {
-          ...m,
-          curly: /** @type {null} */ (null),
-          voidExpression: /** @type {null} */ (null),
-          nnnull: /** @type {null} */ (null),
-          dupImports: /** @type {null} */ (null),
-        };
+        return { ...m, ...nullLintMetrics() };
       }
       try {
         const json = JSON.parse(shown.stdout);
         return { ...m, ...extractLintMetrics(json) };
       } catch {
-        return {
-          ...m,
-          curly: /** @type {null} */ (null),
-          voidExpression: /** @type {null} */ (null),
-          nnnull: /** @type {null} */ (null),
-          dupImports: /** @type {null} */ (null),
-        };
+        return { ...m, ...nullLintMetrics() };
       }
     });
   }
@@ -730,32 +762,15 @@ export function runGit(args) {
 
 /**
  * Read live tip lint ceilings from the working tree (for the markdown snapshot).
- * @returns {{
- *   curly: number | null,
- *   voidExpression: number | null,
- *   nnnull: number | null,
- *   dupImports: number | null,
- *   nullish: number | null,
- * }}
+ * @returns {LintMetrics}
  */
 function readLiveLintSnapshot() {
   const filePath = path.join(ROOT, TRACKED.lintCeilings);
   try {
     const json = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    const lint = extractLintMetrics(json);
-    const nullish = ruleNumber(
-      json?.rules,
-      '@typescript-eslint/prefer-nullish-coalescing'
-    );
-    return { ...lint, nullish };
+    return extractLintMetrics(json);
   } catch {
-    return {
-      curly: null,
-      voidExpression: null,
-      nnnull: null,
-      dupImports: null,
-      nullish: null,
-    };
+    return nullLintMetrics();
   }
 }
 
