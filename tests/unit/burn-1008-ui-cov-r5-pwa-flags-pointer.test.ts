@@ -23,12 +23,24 @@ import { installDomHooks } from './helpers/dom';
 
 installDomHooks();
 
+// unit-shared uses isolate:false — restore document.hidden so later suites
+// do not see a stuck stub from Object.defineProperty (q-mp-1346).
+const originalDocumentHidden = Object.getOwnPropertyDescriptor(
+  document,
+  'hidden'
+);
+
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
   resetPwaReloadGuardForTests();
   document.documentElement.removeAttribute('data-offline');
   document.documentElement.removeAttribute(IDLE_WARM_DONE_ATTR);
+  if (originalDocumentHidden) {
+    Object.defineProperty(document, 'hidden', originalDocumentHidden);
+  } else {
+    Reflect.deleteProperty(document, 'hidden');
+  }
 });
 
 describe('burn-1008 ui-cov-r5 pwa register residuals', () => {

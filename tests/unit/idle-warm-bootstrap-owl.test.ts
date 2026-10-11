@@ -5,6 +5,21 @@ import {
 } from '../../src/pwa/idle-warm';
 import { bootstrapOwl } from '../../src/pwa/bootstrap-owl';
 
+// unit-shared uses isolate:false — restore document.hidden so later suites
+// do not see a stuck stub from Object.defineProperty (q-mp-1346).
+const originalDocumentHidden = Object.getOwnPropertyDescriptor(
+  document,
+  'hidden'
+);
+
+function restoreDocumentHidden(): void {
+  if (originalDocumentHidden) {
+    Object.defineProperty(document, 'hidden', originalDocumentHidden);
+  } else {
+    Reflect.deleteProperty(document, 'hidden');
+  }
+}
+
 describe('scheduleIdleGameWarm', () => {
   beforeEach(() => {
     Object.defineProperty(document, 'hidden', {
@@ -17,6 +32,7 @@ describe('scheduleIdleGameWarm', () => {
   afterEach(() => {
     vi.restoreAllMocks();
     document.documentElement.removeAttribute(IDLE_WARM_DONE_ATTR);
+    restoreDocumentHidden();
   });
 
   it('imports shell then warm games on the scheduled callback', async () => {
@@ -80,6 +96,7 @@ describe('scheduleIdleGameWarm', () => {
 describe('bootstrapOwl', () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    restoreDocumentHidden();
   });
 
   it('schedules work when enabled', () => {
