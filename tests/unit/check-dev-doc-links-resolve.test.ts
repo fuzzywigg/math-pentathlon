@@ -7,7 +7,7 @@ import {
 
 const fromDoc = path.resolve('docs/dev/sample.md');
 
-describe('stripMdLinkTitle (q-mp-1095)', () => {
+describe('stripMdLinkTitle (q-mp-1095 + q-mp-1152)', () => {
   it('strips double- and single-quoted titles after the path', () => {
     expect(stripMdLinkTitle('../wiki/development.md "title"')).toBe(
       '../wiki/development.md'
@@ -16,6 +16,17 @@ describe('stripMdLinkTitle (q-mp-1095)', () => {
       '../wiki/development.md'
     );
     expect(stripMdLinkTitle('path.md "title with spaces"')).toBe('path.md');
+  });
+
+  it('strips CommonMark parenthetical titles after the path (q-mp-1152)', () => {
+    expect(stripMdLinkTitle('path.md (title)')).toBe('path.md');
+    expect(stripMdLinkTitle('../wiki/development.md (title)')).toBe(
+      '../wiki/development.md'
+    );
+    expect(stripMdLinkTitle('path.md (title with spaces)')).toBe('path.md');
+    expect(stripMdLinkTitle('../wiki/development.md#anchor (title)')).toBe(
+      '../wiki/development.md#anchor'
+    );
   });
 
   it('leaves untitled destinations unchanged (incl. hash/query)', () => {
@@ -28,10 +39,12 @@ describe('stripMdLinkTitle (q-mp-1095)', () => {
     expect(stripMdLinkTitle('../wiki/development.md?q=1')).toBe(
       '../wiki/development.md?q=1'
     );
+    // Path-internal parens without a title separator stay intact.
+    expect(stripMdLinkTitle('foo(bar).md')).toBe('foo(bar).md');
   });
 });
 
-describe('resolveMdLink (q-mp-1095)', () => {
+describe('resolveMdLink (q-mp-1095 + q-mp-1152)', () => {
   it('resolves titled hrefs to the path without the title segment', () => {
     const doubleQ = resolveMdLink(fromDoc, '../wiki/development.md "title"');
     expect(doubleQ.skip).toBeUndefined();
@@ -40,6 +53,10 @@ describe('resolveMdLink (q-mp-1095)', () => {
     const singleQ = resolveMdLink(fromDoc, "../wiki/development.md 'title'");
     expect(singleQ.skip).toBeUndefined();
     expect(singleQ.rel).toBe('docs/wiki/development.md');
+
+    const paren = resolveMdLink(fromDoc, '../wiki/development.md (title)');
+    expect(paren.skip).toBeUndefined();
+    expect(paren.rel).toBe('docs/wiki/development.md');
   });
 
   it('still strips hash/query after title removal', () => {
@@ -56,6 +73,13 @@ describe('resolveMdLink (q-mp-1095)', () => {
     );
     expect(withQuery.skip).toBeUndefined();
     expect(withQuery.rel).toBe('docs/wiki/development.md');
+
+    const parenHash = resolveMdLink(
+      fromDoc,
+      '../wiki/development.md#sec (title)'
+    );
+    expect(parenHash.skip).toBeUndefined();
+    expect(parenHash.rel).toBe('docs/wiki/development.md');
   });
 
   it('skips absolute / external / fragment-only hrefs', () => {
