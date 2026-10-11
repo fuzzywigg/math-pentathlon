@@ -12,9 +12,12 @@
  *   npm run mutation:report
  *   npm run mutation:report -- --games=hex,fiar --max=40
  *   npm run mutation:report -- --games=star-track --max=0   # all mutants
+ *   npm run mutation:report -- --help
+ *   npm run mutation:report -- --dry-run
  *
  * NOT wired into CI. Successful report runs exit 0. Invalid argv (bad --max /
- * --timeout / unknown --games= ids) exits 2 with usage before any rules.ts I/O.
+ * --timeout / unknown --games= ids / unknown flags) exits 2 with usage before
+ * any rules.ts I/O. --help / -h and --dry-run exit 0 without mutating.
  */
 
 import fs from 'node:fs';
@@ -453,10 +456,26 @@ function main() {
   if (!parsed.ok) usageExit(parsed.message);
 
   const opts = parsed.opts;
+  if (opts.help) {
+    console.log(MUTATION_REPORT_USAGE);
+    process.exit(0);
+  }
+
   const resolved = resolveMutationReportGames(opts.games, listGames());
   if (!resolved.ok) usageExit(resolved.message);
 
   const games = resolved.games;
+  if (opts.dryRun) {
+    console.log(
+      `Mutation report dry-run — would mutate ${games.length} games (no writes)`
+    );
+    console.log(`games=${games.join(',')}`);
+    console.log(
+      `maxMutantsPerGame=${opts.max === 0 ? 'all' : opts.max} timeoutMs=${opts.timeoutMs}`
+    );
+    process.exit(0);
+  }
+
   console.log('Mutation report (rules engines) — report-only, not CI-gated');
   console.log(`games=${games.join(',')}`);
   console.log(`maxMutantsPerGame=${opts.max === 0 ? 'all' : opts.max} timeoutMs=${opts.timeoutMs}`);
