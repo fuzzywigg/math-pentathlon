@@ -155,6 +155,35 @@ export function validateManifest(manifest) {
 }
 
 /**
+ * True when html has a single meta tag with name=theme-color, the given
+ * content, and media=(prefers-color-scheme: scheme) — any attribute order.
+ * @param {string} html
+ * @param {string} content
+ * @param {'light' | 'dark'} scheme
+ * @returns {boolean}
+ */
+function hasThemeColorForScheme(html, content, scheme) {
+  const metaRe = /<meta\b[^>]*>/gi;
+  const nameRe = /\bname=["']theme-color["']/i;
+  const contentRe = new RegExp(
+    `\\bcontent=["']${content.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["']`,
+    'i'
+  );
+  const mediaRe = new RegExp(
+    `\\bmedia=["']\\(prefers-color-scheme:\\s*${scheme}\\)["']`,
+    'i'
+  );
+  let match;
+  while ((match = metaRe.exec(html)) !== null) {
+    const tag = match[0];
+    if (nameRe.test(tag) && contentRe.test(tag) && mediaRe.test(tag)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Validate index.html install meta tags (apple + theme-color light/dark).
  * @param {string} html
  * @returns {{ ok: boolean, errors: string[] }}
@@ -183,19 +212,12 @@ export function validateIndexHtml(html) {
     errors.push('missing apple-mobile-web-app-title=Math Pentathlon');
   }
 
-  const hasLightTheme = new RegExp(
-    `name=["']theme-color["'][^>]*content=["']${THEME_COLOR_LIGHT}["'][^>]*media=["']\\(prefers-color-scheme:\\s*light\\)["']` +
-      `|` +
-      `name=["']theme-color["'][^>]*media=["']\\(prefers-color-scheme:\\s*light\\)["'][^>]*content=["']${THEME_COLOR_LIGHT}["']`,
-    'i'
-  ).test(html);
-
-  const hasDarkTheme = new RegExp(
-    `name=["']theme-color["'][^>]*content=["']${THEME_COLOR_DARK}["'][^>]*media=["']\\(prefers-color-scheme:\\s*dark\\)["']` +
-      `|` +
-      `name=["']theme-color["'][^>]*media=["']\\(prefers-color-scheme:\\s*dark\\)["'][^>]*content=["']${THEME_COLOR_DARK}["']`,
-    'i'
-  ).test(html);
+  const hasLightTheme = hasThemeColorForScheme(
+    html,
+    THEME_COLOR_LIGHT,
+    'light'
+  );
+  const hasDarkTheme = hasThemeColorForScheme(html, THEME_COLOR_DARK, 'dark');
 
   // Fallback theme-color (no media) for older browsers — brand dark splash.
   const hasFallbackTheme =
