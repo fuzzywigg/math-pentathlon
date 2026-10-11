@@ -1,12 +1,29 @@
 /**
- * Pure heap-snapshot helpers for scripts/memory-leak-audit.mjs (q-mp-1215 / 1216).
- * Kept free of Playwright / vite so unit tests can import hermetically.
+ * Pure heap-snapshot helpers for scripts/memory-leak-audit.mjs
+ * (q-mp-1215 / 1216 / 1310). Kept free of Playwright / vite so unit tests
+ * can import hermetically.
  */
 
-/** @param {number | null | undefined} bytes */
+/**
+ * @param {number | null | undefined} bytes
+ * Non-finite / non-number → `n/a` (q-mp-1310 — never `"NaN MB"`).
+ */
 export function fmtMb(bytes) {
-  if (bytes == null) return 'n/a';
+  if (typeof bytes !== 'number' || !Number.isFinite(bytes)) return 'n/a';
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+/**
+ * Coerce a heap `self_size` field to a finite number (q-mp-1310).
+ * Non-number / non-finite values (string, null, NaN, Infinity) → 0 so
+ * totals never string-concat or become NaN. Leaves metricDelta alone.
+ *
+ * @param {unknown} value
+ * @returns {number}
+ */
+function finiteSelfSize(value) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return 0;
+  return value;
 }
 
 /**
@@ -32,6 +49,7 @@ export function metricDelta(after, warm) {
 /**
  * Parse Chrome heap snapshot for Detached DOM counts + total self size.
  * Fail closed when required node_fields are missing (q-mp-1215) — never NaN.
+ * Coerce non-finite / non-number self_size to 0 (q-mp-1310) — never concat.
  *
  * @param {string} jsonText
  * @returns {{ detachedDomNodes: number, detachedSelfSize: number, totalSelfSize: number }}
@@ -67,7 +85,7 @@ export function analyzeHeapSnapshot(jsonText) {
   let totalSelfSize = 0;
 
   for (let i = 0; i < nodes.length; i += fieldCount) {
-    const selfSize = nodes[i + selfSizeOffset];
+    const selfSize = finiteSelfSize(nodes[i + selfSizeOffset]);
     totalSelfSize += selfSize;
     const name = strings[nodes[i + nameOffset]];
     if (typeof name === 'string' && name.startsWith('Detached ')) {
