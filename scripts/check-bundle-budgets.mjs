@@ -217,13 +217,35 @@ export function partitionOvers(overLabels, knownOvers) {
 /**
  * Exit code for the CLI. Non-zero only when `--fail-on-new-over` is set and
  * there is at least one novel OVER (CI uses this under continue-on-error).
+ * Non-finite or negative `novelCount` fail closed under that flag (q-mp-1253)
+ * so NaN/`-1` cannot green-wash the soft gate (`novelCount > 0` is false for both).
  *
  * @param {{ novelCount: number, failOnNewOver: boolean }} opts
- * @returns {0 | 1}
+ * @returns {0 | 1 | 2}
  */
 export function resolveSizeCheckExitCode({ novelCount, failOnNewOver }) {
-  if (failOnNewOver && novelCount > 0) return 1;
+  if (!failOnNewOver) return 0;
+  if (
+    typeof novelCount !== 'number' ||
+    !Number.isFinite(novelCount) ||
+    novelCount < 0
+  ) {
+    return 2;
+  }
+  if (novelCount > 0) return 1;
   return 0;
+}
+
+/**
+ * Exit code after an unexpected measurement/throw in main.
+ * Default (report-only) stays 0; `--fail-on-new-over` must not green-wash
+ * measurement failures (q-mp-1265).
+ *
+ * @param {boolean} failOnNewOver
+ * @returns {0 | 2}
+ */
+export function resolveSizeCheckCatchExitCode(failOnNewOver) {
+  return failOnNewOver ? 2 : 0;
 }
 
 /**
@@ -400,11 +422,20 @@ const isMain =
   path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 
 if (isMain) {
+  const argv = process.argv.slice(2);
+  const { failOnNewOver } = parseSizeCheckArgs(argv);
   try {
-    main(process.argv.slice(2));
+    main(argv);
   } catch (err) {
     console.error(err instanceof Error ? err.message : err);
-    console.error('(report-only: exiting 0)');
-    process.exitCode = 0;
+    const code = resolveSizeCheckCatchExitCode(failOnNewOver);
+    if (code === 0) {
+      console.error('(report-only: exiting 0)');
+    } else {
+      console.error(
+        `(fail-on-new-over: exiting ${code} after measurement error)`
+      );
+    }
+    process.exitCode = code;
   }
 }
