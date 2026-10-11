@@ -158,6 +158,8 @@ const nodePureFiles = [
   'tests/unit/help-only-cli.test.ts',
   // harness env Number() parser (q-mp-876 / q-mp-908); spawnSync CLI check needs node env.
   'tests/unit/env-number.test.ts',
+  // writable artifact-dir helper (q-mp-955); injectable mkdirSync needs node env.
+  'tests/unit/artifact-dir.test.ts',
   // mutation-report argv validation (q-mp-867 / q-mp-868); spawnSync CLI check.
   'tests/unit/mutation-report-args.test.ts',
   // report-coverage-map flag-like argv rejection (q-mp-906); spawnSync CLI check.
