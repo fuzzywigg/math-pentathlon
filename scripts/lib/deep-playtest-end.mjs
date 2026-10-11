@@ -15,7 +15,8 @@ import { parseHelpOnlyArgv } from './help-only-cli.mjs';
 
 export const DEEP_PLAYTEST_END_USAGE = `Usage: node scripts/lib/deep-playtest-end.mjs [--help]
 
-Library module — import from deep-playtest harness scripts.
+Library module — import from harness scripts (e.g. scripts/par-55-deep-playtest.mjs,
+scripts/stars-bars-deep-playtest.mjs).
 Not a standalone CLI.
 
 Options:
@@ -23,8 +24,8 @@ Options:
 
 /** Source body for page.waitForFunction (no flags; callers add `i`). */
 export const END_RE_SOURCE = String.raw`\bwins\b|\btie\b|\bdraw\b`;
-export const DRAW_RE_SOURCE = String.raw`\btie\b|\bdraw\b`;
-export const TIE_RE_SOURCE = String.raw`\btie\b`;
+const DRAW_RE_SOURCE = String.raw`\btie\b|\bdraw\b`;
+const TIE_RE_SOURCE = String.raw`\btie\b`;
 
 const END_RE = new RegExp(END_RE_SOURCE, 'i');
 const DRAW_RE = new RegExp(DRAW_RE_SOURCE, 'i');
