@@ -54,6 +54,9 @@ npm run report:lint-buckets      # per-rule path buckets (local report-only; doc
 npm run perf:runtime             # runtime AI/move timing probe
                                  # PERF_MODE=render → tablet/CPU4× RENDER/INPUT report (docs/dev/render-perf-2026-10.md)
 npm run audit:memory             # heap / detach probe across game mounts
+npm run audit:console            # console error/warn/pageerror sweep across games (local; not CI)
+npm run audit:mobile             # mobile viewport / layout audit (local; not CI)
+npm run audit:nav-away           # mid-game navigation-away sweep (local; not CI)
 npm run flake:unit               # local unit flake-rate loop (scripts/flake-rate-unit-loop.mjs; not CI)
 npm run flake:e2e                # local Chromium e2e flake-rate loop (scripts/flake-rate-e2e-loop.mjs; not CI)
 ```
