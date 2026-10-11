@@ -98,16 +98,18 @@ const outDir =
     : strFlag('--out', '');
 fs.mkdirSync(outDir, { recursive: true });
 
-/** @type {Map<string, { passes: number, fails: number, durations: number[], errors: string[] }>} */
+/** @type {Map<string, { passes: number, fails: number, flakes: number, durations: number[], errors: string[] }>} */
 const byTest = new Map();
 const runSummaries = [];
 
 /**
  * Recurse Playwright JSONReportSuite trees (file → describe → specs).
  * Top-level-only reports (specs on the root suite, no nested suites) stay unchanged.
+ * Per-result `status: "flaky"` increments flake counters (q-mp-1183); nested suite
+ * recursion is owned by q-mp-1052.
  * @param {object} suite
  * @param {string} inheritedFile
- * @param {{ passed: number, failed: number }} counts
+ * @param {{ passed: number, failed: number, flaky: number }} counts
  */
 function walkSuite(suite, inheritedFile, counts) {
   const file = suite.file || suite.title || inheritedFile || '';
@@ -119,6 +121,7 @@ function walkSuite(suite, inheritedFile, counts) {
           byTest.set(full, {
             passes: 0,
             fails: 0,
+            flakes: 0,
             durations: [],
             errors: [],
           });
@@ -134,6 +137,13 @@ function walkSuite(suite, inheritedFile, counts) {
         ) {
           rec.fails += 1;
           counts.failed += 1;
+          const msg = r.error?.message || r.errors?.[0]?.message || r.status;
+          if (rec.errors.length < 3) rec.errors.push(String(msg).slice(0, 400));
+        } else if (r.status === 'flaky') {
+          // Playwright JSONReportTest.status includes 'flaky'; synthetic /
+          // outcome-shaped result rows use the same token (q-mp-1183).
+          rec.flakes += 1;
+          counts.flaky += 1;
           const msg = r.error?.message || r.errors?.[0]?.message || r.status;
           if (rec.errors.length < 3) rec.errors.push(String(msg).slice(0, 400));
         }
@@ -152,19 +162,25 @@ function ingest(jsonPath, runId) {
     return;
   }
   const data = loaded.data;
-  const counts = { passed: 0, failed: 0 };
+  const counts = { passed: 0, failed: 0, flaky: 0 };
   for (const suite of data.suites || []) {
     walkSuite(suite, '', counts);
   }
-  const { passed, failed } = counts;
-  // Playwright JSON has stats
-  const ok = (data.stats?.unexpected ?? failed) === 0 && failed === 0;
+  const { passed, failed, flaky } = counts;
+  const unexpected = data.stats?.unexpected ?? failed;
+  // Prefer the larger of root stats.flaky and walked per-result flaky counts so
+  // an explicit stats.flaky:0 cannot mask result rows with status "flaky".
+  const statsFlaky =
+    typeof data.stats?.flaky === 'number' ? data.stats.flaky : 0;
+  const flakyTotal = Math.max(statsFlaky, flaky);
+  // Flakes undercount when walkSuite ignores status "flaky"; ok must fail closed.
+  const ok = unexpected === 0 && failed === 0 && flakyTotal === 0;
   runSummaries.push({
     runId,
     ok,
     passed: data.stats?.expected ?? passed,
-    failed: data.stats?.unexpected ?? failed,
-    flaky: data.stats?.flaky ?? 0,
+    failed: unexpected,
+    flaky: flakyTotal,
     durationMs: data.stats?.duration ?? null,
   });
 }
@@ -223,17 +239,18 @@ for (let i = 1; i <= runs; i++) {
 }
 
 const failures = [...byTest.entries()]
-  .filter(([, v]) => v.fails > 0)
+  .filter(([, v]) => v.fails > 0 || v.flakes > 0)
   .map(([k, v]) => ({
     test: k,
-    runs: v.passes + v.fails,
+    runs: v.passes + v.fails + v.flakes,
     failures: v.fails,
+    flakes: v.flakes,
     avgMs: Math.round(
       v.durations.reduce((a, b) => a + b, 0) / Math.max(1, v.durations.length)
     ),
     errors: v.errors,
   }))
-  .sort((a, b) => b.failures - a.failures);
+  .sort((a, b) => b.failures + b.flakes - (a.failures + a.flakes));
 
 const summary = {
   totalRuns: runs,
@@ -259,21 +276,21 @@ const lines = [
       `| ${r.runId} | ${r.ok} | ${r.passed ?? '?'} | ${r.failed ?? '?'} | ${r.flaky ?? 0} |`
   ),
   '',
-  '## Tests with ≥1 failure',
+  '## Tests with ≥1 failure or flake',
   '',
 ];
 if (failures.length === 0) {
   lines.push('_None_');
 } else {
-  lines.push('| Test | Runs | Failures | Avg ms | Sample error |');
-  lines.push('| --- | --- | --- | --- | --- |');
+  lines.push('| Test | Runs | Failures | Flakes | Avg ms | Sample error |');
+  lines.push('| --- | --- | --- | --- | --- | --- |');
   for (const f of failures) {
     const err = (f.errors[0] || '')
       .replace(/\|/g, '\\|')
       .replace(/\n/g, ' ')
       .slice(0, 120);
     lines.push(
-      `| \`${f.test}\` | ${f.runs} | ${f.failures} | ${f.avgMs} | ${err} |`
+      `| \`${f.test}\` | ${f.runs} | ${f.failures} | ${f.flakes} | ${f.avgMs} | ${err} |`
     );
   }
 }
