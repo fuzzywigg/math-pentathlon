@@ -108,7 +108,7 @@ Contributor checklist: [CONTRIBUTING.md](./CONTRIBUTING.md). Full scripts (cover
 ## Status (2026-10-08)
 
 - 20 registered games in `src/core/game-registry.ts` (all `available: true`)
-- Tests: **3464** Vitest files under `tests/unit` (excl. `_tokenmaxx_archive`; **11361** passed / 19 skipped on tip CI) + **31** Playwright specs under `tests/e2e` excl. `fullgame/` (visual baselines in `tests/e2e/visual-baselines/`; required Chromium e2e **249** passed on tip CI). Plus 20 report-only `@fullgame` specs under `tests/e2e/fullgame/`.
+- Tests: **3465** Vitest files under `tests/unit` (excl. `_tokenmaxx_archive`; **15240** passed / 54 skipped on tip after round-55 fold) + **31** Playwright specs under `tests/e2e` excl. `fullgame/` (visual baselines in `tests/e2e/visual-baselines/`; required Chromium e2e **249** listed via `test:e2e:chromium --list`). Plus 20 report-only `@fullgame` specs under `tests/e2e/fullgame/`.
 - CI (`ci.yml`): lint (`npm run verify` = lint → `lint:ratchet` → `format:check` → `typecheck` → `typecheck:ratchet` → `check:boundaries`; then soft `check:copy-pins -- --fail`), `npm audit --audit-level=high`, build (hard 250 kB JS chunk budget; soft `size:check -- --fail-on-new-over` + soft `check:pwa-manifest`), unit (required), Chromium e2e (required); report-only `knip`, `mobile-touch`, `zoom-reflow`, `forced-colors`, `e2e-cross-browser`, `e2e-fullgame`, and `visual-baseline` (see `docs/wiki/development.md`)
 - `origin/alpha` is the trunk tip; the integration tip may be ahead of alpha.
 
