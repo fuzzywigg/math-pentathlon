@@ -1,7 +1,7 @@
 /**
  * burn-1008 registry module contract — games shard b (q-mp-1188).
- * Registry ids[5:10]: dynamic-import + destroyGame asserts (coverage-identical).
- * Sibling shards: games-a, games-c, base catalog file. Catalog/menu/assets stay in
+ * Registry ids.slice(4, 8): dynamic-import + destroyGame asserts
+ * (coverage-identical). Siblings: games-a/games-c/games-d/games-e. Catalog/menu/assets stay in
  * burn-1008-registry-module-contract.test.ts.
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -15,9 +15,9 @@ import {
   importTutorial,
   isTutorialConfig,
   registryIds,
-} from './helpers/burn-1008-registry-module-contract';
+} from './burn-1008-registry-module-contract.shared';
 
-const GAME_IDS = registryIds().slice(5, 10);
+const GAME_IDS = registryIds().slice(4, 8);
 
 describe('burn-1008 registry module contract — dynamic import + required exports', () => {
   it.each(GAME_IDS)(

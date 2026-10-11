@@ -6,9 +6,9 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect } from 'vitest';
 
-import { GAMES } from '../../../src/core/game-registry';
-import type { TutorialConfig } from '../../../src/core/tutorial';
-import { mountPair } from '../../helpers/mount-pair';
+import { GAMES } from '../../src/core/game-registry';
+import type { TutorialConfig } from '../../src/core/tutorial';
+import { mountPair } from '../helpers/mount-pair';
 
 export const ROOT = process.cwd();
 export const GAMES_ROOT = join(ROOT, 'src', 'games');
@@ -138,31 +138,29 @@ export const controllerLoaders: Record<
   () => Promise<Record<string, unknown>>
 > = {
   'kings-quadraphages': () =>
-    import('../../../src/games/kings-quadraphages/game-controller'),
-  hex: () => import('../../../src/games/hex/game-controller'),
-  'star-track': () => import('../../../src/games/star-track/game-controller'),
-  'hex-a-gone': () => import('../../../src/games/hex-a-gone/game-controller'),
-  calla: () => import('../../../src/games/calla/game-controller'),
-  fiar: () => import('../../../src/games/fiar/game-controller'),
+    import('../../src/games/kings-quadraphages/game-controller'),
+  hex: () => import('../../src/games/hex/game-controller'),
+  'star-track': () => import('../../src/games/star-track/game-controller'),
+  'hex-a-gone': () => import('../../src/games/hex-a-gone/game-controller'),
+  calla: () => import('../../src/games/calla/game-controller'),
+  fiar: () => import('../../src/games/fiar/game-controller'),
   'queens-guards': () =>
-    import('../../../src/games/queens-guards/game-controller'),
-  'contig-60': () => import('../../../src/games/contig-60/game-controller'),
-  juggle: () => import('../../../src/games/juggle/game-controller'),
-  'fab-a-diffy': () => import('../../../src/games/fab-a-diffy/game-controller'),
-  'sum-dominoes': () =>
-    import('../../../src/games/sum-dominoes/game-controller'),
-  'par-55': () => import('../../../src/games/par-55/game-controller'),
-  ramrod: () => import('../../../src/games/ramrod/game-controller'),
-  'kwatro-sinko': () =>
-    import('../../../src/games/kwatro-sinko/game-controller'),
-  'stars-bars': () => import('../../../src/games/stars-bars/game-controller'),
-  'prime-gold': () => import('../../../src/games/prime-gold/game-controller'),
-  'pent-em-in': () => import('../../../src/games/pent-em-in/game-controller'),
-  'frac-fact': () => import('../../../src/games/frac-fact/game-controller'),
+    import('../../src/games/queens-guards/game-controller'),
+  'contig-60': () => import('../../src/games/contig-60/game-controller'),
+  juggle: () => import('../../src/games/juggle/game-controller'),
+  'fab-a-diffy': () => import('../../src/games/fab-a-diffy/game-controller'),
+  'sum-dominoes': () => import('../../src/games/sum-dominoes/game-controller'),
+  'par-55': () => import('../../src/games/par-55/game-controller'),
+  ramrod: () => import('../../src/games/ramrod/game-controller'),
+  'kwatro-sinko': () => import('../../src/games/kwatro-sinko/game-controller'),
+  'stars-bars': () => import('../../src/games/stars-bars/game-controller'),
+  'prime-gold': () => import('../../src/games/prime-gold/game-controller'),
+  'pent-em-in': () => import('../../src/games/pent-em-in/game-controller'),
+  'frac-fact': () => import('../../src/games/frac-fact/game-controller'),
   'remainder-islands': () =>
-    import('../../../src/games/remainder-islands/game-controller'),
+    import('../../src/games/remainder-islands/game-controller'),
   'fraction-pinball': () =>
-    import('../../../src/games/fraction-pinball/game-controller'),
+    import('../../src/games/fraction-pinball/game-controller'),
 };
 
 export const boardUiLoaders: Record<
@@ -170,28 +168,27 @@ export const boardUiLoaders: Record<
   () => Promise<Record<string, unknown>>
 > = {
   'kings-quadraphages': () =>
-    import('../../../src/games/kings-quadraphages/board-ui'),
-  hex: () => import('../../../src/games/hex/board-ui'),
-  'star-track': () => import('../../../src/games/star-track/board-ui'),
-  'hex-a-gone': () => import('../../../src/games/hex-a-gone/board-ui'),
-  calla: () => import('../../../src/games/calla/board-ui'),
-  fiar: () => import('../../../src/games/fiar/board-ui'),
-  'queens-guards': () => import('../../../src/games/queens-guards/board-ui'),
-  'contig-60': () => import('../../../src/games/contig-60/board-ui'),
-  juggle: () => import('../../../src/games/juggle/board-ui'),
-  'fab-a-diffy': () => import('../../../src/games/fab-a-diffy/board-ui'),
-  'sum-dominoes': () => import('../../../src/games/sum-dominoes/board-ui'),
-  'par-55': () => import('../../../src/games/par-55/board-ui'),
-  ramrod: () => import('../../../src/games/ramrod/board-ui'),
-  'kwatro-sinko': () => import('../../../src/games/kwatro-sinko/board-ui'),
-  'stars-bars': () => import('../../../src/games/stars-bars/board-ui'),
-  'prime-gold': () => import('../../../src/games/prime-gold/board-ui'),
-  'pent-em-in': () => import('../../../src/games/pent-em-in/board-ui'),
-  'frac-fact': () => import('../../../src/games/frac-fact/board-ui'),
+    import('../../src/games/kings-quadraphages/board-ui'),
+  hex: () => import('../../src/games/hex/board-ui'),
+  'star-track': () => import('../../src/games/star-track/board-ui'),
+  'hex-a-gone': () => import('../../src/games/hex-a-gone/board-ui'),
+  calla: () => import('../../src/games/calla/board-ui'),
+  fiar: () => import('../../src/games/fiar/board-ui'),
+  'queens-guards': () => import('../../src/games/queens-guards/board-ui'),
+  'contig-60': () => import('../../src/games/contig-60/board-ui'),
+  juggle: () => import('../../src/games/juggle/board-ui'),
+  'fab-a-diffy': () => import('../../src/games/fab-a-diffy/board-ui'),
+  'sum-dominoes': () => import('../../src/games/sum-dominoes/board-ui'),
+  'par-55': () => import('../../src/games/par-55/board-ui'),
+  ramrod: () => import('../../src/games/ramrod/board-ui'),
+  'kwatro-sinko': () => import('../../src/games/kwatro-sinko/board-ui'),
+  'stars-bars': () => import('../../src/games/stars-bars/board-ui'),
+  'prime-gold': () => import('../../src/games/prime-gold/board-ui'),
+  'pent-em-in': () => import('../../src/games/pent-em-in/board-ui'),
+  'frac-fact': () => import('../../src/games/frac-fact/board-ui'),
   'remainder-islands': () =>
-    import('../../../src/games/remainder-islands/board-ui'),
-  'fraction-pinball': () =>
-    import('../../../src/games/fraction-pinball/board-ui'),
+    import('../../src/games/remainder-islands/board-ui'),
+  'fraction-pinball': () => import('../../src/games/fraction-pinball/board-ui'),
 };
 
 export const rulesLoaders: Record<
@@ -199,27 +196,26 @@ export const rulesLoaders: Record<
   () => Promise<Record<string, unknown>>
 > = {
   'kings-quadraphages': () =>
-    import('../../../src/games/kings-quadraphages/rules'),
-  hex: () => import('../../../src/games/hex/rules'),
-  'star-track': () => import('../../../src/games/star-track/rules'),
-  'hex-a-gone': () => import('../../../src/games/hex-a-gone/rules'),
-  calla: () => import('../../../src/games/calla/rules'),
-  fiar: () => import('../../../src/games/fiar/rules'),
-  'queens-guards': () => import('../../../src/games/queens-guards/rules'),
-  'contig-60': () => import('../../../src/games/contig-60/rules'),
-  juggle: () => import('../../../src/games/juggle/rules'),
-  'fab-a-diffy': () => import('../../../src/games/fab-a-diffy/rules'),
-  'sum-dominoes': () => import('../../../src/games/sum-dominoes/rules'),
-  'par-55': () => import('../../../src/games/par-55/rules'),
-  ramrod: () => import('../../../src/games/ramrod/rules'),
-  'kwatro-sinko': () => import('../../../src/games/kwatro-sinko/rules'),
-  'stars-bars': () => import('../../../src/games/stars-bars/rules'),
-  'prime-gold': () => import('../../../src/games/prime-gold/rules'),
-  'pent-em-in': () => import('../../../src/games/pent-em-in/rules'),
-  'frac-fact': () => import('../../../src/games/frac-fact/rules'),
-  'remainder-islands': () =>
-    import('../../../src/games/remainder-islands/rules'),
-  'fraction-pinball': () => import('../../../src/games/fraction-pinball/rules'),
+    import('../../src/games/kings-quadraphages/rules'),
+  hex: () => import('../../src/games/hex/rules'),
+  'star-track': () => import('../../src/games/star-track/rules'),
+  'hex-a-gone': () => import('../../src/games/hex-a-gone/rules'),
+  calla: () => import('../../src/games/calla/rules'),
+  fiar: () => import('../../src/games/fiar/rules'),
+  'queens-guards': () => import('../../src/games/queens-guards/rules'),
+  'contig-60': () => import('../../src/games/contig-60/rules'),
+  juggle: () => import('../../src/games/juggle/rules'),
+  'fab-a-diffy': () => import('../../src/games/fab-a-diffy/rules'),
+  'sum-dominoes': () => import('../../src/games/sum-dominoes/rules'),
+  'par-55': () => import('../../src/games/par-55/rules'),
+  ramrod: () => import('../../src/games/ramrod/rules'),
+  'kwatro-sinko': () => import('../../src/games/kwatro-sinko/rules'),
+  'stars-bars': () => import('../../src/games/stars-bars/rules'),
+  'prime-gold': () => import('../../src/games/prime-gold/rules'),
+  'pent-em-in': () => import('../../src/games/pent-em-in/rules'),
+  'frac-fact': () => import('../../src/games/frac-fact/rules'),
+  'remainder-islands': () => import('../../src/games/remainder-islands/rules'),
+  'fraction-pinball': () => import('../../src/games/fraction-pinball/rules'),
 };
 
 export const tutorialLoaders: Record<
@@ -227,28 +223,27 @@ export const tutorialLoaders: Record<
   () => Promise<Record<string, unknown>>
 > = {
   'kings-quadraphages': () =>
-    import('../../../src/games/kings-quadraphages/tutorial'),
-  hex: () => import('../../../src/games/hex/tutorial'),
-  'star-track': () => import('../../../src/games/star-track/tutorial'),
-  'hex-a-gone': () => import('../../../src/games/hex-a-gone/tutorial'),
-  calla: () => import('../../../src/games/calla/tutorial'),
-  fiar: () => import('../../../src/games/fiar/tutorial'),
-  'queens-guards': () => import('../../../src/games/queens-guards/tutorial'),
-  'contig-60': () => import('../../../src/games/contig-60/tutorial'),
-  juggle: () => import('../../../src/games/juggle/tutorial'),
-  'fab-a-diffy': () => import('../../../src/games/fab-a-diffy/tutorial'),
-  'sum-dominoes': () => import('../../../src/games/sum-dominoes/tutorial'),
-  'par-55': () => import('../../../src/games/par-55/tutorial'),
-  ramrod: () => import('../../../src/games/ramrod/tutorial'),
-  'kwatro-sinko': () => import('../../../src/games/kwatro-sinko/tutorial'),
-  'stars-bars': () => import('../../../src/games/stars-bars/tutorial'),
-  'prime-gold': () => import('../../../src/games/prime-gold/tutorial'),
-  'pent-em-in': () => import('../../../src/games/pent-em-in/tutorial'),
-  'frac-fact': () => import('../../../src/games/frac-fact/tutorial'),
+    import('../../src/games/kings-quadraphages/tutorial'),
+  hex: () => import('../../src/games/hex/tutorial'),
+  'star-track': () => import('../../src/games/star-track/tutorial'),
+  'hex-a-gone': () => import('../../src/games/hex-a-gone/tutorial'),
+  calla: () => import('../../src/games/calla/tutorial'),
+  fiar: () => import('../../src/games/fiar/tutorial'),
+  'queens-guards': () => import('../../src/games/queens-guards/tutorial'),
+  'contig-60': () => import('../../src/games/contig-60/tutorial'),
+  juggle: () => import('../../src/games/juggle/tutorial'),
+  'fab-a-diffy': () => import('../../src/games/fab-a-diffy/tutorial'),
+  'sum-dominoes': () => import('../../src/games/sum-dominoes/tutorial'),
+  'par-55': () => import('../../src/games/par-55/tutorial'),
+  ramrod: () => import('../../src/games/ramrod/tutorial'),
+  'kwatro-sinko': () => import('../../src/games/kwatro-sinko/tutorial'),
+  'stars-bars': () => import('../../src/games/stars-bars/tutorial'),
+  'prime-gold': () => import('../../src/games/prime-gold/tutorial'),
+  'pent-em-in': () => import('../../src/games/pent-em-in/tutorial'),
+  'frac-fact': () => import('../../src/games/frac-fact/tutorial'),
   'remainder-islands': () =>
-    import('../../../src/games/remainder-islands/tutorial'),
-  'fraction-pinball': () =>
-    import('../../../src/games/fraction-pinball/tutorial'),
+    import('../../src/games/remainder-islands/tutorial'),
+  'fraction-pinball': () => import('../../src/games/fraction-pinball/tutorial'),
 };
 
 export async function importController(
