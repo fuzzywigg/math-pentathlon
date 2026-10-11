@@ -45,7 +45,7 @@ Base tip: `cursor/integration-fold-wave5-tip-4af0` (#477)
 ```bash
 npm run build
 npm run check:build          # two clean builds + diffs + precache; always exit 0
-npx tsc --noEmit
+npm run typecheck
 npm run test:unit
 ```
 
