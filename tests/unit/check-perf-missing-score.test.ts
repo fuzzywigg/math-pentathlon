@@ -45,21 +45,15 @@ const AUDITS = {
  */
 async function runWithFixture(report: unknown) {
   const reportPath = 'virtual-lh-missing-score.json';
-  return runLighthouse(
-    'http://127.0.0.1:9',
-    'mobile',
-    TARGET,
-    reportPath,
-    {
-      timeoutMs: 60_000,
-      runCmd: () => ({
-        promise: Promise.resolve({ code: 0, stdout: '', stderr: '' }),
-        child: makeMockChild(),
-      }),
-      existsSync: (p) => p === reportPath,
-      readFileSync: () => JSON.stringify(report),
-    }
-  );
+  return runLighthouse('http://127.0.0.1:9', 'mobile', TARGET, reportPath, {
+    timeoutMs: 60_000,
+    runCmd: () => ({
+      promise: Promise.resolve({ code: 0, stdout: '', stderr: '' }),
+      child: makeMockChild(),
+    }),
+    existsSync: (p) => p === reportPath,
+    readFileSync: () => JSON.stringify(report),
+  });
 }
 
 describe('shapeLhPerformanceScore (q-mp-1208)', () => {
