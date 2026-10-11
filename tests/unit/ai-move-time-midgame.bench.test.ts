@@ -1,6 +1,8 @@
 /**
  * Unit-level AI think-time bench: every game × easy/medium/hard on hand-built
- * mid-game states. Writes docs/ai-move-time-2026-10-07.md (p50/p95).
+ * mid-game states. Writes docs/ai-move-time-<UTC-YYYY-MM-DD>.md (p50/p95).
+ * Historical docs/ai-move-time-2026-10-07.md may remain; local (non-CI) runs
+ * stamp today's UTC date so re-runs do not clobber that Oct 7 artifact.
  *
  * Run: npx vitest run tests/unit/ai-move-time-midgame.bench.test.ts
  *
@@ -8,9 +10,10 @@
  * runners, and the unit step cannot absorb both this bench and the tip suite.
  */
 import { describe, it, expect, afterEach } from 'vitest';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createSeededRng } from '../../src/core/ai-worker/seeded-rng';
+import { utcPlaytestDateStamp } from '../../scripts/lib/playtest-date.mjs';
 
 import { createInitialState as createCalla } from '../../src/games/calla/types';
 import {
@@ -496,8 +499,9 @@ function buildCases(): BenchCase[] {
 
 function writeReport(rows: StatRow[]): void {
   const flagged = rows.filter((r) => r.flagged);
+  const dateStamp = utcPlaytestDateStamp();
   const lines: string[] = [];
-  lines.push('# AI move think-time — 2026-10-07');
+  lines.push(`# AI move think-time — ${dateStamp}`);
   lines.push('');
   lines.push('Unit-level bench (no browser) over hand-built mid-game states.');
   lines.push('');
@@ -566,7 +570,7 @@ function writeReport(rows: StatRow[]): void {
   lines.push('');
 
   writeFileSync(
-    resolve(process.cwd(), 'docs/ai-move-time-2026-10-07.md'),
+    resolve(process.cwd(), `docs/ai-move-time-${dateStamp}.md`),
     lines.join('\n')
   );
 }
@@ -575,10 +579,41 @@ afterEach(() => {
   document.body.innerHTML = '';
 });
 
+describe('ai-move-time bench OUT date stamp (q-mp-1408)', () => {
+  it('wires utcPlaytestDateStamp for OUT path + H1 (keeps historical Oct 7 doc)', () => {
+    const src = readFileSync(
+      resolve(process.cwd(), 'tests/unit/ai-move-time-midgame.bench.test.ts'),
+      'utf8'
+    );
+    // Scope to writeReport so this describe's own path literals cannot false-fail.
+    const writeReportSrc = src.slice(
+      src.indexOf('function writeReport'),
+      src.indexOf('\nafterEach')
+    );
+    expect(writeReportSrc).toMatch(/utcPlaytestDateStamp/);
+    expect(writeReportSrc).toMatch(/`docs\/ai-move-time-\$\{dateStamp\}\.md`/);
+    expect(writeReportSrc).toMatch(
+      /`# AI move think-time — \$\{dateStamp\}`/
+    );
+    expect(writeReportSrc).not.toContain('2026-10-07');
+    expect(utcPlaytestDateStamp()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(utcPlaytestDateStamp()).toBe(new Date().toISOString().slice(0, 10));
+    // Historical artifact remains on disk for the Oct 7 record.
+    const historical = resolve(
+      process.cwd(),
+      'docs',
+      'ai-move-time-2026-10-07.md'
+    );
+    expect(readFileSync(historical, 'utf8')).toMatch(
+      /^# AI move think-time — 2026-10-07\b/m
+    );
+  });
+});
+
 describe.skipIf(!!process.env.CI)(
   'AI move-time mid-game bench (all games × difficulties)',
   () => {
-    it('measures p50/p95 and writes docs/ai-move-time-2026-10-07.md', () => {
+    it('measures p50/p95 and writes docs/ai-move-time-<UTC-date>.md', () => {
       const cases = buildCases();
       for (const c of cases) {
         for (const difficulty of DIFFICULTIES) {

@@ -12,7 +12,10 @@ import { chromium, devices } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import { artifactPath } from './lib/artifact-dir.mjs';
-import { isCallaEndStatus } from './lib/calla-end-status.mjs';
+import {
+  CALLA_END_STATUS_RE_SOURCE,
+  isCallaEndStatus,
+} from './lib/calla-end-status.mjs';
 import { applyDeepPlaytestCli } from './lib/deep-playtest-cli.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { utcPlaytestDateStamp } from './lib/playtest-date.mjs';
@@ -236,20 +239,19 @@ async function playOneGame(page, { viewport, difficulty, gameIndex }) {
       await valid.nth(idx).click({ force: true });
       humanMoves++;
 
-      // Wait for status change or thinking / end (word-boundary; browser isolate)
+      // Wait for status change or thinking / end (banner matcher; browser isolate)
       await page
         .waitForFunction(
-          (prev) => {
+          ({ prev, endReSource }) => {
+            const endRe = new RegExp(endReSource, 'i');
             const t = (
               document.querySelector('.status-turn')?.textContent || ''
             )
               .replace(/\s+/g, ' ')
               .trim();
-            return (
-              t !== prev || /thinking/i.test(t) || /\b(?:wins?|tie)\b/i.test(t)
-            );
+            return t !== prev || /thinking/i.test(t) || endRe.test(t);
           },
-          before,
+          { prev: before, endReSource: CALLA_END_STATUS_RE_SOURCE },
           { timeout: 5_000 }
         )
         .catch(() => {});

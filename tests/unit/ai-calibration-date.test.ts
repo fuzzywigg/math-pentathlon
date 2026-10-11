@@ -1,5 +1,6 @@
 /**
  * Hermetic coverage for ai-calibration OUT/title date stamp (q-mp-1352).
+ * Whitespace-only treated as unset (q-mp-1409).
  * Date metadata only — no AI search/scoring/difficulty/timing.
  */
 import { readFileSync } from 'node:fs';
@@ -15,11 +16,21 @@ describe('resolveCalibrationDate (q-mp-1352)', () => {
     expect(resolveCalibrationDate('2099-01-02')).toBe('2099-01-02');
   });
 
+  it('returns trimmed non-empty override (q-mp-1409)', () => {
+    expect(resolveCalibrationDate('  2026-10-11  ')).toBe('2026-10-11');
+  });
+
   it('defaults to UTC YYYY-MM-DD via toISOString when unset/empty', () => {
     const fixed = new Date('2026-11-02T15:04:05.000Z');
     expect(resolveCalibrationDate(undefined, fixed)).toBe('2026-11-02');
     expect(resolveCalibrationDate('', fixed)).toBe('2026-11-02');
     expect(resolveCalibrationDate(null, fixed)).toBe('2026-11-02');
+  });
+
+  it('treats whitespace-only as unset (q-mp-1409)', () => {
+    const fixed = new Date('2026-11-02T15:04:05.000Z');
+    expect(resolveCalibrationDate('   ', fixed)).toBe('2026-11-02');
+    expect(resolveCalibrationDate('\t\n', fixed)).toBe('2026-11-02');
   });
 
   it('matches live UTC today when now is omitted', () => {

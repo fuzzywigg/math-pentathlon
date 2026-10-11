@@ -3,6 +3,9 @@
  * and PAR55_QUICK enable parsing (q-mp-1260).
  *
  * Substring matchers like /tie|draw/i false-end on "patience" / "Drawing card".
+ * q-mp-1403: reject star-track mid-game "Draw chains …" (title-case verb).
+ * q-mp-1404: reject hyphenated forms (pre-tie / re-draw / pre-wins / tie-breaker)
+ * via lookaround that treats `-` like a word char (plain `\b` does not).
  * Keep browser waitForFunction bodies in sync with END_RE_SOURCE (page callbacks
  * cannot import this module).
  *
@@ -22,10 +25,16 @@ Not a standalone CLI.
 Options:
   -h, --help    Show this help and exit`;
 
+/**
+ * Token edges treat ASCII letters/digits/`_`/`-` as interior (q-mp-1404
+ * lookaround; plain `\b` still matches after `-`). Draw arm rejects
+ * star-track "Draw chains" (q-mp-1403). Chromium waitForFunction supports
+ * these lookarounds.
+ */
 /** Source body for page.waitForFunction (no flags; callers add `i`). */
-export const END_RE_SOURCE = String.raw`\bwins\b|\btie\b|\bdraw\b`;
-const DRAW_RE_SOURCE = String.raw`\btie\b|\bdraw\b`;
-const TIE_RE_SOURCE = String.raw`\btie\b`;
+export const END_RE_SOURCE = String.raw`(?<![A-Za-z0-9_-])wins(?![A-Za-z0-9_-])|(?<![A-Za-z0-9_-])tie(?![A-Za-z0-9_-])|(?<![A-Za-z0-9_-])draw(?![A-Za-z0-9_-])(?!\s+chains\b)`;
+const DRAW_RE_SOURCE = String.raw`(?<![A-Za-z0-9_-])tie(?![A-Za-z0-9_-])|(?<![A-Za-z0-9_-])draw(?![A-Za-z0-9_-])(?!\s+chains\b)`;
+const TIE_RE_SOURCE = String.raw`(?<![A-Za-z0-9_-])tie(?![A-Za-z0-9_-])`;
 
 const END_RE = new RegExp(END_RE_SOURCE, 'i');
 const DRAW_RE = new RegExp(DRAW_RE_SOURCE, 'i');

@@ -13,7 +13,7 @@ Options:
   -h, --help       Show this help and exit (no browser launch)
 
 Env:
-  BASE_URL         Dev server URL (default http://localhost:5173)
+  BASE_URL         Dev server URL (default http://127.0.0.1:5173)
   SWEEP_OUT        Output JSON path (overrides artifact-dir default)
   MP_ARTIFACT_DIR  Artifact root override when SWEEP_OUT is unset`;
 

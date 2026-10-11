@@ -18,9 +18,12 @@ npm test                         # unit then Chromium e2e (CI required pair)
 npm run test:unit
 npm run test:unit:watch
 npm run test:unit:coverage
+npm run bench:engines            # Vitest engines-rules bench (local; not CI)
 npm run report:coverage-map      # rewrite docs/dev/coverage-map.{md,svg}; wiki: [heat map](./coverage-map.md)
 npm run report:engine-coverage-rank -- <summary.json>  # rank engine modules from a local coverage-summary.json (not CI)
+npm run test:e2e                 # every Playwright project — prefer an explicit script
 npm run test:e2e:chromium        # required CI e2e path
+npm run test:e2e:fullgame        # report-only @fullgame Chromium suite
 npm run test:e2e:firefox-webkit  # full Firefox + WebKit suite (CI report-only)
 npm run test:e2e:cross           # Firefox + WebKit + iPad WebKit
 npm run test:e2e:mobile          # phone + tablet touch smoke (report-only)
@@ -140,7 +143,7 @@ Workflows under `.github/workflows/`:
 
 ### Unit job runtime
 
-Live tip `cursor/mp-tip-post8f8a` (cut from `alpha` @ `8f8a2122` after #1450 squash-merge, 2026-10-11): tip-owner fold on draft tip PR (q-mp-026ah); live unit suite **3458** files @ tip open (remasure). Counts move every fold — tip owner remasures; do not treat these numbers as tip-head truth between folds. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
+Live tip `cursor/mp-tip-postf759` (cut from `alpha` @ `f759dc12` after #1489 squash-merge, 2026-10-11): tip-owner fold on draft tip PR (q-mp-026ai); live unit suite **3464** files @ tip open (remasure). Counts move every fold — tip owner remasures; do not treat these numbers as tip-head truth between folds. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
 
 - Job `timeout-minutes: 14` and step `timeout-minutes: 12` so overrun fails loudly
 - CI prints the unit file count up front

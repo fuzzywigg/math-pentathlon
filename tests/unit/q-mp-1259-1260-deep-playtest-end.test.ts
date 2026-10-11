@@ -46,8 +46,14 @@ describe('q-mp-1259 deep-playtest end status word boundaries', () => {
     expect(isDeepPlaytestTieStatus("It's a tie!")).toBe(true);
   });
 
-  it('END_RE_SOURCE is the word-boundary body used in page callbacks', () => {
-    expect(END_RE_SOURCE).toBe(String.raw`\bwins\b|\btie\b|\bdraw\b`);
+  it('END_RE_SOURCE is the token-boundary body used in page callbacks', () => {
+    // q-mp-1403/1404: hyphen-aware lookaround + Draw-chains reject (not bare \b).
+    expect(END_RE_SOURCE).toContain(String.raw`(?<![A-Za-z0-9_-])`);
+    expect(END_RE_SOURCE).toContain(String.raw`(?![A-Za-z0-9_-])`);
+    expect(END_RE_SOURCE).toContain(String.raw`(?!\s+chains\b)`);
+    expect(END_RE_SOURCE).toMatch(/wins/);
+    expect(END_RE_SOURCE).toMatch(/tie/);
+    expect(END_RE_SOURCE).toMatch(/draw/);
     const endRe = new RegExp(END_RE_SOURCE, 'i');
     expect(endRe.test('Drawing card')).toBe(false);
     expect(endRe.test('patience')).toBe(false);
@@ -90,7 +96,9 @@ describe('q-mp-1260 PAR55_QUICK enable tokens', () => {
 
   it('par-55-deep-playtest wires isPar55QuickEnabled before PAR55_GAMES', () => {
     const src = readScript('scripts/par-55-deep-playtest.mjs');
-    expect(src).toMatch(/isPar55QuickEnabled\(\s*process\.env\.PAR55_QUICK\s*\)/);
+    expect(src).toMatch(
+      /isPar55QuickEnabled\(\s*process\.env\.PAR55_QUICK\s*\)/
+    );
     expect(src).toMatch(/requireEnvNumber\(\s*['"]PAR55_GAMES['"]/);
     // Old truthy short-circuit must be gone.
     expect(src).not.toMatch(/process\.env\.PAR55_QUICK\s*\?\s*1\s*:/);

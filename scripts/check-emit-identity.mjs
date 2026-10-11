@@ -77,12 +77,68 @@ export function duplicateFilesFromErrorMessage(flag = '--files-from') {
 }
 
 /**
+ * Usage text when a list/positional path escapes the repository root
+ * (q-mp-1429).
+ * @param {string} file
+ */
+export function pathNotInRepoErrorMessage(file) {
+  return `error: path escapes repository root: ${file}\n${USAGE}`;
+}
+
+/**
+ * Normalize a file path for emit compare: strip leading `./`, map absolute
+ * paths under the repo root to repo-relative, reject escapes (q-mp-1429 /
+ * q-mp-1430).
+ * @param {string} file
+ * @param {string} [root]
+ * @returns {{ ok: true, path: string } | { ok: false, message: string }}
+ */
+export function normalizeRepoRelativePath(file, root = ROOT) {
+  const raw = String(file ?? '').trim();
+  if (!raw) {
+    return { ok: false, message: pathNotInRepoErrorMessage(file) };
+  }
+  let candidate = raw;
+  while (candidate.startsWith('./')) {
+    candidate = candidate.slice(2);
+  }
+  const abs = path.isAbsolute(raw)
+    ? path.resolve(raw)
+    : path.resolve(root, candidate);
+  const rel = path.relative(root, abs);
+  if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) {
+    return { ok: false, message: pathNotInRepoErrorMessage(raw) };
+  }
+  return { ok: true, path: rel.split(path.sep).join('/') };
+}
+
+/**
+ * First-wins dedupe for normalized repo-relative paths (q-mp-1430).
+ * @param {string[]} files
+ * @returns {string[]}
+ */
+export function dedupePreserveOrder(files) {
+  const seen = new Set();
+  /** @type {string[]} */
+  const out = [];
+  for (const f of files) {
+    if (seen.has(f)) continue;
+    seen.add(f);
+    out.push(f);
+  }
+  return out;
+}
+
+/**
  * Read a `--files-from` list without throwing ENOENT/EISDIR stacks.
+ * Normalizes `./` and absolute-under-root paths; rejects escapes; first-wins
+ * dedupe within the list (q-mp-1429 / q-mp-1430).
  * @param {string} filesFrom
  * @param {{
  *   existsSync?: (p: string) => boolean,
  *   statSync?: (p: string) => { isFile: () => boolean },
  *   readFileSync?: (p: string, enc: string) => string,
+ *   root?: string,
  * }} [io]
  * @returns {{ ok: true, files: string[] } | { ok: false, message: string }}
  */
@@ -90,6 +146,7 @@ export function loadFilesFromList(filesFrom, io = {}) {
   const existsSync = io.existsSync ?? ((p) => fs.existsSync(p));
   const statSync = io.statSync ?? ((p) => fs.statSync(p));
   const readFileSync = io.readFileSync ?? ((p, enc) => fs.readFileSync(p, enc));
+  const root = io.root ?? ROOT;
 
   if (!filesFrom) {
     return { ok: false, message: filesFromErrorMessage('', 'missing') };
@@ -120,9 +177,12 @@ export function loadFilesFromList(filesFrom, io = {}) {
   const files = [];
   for (const line of text.split('\n')) {
     const t = line.trim();
-    if (t && !t.startsWith('#')) files.push(t);
+    if (!t || t.startsWith('#')) continue;
+    const normalized = normalizeRepoRelativePath(t, root);
+    if (!normalized.ok) return normalized;
+    files.push(normalized.path);
   }
-  return { ok: true, files };
+  return { ok: true, files: dedupePreserveOrder(files) };
 }
 
 /**
@@ -709,7 +769,15 @@ export function resolveDefaultMergeBase(deps = {}) {
 
 /**
  * @param {string[]} argv
- * @returns {{ base: string, head: string, files: string[], normalize: boolean, minify: boolean, json: boolean }}
+ * @returns {{
+ *   base: string,
+ *   head: string,
+ *   files: string[],
+ *   normalize: boolean,
+ *   minify: boolean,
+ *   json: boolean,
+ *   filesFrom: boolean,
+ * }}
  */
 export function parseArgs(argv) {
   let base = '';
@@ -818,7 +886,29 @@ export function parseArgs(argv) {
     }
     files.push(...loaded.files);
   }
-  return { base, head, files, normalize, minify, json };
+  // Positionals may still carry `./` or absolute-under-root forms; normalize
+  // + first-wins dedupe after merge with --files-from (q-mp-1429 / q-mp-1430).
+  /** @type {string[]} */
+  const normalized = [];
+  for (const f of files) {
+    const n = normalizeRepoRelativePath(f);
+    if (!n.ok) {
+      console.error(n.message);
+      process.exit(2);
+    }
+    normalized.push(n.path);
+  }
+  return {
+    base,
+    head,
+    files: dedupePreserveOrder(normalized),
+    normalize,
+    minify,
+    json,
+    // Explicit --files-from (even when the list is empty/comment-only) must
+    // not fall through to AI discovery (q-mp-1428).
+    filesFrom: sawFilesFrom,
+  };
 }
 
 function printHelp() {
@@ -838,7 +928,15 @@ under src/games/.`);
 }
 
 /**
- * @param {ReturnType<typeof parseArgs>} opts
+ * @param {ReturnType<typeof parseArgs> | {
+ *   base: string,
+ *   head: string,
+ *   files: string[],
+ *   normalize?: boolean,
+ *   minify?: boolean,
+ *   json?: boolean,
+ *   filesFrom?: boolean,
+ * }} opts
  * @param {{
  *   listAiTouchedFiles?: typeof listAiTouchedFiles,
  * }} [deps]
@@ -850,7 +948,9 @@ under src/games/.`);
  */
 export async function runEmitIdentityCheck(opts, deps = {}) {
   let files = opts.files;
-  if (files.length === 0) {
+  // Explicit --files-from with zero paths must stay empty (print “no files” /
+  // exit 0) — do not discover ai*.ts as if the flag were omitted (q-mp-1428).
+  if (files.length === 0 && !opts.filesFrom) {
     const listFn = deps.listAiTouchedFiles ?? listAiTouchedFiles;
     const listed = listFn(opts.base, opts.head);
     if (!listed.ok) {
@@ -860,7 +960,9 @@ export async function runEmitIdentityCheck(opts, deps = {}) {
   }
   if (files.length === 0) {
     console.log(
-      `check-emit-identity: no ai/ files to compare (base=${opts.base} head=${opts.head})`
+      opts.filesFrom
+        ? `check-emit-identity: no files to compare (base=${opts.base} head=${opts.head})`
+        : `check-emit-identity: no ai/ files to compare (base=${opts.base} head=${opts.head})`
     );
     return { ok: true, results: [] };
   }
