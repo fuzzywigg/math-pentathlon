@@ -32,7 +32,7 @@ npm run report:lint-buckets -- --json
 | `--json`        | Machine-readable summary (still exit **0** on success) |
 | `-h` / `--help` | Usage                                                  |
 
-Runs offline against the local tree (`eslint src` + a **unique** probe config under the repo root, `pid`+entropy — same pattern as `lint:ratchet` so concurrent runs cannot clobber each other; probe file is deleted in `finally` before `process.exit`). Exit **1** only on probe/parse failure or unknown `--rule`.
+Runs offline against the local tree (`eslint src` + a **unique** probe config under the repo root, `pid`+entropy — same pattern as `lint:ratchet` so concurrent runs cannot clobber each other; probe file is deleted in `finally` before `process.exit`). Exit **1** on probe/parse failure, empty eslint stdout (q-mp-1317: refuse all-zero totals), eslint fatal exit (≥2), or unknown `--rule`. ESLint exit **1** with a valid JSON array (rule hits) is still a successful report.
 
 ## Relationship to other lint docs
 
