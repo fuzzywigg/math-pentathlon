@@ -36,7 +36,10 @@ const DOCS_DIR = path.join(ROOT, 'docs');
 
 const PATH_RE =
   /`((?:src|tests|docs|scripts)\/[A-Za-z0-9_./@+-]+\.(?:ts|tsx|js|mjs|css|md|json))`/g;
-const MD_LINK_RE = /\]\(([^)]+)\)/g;
+// Destination + optional CommonMark title ("…" / '…' / (…)). Nested paren
+// titles must be matched here — a naive [^)]+ truncates at the title's ')'.
+const MD_LINK_RE =
+  /\]\(([^)\s]+(?:\s+(?:"[^"]*"|'[^']*'|\([^)]*\)))?)\)/g;
 const TABLE_ROW_RE =
   /^\|\s*`([^`]+)`\s*\|\s*`((?:src|tests|docs|scripts)\/[^`]+)`\s*\|/;
 const MODULE_ROW_RE =
@@ -67,13 +70,14 @@ function symbolInFile(fileRel, symbol) {
 }
 
 /**
- * Strip an optional CommonMark link title (`"title"` / `'title'`) after the
- * destination. Leaves the path (and any `#fragment` / `?query`) intact.
+ * Strip an optional CommonMark link title after the destination:
+ * `"title"` / `'title'` / `(title)`. Leaves the path (and any `#fragment` /
+ * `?query`) intact. Parenthetical titles are q-mp-1152 (quoted: q-mp-1095).
  * @param {string} href
  * @returns {string}
  */
 export function stripMdLinkTitle(href) {
-  const m = /^(.*?)\s+("[^"]*"|'[^']*')\s*$/.exec(href);
+  const m = /^(.*?)\s+("[^"]*"|'[^']*'|\([^)]*\))\s*$/.exec(href);
   return m ? m[1] : href;
 }
 
