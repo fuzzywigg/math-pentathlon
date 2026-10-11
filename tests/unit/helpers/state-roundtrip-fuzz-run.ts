@@ -1,6 +1,8 @@
 /**
- * Shared runner for state round-trip fuzz shards (q-mp-1108).
+ * Shared runner for state round-trip fuzz shards (q-mp-1108 / q-mp-1291).
  * Same seeds, move caps, and assertion schedule as the pre-shard suite.
+ * Optional assert-move windows let expensive seed-A queens work split across
+ * files without dropping serialize / AI checkpoints when both shards run.
  */
 import { expect } from 'vitest';
 
@@ -20,6 +22,13 @@ import {
 
 /** Second play seed (widens coverage without exploding runtime). */
 export const FUZZ_PLAY_SEED_B = FUZZ_PLAY_SEED ^ 0x9e3779b9;
+
+/**
+ * Split point for queens-guards seed-A early/late shards (q-mp-1291).
+ * Early asserts moves 1..SPLIT; late fast-forwards then asserts SPLIT+1..end.
+ * Together they keep the same seed, move cap, and every-5th AI schedule.
+ */
+export const QUEENS_SEED_A_SPLIT_MOVE = 14;
 
 const FUZZ_PLAY_SEEDS = [FUZZ_PLAY_SEED, FUZZ_PLAY_SEED_B] as const;
 
@@ -50,6 +59,18 @@ export const REGISTERED_GAME_IDS = [
   'sum-dominoes',
 ] as const;
 
+/** Optional move window for parallel shards (inclusive 1-based move numbers). */
+export type RoundTripFuzzOptions = {
+  /** First move to fully assert (serialize / legal / AI). Default 1. */
+  assertFromMove?: number;
+  /** Last move to fully assert. Default: no upper bound. */
+  assertToMove?: number;
+  /** Initial empty-board snapshot asserts. Default: true when asserting from ≤1. */
+  assertInitial?: boolean;
+  /** Final AI + structuredClone asserts. Default: true when no assertToMove. */
+  assertFinal?: boolean;
+};
+
 export function adapterById(id: string): GameFuzzAdapter {
   const adapter = ALL_GAME_ADAPTERS.find((a) => a.id === id);
   if (!adapter) {
@@ -60,15 +81,21 @@ export function adapterById(id: string): GameFuzzAdapter {
 
 export function runRoundTripFuzz(
   adapter: GameFuzzAdapter,
-  playSeed: number
+  playSeed: number,
+  options: RoundTripFuzzOptions = {}
 ): void {
+  const assertFromMove = options.assertFromMove ?? 1;
+  const assertToMove = options.assertToMove ?? Number.POSITIVE_INFINITY;
+  const assertInitial = options.assertInitial ?? assertFromMove <= 1;
+  const assertFinal = options.assertFinal ?? !Number.isFinite(assertToMove);
+
   const rng = createRng(playSeed);
 
   const state0 = withSeededRandom(playSeed, () => adapter.create());
   let state = state0;
 
   // Initial snapshot
-  {
+  if (assertInitial) {
     const restored = adapter.roundTrip(state);
     expect(adapter.normalize(restored)).toEqual(adapter.normalize(state));
     expect(canonMoves(adapter.legalMoves(restored))).toBe(
@@ -89,6 +116,14 @@ export function runRoundTripFuzz(
     );
     movesPlayed++;
 
+    const inAssertWindow =
+      movesPlayed >= assertFromMove && movesPlayed <= assertToMove;
+    if (!inAssertWindow) {
+      // Late shard: keep applying through the prefix; early shard never reaches here
+      // once it breaks at assertToMove (below).
+      continue;
+    }
+
     const restored = adapter.roundTrip(state);
     expect(
       adapter.normalize(restored),
@@ -108,22 +143,27 @@ export function runRoundTripFuzz(
         aiOriginal
       );
     }
+
+    // Early shard can stop once its assert window is done (same seed prefix).
+    if (movesPlayed >= assertToMove && Number.isFinite(assertToMove)) break;
   }
 
-  // Final AI parity checkpoint (covers short playouts that never hit % 5)
-  {
-    const restored = adapter.roundTrip(state);
-    const aiOriginal = adapter.aiChoice(state);
-    const aiRestored = adapter.aiChoice(restored);
-    expect(aiRestored, `${adapter.id}: AI at end`).toEqual(aiOriginal);
-  }
+  if (assertFinal) {
+    // Final AI parity checkpoint (covers short playouts that never hit % 5)
+    {
+      const restored = adapter.roundTrip(state);
+      const aiOriginal = adapter.aiChoice(state);
+      const aiRestored = adapter.aiChoice(restored);
+      expect(aiRestored, `${adapter.id}: AI at end`).toEqual(aiOriginal);
+    }
 
-  // structuredClone path must also preserve identity for Map/Set games
-  const viaClone = structuredRoundTrip(state);
-  expect(adapter.normalize(viaClone)).toEqual(adapter.normalize(state));
-  expect(canonMoves(adapter.legalMoves(viaClone))).toBe(
-    canonMoves(adapter.legalMoves(state))
-  );
+    // structuredClone path must also preserve identity for Map/Set games
+    const viaClone = structuredRoundTrip(state);
+    expect(adapter.normalize(viaClone)).toEqual(adapter.normalize(state));
+    expect(canonMoves(adapter.legalMoves(viaClone))).toBe(
+      canonMoves(adapter.legalMoves(state))
+    );
+  }
 
   expect(movesPlayed).toBeGreaterThanOrEqual(0);
 }
