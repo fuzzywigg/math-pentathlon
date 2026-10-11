@@ -84,3 +84,36 @@ describe('readReporterJson rejects null / non-object roots (q-mp-1153)', () => {
     });
   });
 });
+
+describe('readReporterJson accepts UTF-8 BOM JSON (q-mp-1321)', () => {
+  it('parses object roots prefixed with U+FEFF', () => {
+    const result = readReporterJson(writeJson('\uFEFF{"numFailedTests":0,"success":true}'));
+    expect(result).toEqual({
+      ok: true,
+      data: { numFailedTests: 0, success: true },
+    });
+  });
+
+  it('still rejects BOM-prefixed corrupt JSON and non-object roots', () => {
+    expect(readReporterJson(writeJson('\uFEFF{'))).toEqual({
+      ok: false,
+      error: 'corrupt json',
+    });
+    expect(readReporterJson(writeJson('\uFEFFnull'))).toEqual({
+      ok: false,
+      error: 'non-object json root',
+    });
+    expect(readReporterJson(writeJson('\uFEFF[]'))).toEqual({
+      ok: false,
+      error: 'non-object json root',
+    });
+  });
+
+  it('does not treat a mid-payload FEFF as a leading BOM strip that salvages corrupt JSON', () => {
+    // Leading char is '{', not BOM — FEFF inside remains and JSON.parse fails closed.
+    expect(readReporterJson(writeJson('{\uFEFF"numFailedTests":0}'))).toEqual({
+      ok: false,
+      error: 'corrupt json',
+    });
+  });
+});
