@@ -9,6 +9,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { artifactPath } from './lib/artifact-dir.mjs';
+import { readReporterJson } from './lib/read-reporter-json.mjs';
 
 const USAGE =
   'Usage: node scripts/flake-rate-e2e-loop.mjs [--runs N] [--out DIR]\n' +
@@ -102,11 +103,12 @@ const byTest = new Map();
 const runSummaries = [];
 
 function ingest(jsonPath, runId) {
-  if (!fs.existsSync(jsonPath)) {
-    runSummaries.push({ runId, ok: false, error: 'missing json' });
+  const loaded = readReporterJson(jsonPath);
+  if (!loaded.ok) {
+    runSummaries.push({ runId, ok: false, error: loaded.error });
     return;
   }
-  const data = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+  const data = loaded.data;
   let passed = 0;
   let failed = 0;
   for (const suite of data.suites || []) {
@@ -195,10 +197,16 @@ for (let i = 1; i <= runs; i++) {
       result.stderr || '',
     ].join('\n')
   );
+  // Corrupt/missing reporter JSON is recorded inside ingest (q-mp-1024);
+  // keep a safety net for unexpected walk errors so the loop still finishes.
   try {
     ingest(jsonPath, runId);
   } catch (e) {
-    runSummaries.push({ runId, ok: false, error: String(e) });
+    runSummaries.push({
+      runId,
+      ok: false,
+      error: e instanceof Error ? e.message : String(e),
+    });
   }
   const last = runSummaries[runSummaries.length - 1];
   console.log(
