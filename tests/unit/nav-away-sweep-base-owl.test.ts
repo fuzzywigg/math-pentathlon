@@ -1,8 +1,7 @@
 /**
- * @vitest-environment node
- *
  * Hermetic coverage for nav-away-sweep BASE_URL + dismissOwl (q-mp-1285 / q-mp-1286).
  * Structural asserts only — no Playwright browser launch.
+ * Stays on unit-shared (jsdom) so vitest.config nodePureFiles need not change.
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
