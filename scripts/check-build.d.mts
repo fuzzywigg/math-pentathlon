@@ -24,7 +24,9 @@ export function offlineNeededPaths(relPaths: Iterable<string>): string[];
 
 export function auditPrecache(distRoot: string): unknown;
 
-export function scanEnvLeakage(distRoot: string): unknown;
+export function scanEnvLeakage(
+  distRoot: string
+): Array<{ path: string; finding: string }>;
 
 export function collectHtmlNonRootAssetRefs(html: string): string[];
 

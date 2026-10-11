@@ -178,9 +178,9 @@ describe('check-build helpers', () => {
       { url: '/a.js', revision: '42' },
     ]);
     // Numeric revision + folded size/integrity extras still parse.
-    expect(
-      parsePrecacheManifest('{url:"/a.js",revision:42,size:12}')
-    ).toEqual([{ url: '/a.js', revision: '42' }]);
+    expect(parsePrecacheManifest('{url:"/a.js",revision:42,size:12}')).toEqual([
+      { url: '/a.js', revision: '42' },
+    ]);
     expect(
       parsePrecacheManifest('{url:"/a.js",revision:0,integrity:null}')
     ).toEqual([{ url: '/a.js', revision: '0' }]);
@@ -290,9 +290,7 @@ describe('check-build helpers', () => {
       );
       writeFileSync(join(dist, 'bare.js'), 'file:///\n');
       const findings = scanEnvLeakage(dist);
-      expect(findings).toEqual([
-        { path: 'leak.js', finding: 'file:// URL' },
-      ]);
+      expect(findings).toEqual([{ path: 'leak.js', finding: 'file:// URL' }]);
       expect(
         findings.some((f) => f.path === 'prose.js' || f.path === 'bare.js')
       ).toBe(false);
