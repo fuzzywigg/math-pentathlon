@@ -8,11 +8,13 @@ import { DIVISIONS } from '../../src/core/game-registry';
 describe('Wave 44 UI — accordion toggle', () => {
   let container: HTMLElement;
   // Direct prototype assign is not undone by vi.restoreAllMocks (q-mp-1180).
-  const hadScrollIntoView = Object.prototype.hasOwnProperty.call(
-    Element.prototype,
-    'scrollIntoView'
-  );
-  const originalScrollIntoView = Element.prototype.scrollIntoView;
+  // Prefer a plain noop over delete: game-selector defers scrollIntoView via
+  // setTimeout, and deleting the method races those callbacks under jsdom.
+  const originalScrollIntoView =
+    typeof Element.prototype.scrollIntoView === 'function' &&
+    !vi.isMockFunction(Element.prototype.scrollIntoView)
+      ? Element.prototype.scrollIntoView
+      : function scrollIntoView() {};
   beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
@@ -21,11 +23,7 @@ describe('Wave 44 UI — accordion toggle', () => {
   afterEach(() => {
     container.remove();
     vi.restoreAllMocks();
-    if (hadScrollIntoView) {
-      Element.prototype.scrollIntoView = originalScrollIntoView;
-    } else {
-      Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
-    }
+    Element.prototype.scrollIntoView = originalScrollIntoView;
   });
 
   it('header click closes then reopens first division', () => {

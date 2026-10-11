@@ -68,11 +68,12 @@ describe('q-mp-399 ui-cov-r29 hex-a-gone board-ui residuals', () => {
   it('confirm scrollIntoView arm + p2 winner banner + filled-cell block color', async () => {
     const scrollSpy = vi.fn();
     // Direct prototype assign is not undone by vi.restoreAllMocks (q-mp-1180).
-    const hadScrollIntoView = Object.prototype.hasOwnProperty.call(
-      HTMLElement.prototype,
-      'scrollIntoView'
-    );
-    const originalScrollIntoView = HTMLElement.prototype.scrollIntoView;
+    // Prefer a plain noop over delete so deferred scroll callbacks stay callable.
+    const originalScrollIntoView =
+      typeof HTMLElement.prototype.scrollIntoView === 'function' &&
+      !vi.isMockFunction(HTMLElement.prototype.scrollIntoView)
+        ? HTMLElement.prototype.scrollIntoView
+        : function scrollIntoView() {};
     HTMLElement.prototype.scrollIntoView = scrollSpy;
     try {
       let state = createInitialState();
@@ -131,11 +132,7 @@ describe('q-mp-399 ui-cov-r29 hex-a-gone board-ui residuals', () => {
       renderStatus(createInitialState(), el, 'human-vs-ai', true);
       expect(el.querySelector('.status-ai-thinking')).toBeTruthy();
     } finally {
-      if (hadScrollIntoView) {
-        HTMLElement.prototype.scrollIntoView = originalScrollIntoView;
-      } else {
-        Reflect.deleteProperty(HTMLElement.prototype, 'scrollIntoView');
-      }
+      HTMLElement.prototype.scrollIntoView = originalScrollIntoView;
     }
   });
 
