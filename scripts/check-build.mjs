@@ -360,7 +360,7 @@ export function collectHtmlNonRootAssetRefs(html) {
  * (q-mp-1401). Non-BOM input matches `JSON.parse(raw || '{}')` byte-for-byte
  * on the parse path (empty → `{}`). Mid-payload FEFF is left alone.
  * @param {string} raw
- * @returns {Record<string, any>}
+ * @returns {Record<string, unknown>}
  */
 export function parseWebmanifestJson(raw) {
   let text = raw ?? '';
