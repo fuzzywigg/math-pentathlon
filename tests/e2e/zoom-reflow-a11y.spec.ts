@@ -25,6 +25,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { GAMES, type GameInfo } from '../../src/core/game-registry';
 import { dismissOwl, startHuman, waitForGameReady } from './helpers/page';
+import { waitDoubleRaf } from './helpers/page-settle';
 
 const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
 const REPORT_ROOT = path.join(process.cwd(), 'test-results', 'zoom-reflow');
@@ -475,12 +476,7 @@ async function runScreenAudit(
   await applyMode(page, mode);
   await setup();
   // Settle layout after zoom/font changes.
-  await page.evaluate(
-    () =>
-      new Promise<void>((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-      })
-  );
+  await waitDoubleRaf(page);
   const audit = await auditLayout(page);
   const issues = issuesFromAudit(audit, screenId);
   const actionable = issues.filter((i) => !i.boardException);
