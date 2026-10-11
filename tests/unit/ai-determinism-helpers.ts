@@ -66,16 +66,35 @@ export function cappedClockOptions(
   };
 }
 
+function isThenable(value: unknown): value is PromiseLike<unknown> {
+  return (
+    value !== null &&
+    (typeof value === 'object' || typeof value === 'function') &&
+    typeof (value as { then?: unknown }).then === 'function'
+  );
+}
+
 /**
  * Oracle RNG that never triggers `rng() < randomness` / teaching branches
  * when randomness ≤ 1 (constant 0). Hex jitter then applies the same delta
  * to every root move, preserving minimax order.
+ *
+ * Sync-only: thenable returns are rejected with TypeError so `finally` cannot
+ * restore Math.random while an async callback is still mid-await (parity with
+ * `withSeededRandom` / q-mp-1302).
  */
 export function withOracleRandom<T>(fn: () => T): T {
   const original = Math.random;
   Math.random = () => 0;
   try {
-    return fn();
+    const result = fn();
+    if (isThenable(result)) {
+      throw new TypeError(
+        'withOracleRandom does not support async callbacks (thenables); ' +
+          'use a sync fn, or call Math.random = () => 0 around an awaited body'
+      );
+    }
+    return result;
   } finally {
     Math.random = original;
   }
