@@ -2,7 +2,8 @@
  * @vitest-environment node
  *
  * Hermetic coverage for mutation-report argv validation
- * (q-mp-867 / q-mp-868 / q-mp-892 / q-mp-967 / q-mp-1064 / q-mp-1217).
+ * (q-mp-867 / q-mp-868 / q-mp-892 / q-mp-967 / q-mp-1064 / q-mp-1217 /
+ * q-mp-1232).
  *
  * Argv reject paths assert via parseMutationReportArgs /
  * resolveMutationReportGames in-process (q-mp-1064 wall-time cut).
@@ -260,6 +261,29 @@ describe('resolveMutationReportGames (q-mp-868)', () => {
     if (!got.ok) {
       expect(got.message).toMatch(/unknown game\(s\): no-such-game/);
       expect(got.message).toMatch(/valid games: calla, hex, fiar/);
+    }
+  });
+
+  it('dedupes requested games preserving first-seen order (q-mp-1232)', () => {
+    expect(resolveMutationReportGames(['hex', 'hex'], ['hex', 'fiar'])).toEqual(
+      {
+        ok: true,
+        games: ['hex'],
+      },
+    );
+    expect(
+      resolveMutationReportGames(['hex', 'fiar', 'hex', 'calla', 'fiar'], VALID),
+    ).toEqual({
+      ok: true,
+      games: ['hex', 'fiar', 'calla'],
+    });
+  });
+
+  it('still rejects unknown ids when duplicates are present (q-mp-1232)', () => {
+    const got = resolveMutationReportGames(['hex', 'nope', 'hex'], VALID);
+    expect(got.ok).toBe(false);
+    if (!got.ok) {
+      expect(got.message).toMatch(/unknown game\(s\): nope/);
     }
   });
 });

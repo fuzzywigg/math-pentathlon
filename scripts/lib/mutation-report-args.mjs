@@ -167,6 +167,8 @@ export function parseMutationReportArgs(argv, defaults) {
 
 /**
  * Resolve game list; reject unknown ids before any rules.ts I/O.
+ * Dedupes requested ids preserving first-seen order (q-mp-1232) so
+ * `--games=hex,hex` does not double-run mutants.
  *
  * @param {string[]|null} requested
  * @param {string[]} validGames
@@ -186,7 +188,8 @@ export function resolveMutationReportGames(requested, validGames) {
         `valid games: ${validGames.join(', ')}`,
     };
   }
-  return { ok: true, games: requested };
+  // q-mp-1232: unique while keeping caller order (Set insertion order).
+  return { ok: true, games: [...new Set(requested)] };
 }
 
 /**
