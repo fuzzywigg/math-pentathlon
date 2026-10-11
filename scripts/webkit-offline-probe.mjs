@@ -18,6 +18,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { artifactPath } from './lib/artifact-dir.mjs';
 import { applyOfflineProbeCli } from './lib/offline-probe-cli.mjs';
+import { parseProbeBrowsers, waitForUrl } from './lib/offline-probe-ready.mjs';
 
 const USAGE = `Usage: node scripts/webkit-offline-probe.mjs
 
@@ -34,7 +35,7 @@ Options:
 applyOfflineProbeCli(process.argv.slice(2), USAGE);
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const BROWSERS = process.env.PROBE_BROWSERS?.split(',') ?? ['webkit'];
+const BROWSERS = parseProbeBrowsers(process.env.PROBE_BROWSERS);
 
 async function getFreePort() {
   return new Promise((resolve, reject) => {
@@ -52,27 +53,19 @@ async function getFreePort() {
   });
 }
 
-async function waitForUrl(url, timeoutMs = 60_000) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(url);
-      if (res.ok || res.status === 404) return;
-    } catch {
-      // booting
-    }
-    await new Promise((r) => setTimeout(r, 250));
-  }
-  throw new Error(`timeout ${url}`);
-}
-
 async function waitForSw(page) {
-  await page.waitForFunction(async () => {
-    if (!('serviceWorker' in navigator)) return false;
-    const reg = await navigator.serviceWorker.ready;
-    return reg.active?.state === 'activated';
-  }, null, { timeout: 45_000 });
-  if (!(await page.evaluate(() => navigator.serviceWorker.controller != null))) {
+  await page.waitForFunction(
+    async () => {
+      if (!('serviceWorker' in navigator)) return false;
+      const reg = await navigator.serviceWorker.ready;
+      return reg.active?.state === 'activated';
+    },
+    null,
+    { timeout: 45_000 }
+  );
+  if (
+    !(await page.evaluate(() => navigator.serviceWorker.controller != null))
+  ) {
     await page.reload({ waitUntil: 'load' });
   }
   await page.waitForFunction(
@@ -171,7 +164,10 @@ async function probe(browserType, name, baseURL) {
       try {
         const w = new Worker(url, { type: 'module' });
         await new Promise((resolve, reject) => {
-          const t = setTimeout(() => reject(new Error('worker timeout')), 3_000);
+          const t = setTimeout(
+            () => reject(new Error('worker timeout')),
+            3_000
+          );
           w.onerror = (ev) => {
             clearTimeout(t);
             reject(new Error(ev.message || 'worker error'));
@@ -225,14 +221,23 @@ async function probe(browserType, name, baseURL) {
 
   await context.close();
   await browser.close();
-  return { browser: name, onlineDiag, offlineImport, gotoNav, consoleMsgs: consoleMsgs.slice(0, 10) };
+  return {
+    browser: name,
+    onlineDiag,
+    offlineImport,
+    gotoNav,
+    consoleMsgs: consoleMsgs.slice(0, 10),
+  };
 }
 
 async function main() {
   const port = await getFreePort();
   const baseURL = `http://127.0.0.1:${port}`;
 
-  if (process.env.FORCE_BUILD === '1' || !existsSync(path.join(ROOT, 'dist/sw.js'))) {
+  if (
+    process.env.FORCE_BUILD === '1' ||
+    !existsSync(path.join(ROOT, 'dist/sw.js'))
+  ) {
     console.error('building…');
     await new Promise((resolve, reject) => {
       const build = spawn('npm', ['run', 'build'], {
@@ -248,7 +253,15 @@ async function main() {
 
   const preview = spawn(
     'npx',
-    ['vite', 'preview', '--host', '127.0.0.1', '--port', String(port), '--strictPort'],
+    [
+      'vite',
+      'preview',
+      '--host',
+      '127.0.0.1',
+      '--port',
+      String(port),
+      '--strictPort',
+    ],
     { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'], env: process.env }
   );
   try {
