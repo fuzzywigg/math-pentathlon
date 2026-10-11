@@ -67,36 +67,62 @@ describe('waitForGameReady (q-mp-921)', () => {
     await waitForGameReady(page);
 
     const loading = locators.get('[data-testid="game-loading"]');
+    const loadError = locators.get('[data-testid="game-load-error"]');
     const shell = locators.get('#new-game-btn, h1');
     expect(loading).toBeDefined();
+    expect(loadError).toBeDefined();
     expect(shell).toBeDefined();
     expect(loading!.waitFor).toHaveBeenCalledWith({
+      state: 'hidden',
+      timeout: 20_000,
+    });
+    expect(loadError!.waitFor).toHaveBeenCalledWith({
       state: 'hidden',
       timeout: 20_000,
     });
     expect(shell!.waitFor).toHaveBeenCalledWith({ timeout: 20_000 });
   });
 
-  it('honors timeoutMs for both waits', async () => {
+  it('honors timeoutMs for loading, load-error, and shell waits', async () => {
     const { page, locators } = createFakePage();
     await waitForGameReady(page, { timeoutMs: 5_000 });
 
     expect(
       locators.get('[data-testid="game-loading"]')!.waitFor
     ).toHaveBeenCalledWith({ state: 'hidden', timeout: 5_000 });
+    expect(
+      locators.get('[data-testid="game-load-error"]')!.waitFor
+    ).toHaveBeenCalledWith({ state: 'hidden', timeout: 5_000 });
     expect(locators.get('#new-game-btn, h1')!.waitFor).toHaveBeenCalledWith({
       timeout: 5_000,
     });
   });
 
-  it('swallows loading-wait rejection and still waits for shell', async () => {
+  it('swallows loading-wait rejection and still waits for load-error + shell', async () => {
     const { page, locators } = createFakePage();
     // Pre-create loading locator so we can stub a rejection.
     const loading = page.locator('[data-testid="game-loading"]');
     loading.waitFor.mockRejectedValueOnce(new Error('timeout'));
 
     await expect(waitForGameReady(page)).resolves.toBeUndefined();
+    expect(
+      locators.get('[data-testid="game-load-error"]')!.waitFor
+    ).toHaveBeenCalled();
     expect(locators.get('#new-game-btn, h1')!.waitFor).toHaveBeenCalled();
+  });
+
+  it('rejects when game-load-error stays visible (q-mp-1294)', async () => {
+    const { page, locators } = createFakePage();
+    const loadError = page.locator('[data-testid="game-load-error"]');
+    loadError.waitFor.mockRejectedValueOnce(new Error('Timeout 20000ms'));
+
+    await expect(waitForGameReady(page)).rejects.toThrow(/Timeout/);
+    expect(loadError.waitFor).toHaveBeenCalledWith({
+      state: 'hidden',
+      timeout: 20_000,
+    });
+    // Must not treat shell chrome as ready while load-error is stuck.
+    expect(locators.has('#new-game-btn, h1')).toBe(false);
   });
 });
 

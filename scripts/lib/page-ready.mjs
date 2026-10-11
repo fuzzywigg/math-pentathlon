@@ -31,6 +31,10 @@ Options:
 
 /**
  * Wait until the game shell is past the loading marker and chrome is visible.
+ * `[data-testid="game-load-error"]` fails readiness (waits until cleared or
+ * times out) — shell `h1` / `#new-game-btn` alone are not enough when a lazy
+ * chunk failed (q-mp-1294). Success chrome: `#new-game-btn, h1` after the
+ * load-error slot is clear (that alert occupies the game mount).
  *
  * @param {import('@playwright/test').Page} page
  * @param {{ timeoutMs?: number }} [options]
@@ -42,6 +46,10 @@ export async function waitForGameReady(page, options = {}) {
     .locator('[data-testid="game-loading"]')
     .waitFor({ state: 'hidden', timeout: timeoutMs })
     .catch(() => {});
+  // Detached = already clear; visible stuck error → timeout (not ready).
+  await page
+    .locator('[data-testid="game-load-error"]')
+    .waitFor({ state: 'hidden', timeout: timeoutMs });
   await page
     .locator('#new-game-btn, h1')
     .first()
