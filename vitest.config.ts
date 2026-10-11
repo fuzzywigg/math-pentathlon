@@ -51,8 +51,8 @@ const isolatedFiles = [
   'tests/unit/q-mp-677-game-route-mounts-residual-branches.test.ts',
   // q-mp-299: main.ts soft-fail characterization — same hoisted PWA/demo mocks.
   'tests/unit/q-mp-299-main-soft-fail.test.ts',
-  // q-mp-685: main.ts residual branches — same hoisted PWA/demo mocks.
-  'tests/unit/q-mp-685-main-residual-branches.test.ts',
+  // q-mp-685 / q-mp-1212: main.ts residual shards — same hoisted PWA/demo mocks.
+  'tests/unit/q-mp-685-main-residual-branches*.test.ts',
   // q-mp-422: router soft-fail matrix — vi.resetModules for module-default 404.
   'tests/unit/q-mp-422-router-soft-fail.test.ts',
   // q-mp-453: game-prefetch soft-fail residuals — resetModules + doMock loaders.
