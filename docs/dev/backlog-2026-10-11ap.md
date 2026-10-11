@@ -333,7 +333,7 @@ Baselines also captured under `/opt/cursor/artifacts/q-mp-090ap-baselines.log` a
 - **series:** docs-accuracy
 - **verdict:** **SAFE** — docs-only; stops `check:dev-docs` reporting a self-inflicted broken md link
 - **CI / package.json callers:** `package.json` → `check:dev-docs` (report-only)
-- **target files:** `docs/dev/backlog-2026-10-11ao.md` (measured-baseline / acceptance prose that embeds `](path.md "title")` as a live markdown link)
+- **target files:** `docs/dev/backlog-2026-10-11ao.md` (measured-baseline / acceptance prose that embeds a titled markdown href (`path.md` plus optional `"title"`) as a live markdown link)
 - **measured baseline:** `npm run check:dev-docs` → `problems: 2` including `[broken-md-link] docs/dev/backlog-2026-10-11ao.md: path.md "title" -> docs/dev/path.md` (title strip from folded `1095` works; target still missing). Intentional `no-such-game` missing-path negative example stays.
 - **acceptance criteria:** No live markdown link to missing `path.md`; prose can keep a fenced/code-span example; `check:dev-docs` broken-md-link count drops by 1; no tip-name / count-cell edits.
 - **verification commands:** `npm run check:dev-docs` ; `rg -n 'path\\.md' docs/dev/backlog-2026-10-11ao.md`
@@ -415,10 +415,10 @@ Baselines also captured under `/opt/cursor/artifacts/q-mp-090ap-baselines.log` a
 - **series:** docs-accuracy
 - **verdict:** **SAFE** — docs-only labeling of the remaining missing-path hit
 - **CI / package.json callers:** `package.json` → `check:dev-docs`
-- **target files:** `docs/dev/backlog-2026-10-10af.md` (near `src/games/no-such-game/rules.ts`) and/or a one-line note in `docs/dev/check-dev-doc-links.md` if that doc exists and already describes negatives
+- **target files:** `docs/dev/backlog-2026-10-10af.md` (near the intentional `no-such-game` rules path — keep as af’s labeled missing-path negative example; do not invent a real game tree) and/or a one-line note in the absent check-dev-doc-links doc under docs/dev/ if that page exists and already describes negatives (it does not — do not invent that .md path)
 - **measured baseline:** After `1109`, `check:dev-docs` should still report exactly **1** `missing-path` for the intentional `no-such-game` example in `backlog-2026-10-10af.md`.
 - **acceptance criteria:** Negative example is clearly marked as intentional in-doc so humans do not “fix” it; checker behavior unchanged; no inventing real paths.
-- **verification commands:** `npm run check:dev-docs` ; `rg -n 'no-such-game|intentional' docs/dev/backlog-2026-10-10af.md docs/dev/check-dev-doc-links.md`
+- **verification commands:** `npm run check:dev-docs` ; `rg -n 'no-such-game|intentional' docs/dev/backlog-2026-10-10af.md`
 - **conflict notes:** not resolver title strip (`1095`); not ao titled-link cleanup (`1109`).
 
 ## Verdict summary
