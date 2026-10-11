@@ -32,6 +32,8 @@
  * Missing/null metric objects (q-mp-1222): reject like coverage-map readMetric
  * absent — never invent fake 0/0 branch rows; present covered/total 0/0 still ok.
  * Per-game label (q-mp-1223): use primary kind (`rules-branch` / `types-branch`).
+ * UTF-8 BOM on summary JSON (q-mp-1389): strip a single leading U+FEFF before
+ * JSON.parse so editor-saved summaries rank; non-BOM input unchanged.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -366,7 +368,12 @@ export function main(argv = process.argv.slice(2), io = {}) {
 
   let raw;
   try {
-    raw = JSON.parse(readFileSync(summaryPath, 'utf8'));
+    // q-mp-1389: strip a single leading UTF-8 BOM; mid-file FEFF left alone.
+    let text = readFileSync(summaryPath, 'utf8');
+    if (text.charCodeAt(0) === 0xfeff) {
+      text = text.slice(1);
+    }
+    raw = JSON.parse(text);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     error(`error: failed to read coverage summary: ${summaryPath}\n${msg}`);
