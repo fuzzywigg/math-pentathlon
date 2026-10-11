@@ -12,7 +12,7 @@ import {
 
 const fromDoc = path.resolve('docs/dev/sample.md');
 
-describe('PATH_RE (q-mp-1177)', () => {
+describe('PATH_RE (q-mp-1177 + q-mp-1250)', () => {
   /** @param {string} text */
   function matches(text) {
     return [...text.matchAll(PATH_RE)].map((m) => m[1]);
@@ -29,6 +29,24 @@ describe('PATH_RE (q-mp-1177)', () => {
     expect(matches('`scripts/check-build.mjs`')).toEqual([
       'scripts/check-build.mjs',
     ]);
+  });
+
+  it('matches .github/ backtick paths (workflows + md; q-mp-1250)', () => {
+    expect(matches('`.github/workflows/ci.yml`')).toEqual([
+      '.github/workflows/ci.yml',
+    ]);
+    expect(matches('`.github/workflows/deploy.yml`')).toEqual([
+      '.github/workflows/deploy.yml',
+    ]);
+    expect(matches('`.github/copilot-instructions.md`')).toEqual([
+      '.github/copilot-instructions.md',
+    ]);
+    // Prior roots still match; directory-only / glob prose stay unchecked.
+    expect(matches('`scripts/check-build.mjs`')).toEqual([
+      'scripts/check-build.mjs',
+    ]);
+    expect(matches('`.github/workflows/`')).toEqual([]);
+    expect(matches('`.github/workflows/*`')).toEqual([]);
   });
 
   it('keeps prior extensions and rejects glob stars in path segment', () => {
@@ -214,7 +232,7 @@ describe('resolveMdLink (q-mp-1095 + q-mp-1152 + q-mp-1175)', () => {
   });
 });
 
-describe('symbolInSource (q-mp-1176 export type { Foo })', () => {
+describe('symbolInSource (q-mp-1176 export type { Foo } + q-mp-1249)', () => {
   it('detects export type { Sym } and export type { Sym as Alias }', () => {
     expect(symbolInSource('export type { Foo }\n', 'Foo')).toBe(true);
     expect(symbolInSource('export type { Foo, Bar }\n', 'Foo')).toBe(true);
@@ -230,6 +248,23 @@ describe('symbolInSource (q-mp-1176 export type { Foo })', () => {
     expect(symbolInSource('export { type Foo }\n', 'Foo')).toBe(true);
     expect(symbolInSource('export { Foo }\n', 'Foo')).toBe(true);
     expect(symbolInSource('export function Foo() {}\n', 'Foo')).toBe(true);
+  });
+
+  it('detects bare export default Foo and export namespace Foo (q-mp-1249)', () => {
+    expect(symbolInSource('export default Foo;\n', 'Foo')).toBe(true);
+    expect(symbolInSource('export namespace Foo {}\n', 'Foo')).toBe(true);
+    expect(
+      symbolInSource(
+        'export namespace Foo {\n  export const x = 1;\n}\n',
+        'Foo'
+      )
+    ).toBe(true);
+    // default class / function already matched via declaration patterns
+    expect(symbolInSource('export default class Foo {}\n', 'Foo')).toBe(true);
+    expect(symbolInSource('export default function Foo() {}\n', 'Foo')).toBe(
+      true
+    );
+    expect(symbolInSource('export default Bar;\n', 'Foo')).toBe(false);
   });
 
   it('does not treat // export type { Foo } comments as hits', () => {

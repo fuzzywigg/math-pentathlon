@@ -13,7 +13,7 @@
  * not walked — only *.md. Tip-vs-alpha / triage dumps stay in scope.)
  *
  * Verifies:
- *   1. Backtick paths that look like repo files (src/, tests/, docs/, scripts/)
+ *   1. Backtick paths that look like repo files (src/, tests/, docs/, scripts/, .github/)
  *   2. Rows in "| Symbol | File |" tables — symbol must appear in that file
  *   3. Relative markdown links under docs/
  *
@@ -37,10 +37,11 @@ const ROOT = path.resolve(__dirname, '..');
 /** Walk root: whole docs/ tree (was docs/dev/ only before q-mp-857). */
 const DOCS_DIR = path.join(ROOT, 'docs');
 
-/** Backtick repo paths under src|tests|docs|scripts. Includes .mts / .d.mts
- * (type companions cited e.g. in docs/dev/type-ratchet-batch-8.md; q-mp-1177). */
+/** Backtick repo paths under src|tests|docs|scripts|.github.
+ * Includes .mts / .d.mts (type companions; q-mp-1177) and .yml/.yaml
+ * under `.github/` (workflows / copilot-instructions; q-mp-1250). */
 export const PATH_RE =
-  /`((?:src|tests|docs|scripts)\/[A-Za-z0-9_./@+-]+\.(?:ts|tsx|js|mjs|mts|css|md|json))`/g;
+  /`((?:src|tests|docs|scripts|\.github)\/[A-Za-z0-9_./@+-]+\.(?:ts|tsx|js|mjs|mts|css|md|json|yml|yaml))`/g;
 const TABLE_ROW_RE =
   /^\|\s*`([^`]+)`\s*\|\s*`((?:src|tests|docs|scripts)\/[^`]+)`\s*\|/;
 const MODULE_ROW_RE =
@@ -167,12 +168,9 @@ function parseMdLinkAfterOpen(text, start) {
 }
 
 /**
- * @param {string} fileRel
- * @param {string} symbol
- */
-/**
  * Whether `symbol` appears as a declaration / export in TypeScript/JS source.
- * Used by "| Symbol | File |" table checks (q-mp-1176: `export type { Foo }`).
+ * Used by "| Symbol | File |" table checks (q-mp-1176: `export type { Foo }`;
+ * q-mp-1249: bare `export default Foo` / `export namespace Foo`).
  * @param {string} text
  * @param {string} symbol
  * @returns {boolean}
@@ -195,6 +193,10 @@ export function symbolInSource(text, symbol) {
     new RegExp(
       String.raw`(?:^|[\r\n])\s*export\s+type\s+\{[^}]*\b${escaped}\b`
     ),
+    // Bare default re-export: `export default Foo` (class/function already hit above)
+    new RegExp(String.raw`export\s+default\s+${escaped}\b`),
+    // Namespace export: `export namespace Foo { … }`
+    new RegExp(String.raw`export\s+namespace\s+${escaped}\b`),
   ];
   return patterns.some((re) => re.test(text));
 }
