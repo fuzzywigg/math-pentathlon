@@ -9,6 +9,21 @@ import { OwlComponent } from '../../src/ui/owl/owl-component';
 import { owlSystem } from '../../src/core/owl';
 import { storage } from '../../src/core/storage';
 
+// Direct document assign is not undone by vi.restoreAllMocks (q-mp-1210).
+const originalElementFromPoint =
+  typeof document.elementFromPoint === 'function' &&
+  !vi.isMockFunction(document.elementFromPoint)
+    ? document.elementFromPoint
+    : undefined;
+
+function restoreElementFromPoint(): void {
+  if (originalElementFromPoint) {
+    document.elementFromPoint = originalElementFromPoint;
+  } else {
+    Reflect.deleteProperty(document, 'elementFromPoint');
+  }
+}
+
 function dispatchPointer(
   el: Element,
   type: string,
@@ -78,6 +93,7 @@ describe('mutation-ui5 owl-component', () => {
     localStorage.clear();
     storage.resetAll();
     vi.restoreAllMocks();
+    restoreElementFromPoint();
     vi.useRealTimers();
   });
 

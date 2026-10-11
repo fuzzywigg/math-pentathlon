@@ -9,6 +9,22 @@ import { OwlComponent, owlComponent } from '../../src/ui/owl/owl-component';
 import { owlSystem } from '../../src/core/owl';
 import { storage } from '../../src/core/storage';
 
+// Direct document assign is not undone by vi.restoreAllMocks (q-mp-1210).
+// jsdom baseline often has no elementFromPoint — delete when original was absent/mock.
+const originalElementFromPoint =
+  typeof document.elementFromPoint === 'function' &&
+  !vi.isMockFunction(document.elementFromPoint)
+    ? document.elementFromPoint
+    : undefined;
+
+function restoreElementFromPoint(): void {
+  if (originalElementFromPoint) {
+    document.elementFromPoint = originalElementFromPoint;
+  } else {
+    Reflect.deleteProperty(document, 'elementFromPoint');
+  }
+}
+
 function stubPointer(root: HTMLElement): void {
   vi.spyOn(root, 'getBoundingClientRect').mockReturnValue({
     x: 300,
@@ -61,6 +77,7 @@ describe('Wave 25 owl-component-chrome — lifecycle', () => {
     localStorage.clear();
     storage.resetAll();
     vi.restoreAllMocks();
+    restoreElementFromPoint();
     vi.useRealTimers();
   });
 

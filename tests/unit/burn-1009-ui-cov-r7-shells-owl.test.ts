@@ -304,6 +304,12 @@ describe('q-mp-149 ui-cov-r7 stars/par/ramrod/contig destroy shells', () => {
 describe('q-mp-149 ui-cov-r7 owl-component coast edge clamp', () => {
   let owl: OwlComponent;
   let root: HTMLElement;
+  // Direct document assign is not undone by vi.restoreAllMocks (q-mp-1210).
+  const originalElementFromPoint =
+    typeof document.elementFromPoint === 'function' &&
+    !vi.isMockFunction(document.elementFromPoint)
+      ? document.elementFromPoint
+      : undefined;
 
   beforeEach(() => {
     localStorage.clear();
@@ -339,6 +345,11 @@ describe('q-mp-149 ui-cov-r7 owl-component coast edge clamp', () => {
     document.body.innerHTML = '';
     localStorage.clear();
     storage.resetAll();
+    if (originalElementFromPoint) {
+      document.elementFromPoint = originalElementFromPoint;
+    } else {
+      Reflect.deleteProperty(document, 'elementFromPoint');
+    }
   });
 
   it('fast drag toward viewport edge clamps velocity then destroy mid-coast', async () => {

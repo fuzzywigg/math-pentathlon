@@ -9,6 +9,21 @@ import { owlSystem } from '../../src/core/owl';
 import { storage } from '../../src/core/storage';
 import { setUserReducedMotionFlag } from '../../src/core/settings-flags';
 
+// Direct document assign is not undone by vi.restoreAllMocks (q-mp-1210).
+const originalElementFromPoint =
+  typeof document.elementFromPoint === 'function' &&
+  !vi.isMockFunction(document.elementFromPoint)
+    ? document.elementFromPoint
+    : undefined;
+
+function restoreElementFromPoint(): void {
+  if (originalElementFromPoint) {
+    document.elementFromPoint = originalElementFromPoint;
+  } else {
+    Reflect.deleteProperty(document, 'elementFromPoint');
+  }
+}
+
 function stubPointer(root: HTMLElement): void {
   vi.spyOn(root, 'getBoundingClientRect').mockReturnValue({
     x: 300,
@@ -73,6 +88,7 @@ describe('q-mp-196 ui-cov-r9 owl-component residuals', () => {
     storage.resetAll();
     setUserReducedMotionFlag(false);
     vi.restoreAllMocks();
+    restoreElementFromPoint();
     vi.useRealTimers();
   });
 

@@ -2,6 +2,21 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { OwlComponent } from '../../src/ui/owl/owl-component';
 import { owlSystem } from '../../src/core/owl';
 
+// Direct document assign is not undone by vi.restoreAllMocks (q-mp-1210).
+const originalElementFromPoint =
+  typeof document.elementFromPoint === 'function' &&
+  !vi.isMockFunction(document.elementFromPoint)
+    ? document.elementFromPoint
+    : undefined;
+
+function restoreElementFromPoint(): void {
+  if (originalElementFromPoint) {
+    document.elementFromPoint = originalElementFromPoint;
+  } else {
+    Reflect.deleteProperty(document, 'elementFromPoint');
+  }
+}
+
 function dispatchPointer(
   el: Element,
   type: string,
@@ -74,6 +89,7 @@ describe('Ollie drop-inspect (Cycle-2 B)', () => {
     owl.destroy();
     dropTarget.remove();
     vi.restoreAllMocks();
+    restoreElementFromPoint();
   });
 
   it('on real drag drop: hit-tests under owl, speaks STUB, retains position', () => {

@@ -7,6 +7,21 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { OwlComponent } from '../../src/ui/owl/owl-component';
 import { setUserReducedMotionFlag } from '../../src/core/settings-flags';
 
+// Direct document assign is not undone by vi.restoreAllMocks (q-mp-1210).
+const originalElementFromPoint =
+  typeof document.elementFromPoint === 'function' &&
+  !vi.isMockFunction(document.elementFromPoint)
+    ? document.elementFromPoint
+    : undefined;
+
+function restoreElementFromPoint(): void {
+  if (originalElementFromPoint) {
+    document.elementFromPoint = originalElementFromPoint;
+  } else {
+    Reflect.deleteProperty(document, 'elementFromPoint');
+  }
+}
+
 function stubPointer(root: HTMLElement): { reads: { n: number } } {
   const reads = { n: 0 };
   vi.spyOn(root, 'getBoundingClientRect').mockImplementation(() => {
@@ -68,6 +83,7 @@ describe('q-mp-197 owl-component layout reads', () => {
     owl.destroy();
     document.body.innerHTML = '';
     vi.restoreAllMocks();
+    restoreElementFromPoint();
     vi.useRealTimers();
   });
 

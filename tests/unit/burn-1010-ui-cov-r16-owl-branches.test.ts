@@ -53,6 +53,12 @@ describe('q-mp-295 ui-cov-r16 owl branch residuals', () => {
   let owl: OwlComponent;
   let root: HTMLElement;
   const OriginalRO = globalThis.ResizeObserver;
+  // Direct document assign is not undone by vi.restoreAllMocks (q-mp-1210).
+  const originalElementFromPoint =
+    typeof document.elementFromPoint === 'function' &&
+    !vi.isMockFunction(document.elementFromPoint)
+      ? document.elementFromPoint
+      : undefined;
 
   beforeEach(() => {
     localStorage.clear();
@@ -73,6 +79,11 @@ describe('q-mp-295 ui-cov-r16 owl branch residuals', () => {
     setUserReducedMotionFlag(false);
     globalThis.ResizeObserver = OriginalRO;
     vi.restoreAllMocks();
+    if (originalElementFromPoint) {
+      document.elementFromPoint = originalElementFromPoint;
+    } else {
+      Reflect.deleteProperty(document, 'elementFromPoint');
+    }
     vi.useRealTimers();
   });
 
