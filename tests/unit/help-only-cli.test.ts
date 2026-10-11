@@ -87,7 +87,9 @@ describe('help-only CLI scripts (q-mp-885)', () => {
       });
       expect(r.status).toBe(2);
       const text = `${r.stdout}\n${r.stderr}`;
-      expect(text).toMatch(/Unknown flag: oops/);
+      // help-only callers: "Unknown flag:"; report-licenses own parser:
+      // "Unexpected argument:" — both must exit 2 without running work.
+      expect(text).toMatch(/(?:Unknown flag|Unexpected argument): oops/);
       expect(text).toMatch(
         new RegExp(`Usage: node ${rel.replace(/\./g, '\\.')}`)
       );
