@@ -102,7 +102,8 @@ Contributor checklist: [CONTRIBUTING.md](./CONTRIBUTING.md). Full scripts (cover
 
 ## Branches
 
-- alpha -- trunk. All development merges here.
+- alpha -- trunk. Human / trunk PRs target here (see [CONTRIBUTING.md](./CONTRIBUTING.md)).
+- `cursor/mp-tip-*` -- living tip for stacked cloud-agent **draft** PRs (see [AGENTS.md](./AGENTS.md)). Tip owners fold; not the human PR base.
 - main -- `317` behind / `2` ahead of alpha (`origin/main...origin/alpha` as of 2026-10-07). Do not target main for new work.
 
 ## Status (2026-10-08)
