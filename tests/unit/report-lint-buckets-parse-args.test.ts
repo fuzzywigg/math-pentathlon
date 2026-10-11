@@ -2,8 +2,9 @@
  * @vitest-environment node
  *
  * Hermetic coverage for report-lint-buckets argv (q-mp-870 value hygiene;
- * q-mp-943 unknown-flag rejection). Does not spawn the eslint probe (full
- * report stays integration-only).
+ * q-mp-943 unknown-flag rejection; q-mp-968 non-positive / non-integer --top
+ * + empty --rule=). Does not spawn the eslint probe (full report stays
+ * integration-only).
  */
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
@@ -69,6 +70,54 @@ describe('report-lint-buckets parseArgs (q-mp-870)', () => {
   });
 });
 
+describe('report-lint-buckets parseArgs --top/--rule value hygiene (q-mp-968)', () => {
+  it('rejects --top 0 (does not keep default)', () => {
+    const got = parseArgs(['--top', '0']);
+    expect(got.ok).toBe(false);
+    if (!got.ok) {
+      expect(got.message).toMatch(/Missing or invalid value for --top/);
+    }
+  });
+
+  it('rejects --top=0', () => {
+    const got = parseArgs(['--top=0']);
+    expect(got.ok).toBe(false);
+  });
+
+  it('rejects --top=abc', () => {
+    const got = parseArgs(['--top=abc']);
+    expect(got.ok).toBe(false);
+    if (!got.ok) {
+      expect(got.message).toMatch(/Missing or invalid value for --top/);
+    }
+  });
+
+  it('rejects non-integer --top 1.5 (no parseInt truncation)', () => {
+    const got = parseArgs(['--top', '1.5']);
+    expect(got.ok).toBe(false);
+    if (!got.ok) {
+      expect(got.message).toMatch(/Missing or invalid value for --top/);
+    }
+  });
+
+  it('rejects empty --rule=', () => {
+    const got = parseArgs(['--rule=']);
+    expect(got.ok).toBe(false);
+    if (!got.ok) {
+      expect(got.message).toMatch(/Missing or invalid value for --rule/);
+    }
+  });
+
+  it('still accepts valid --top 5 and --rule=curly', () => {
+    const top = parseArgs(['--top', '5']);
+    expect(top.ok).toBe(true);
+    if (top.ok) expect(top.top).toBe(5);
+    const rule = parseArgs(['--rule=curly']);
+    expect(rule.ok).toBe(true);
+    if (rule.ok) expect(rule.rule).toBe('curly');
+  });
+});
+
 describe('report-lint-buckets parseArgs unknown flags (q-mp-943)', () => {
   it('rejects --wat', () => {
     expect(parseArgs(['--wat'])).toEqual({
@@ -109,6 +158,52 @@ describe('report-lint-buckets.mjs CLI --top/--rule (q-mp-870)', () => {
   });
 });
 
+describe('report-lint-buckets.mjs CLI --top/--rule value hygiene (q-mp-968)', () => {
+  it('--top 0 exits 2 with usage before probing', () => {
+    const r = spawnSync(process.execPath, [SCRIPT, '--top', '0'], {
+      encoding: 'utf8',
+    });
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/Missing or invalid value for --top/);
+    expect(text).toMatch(/Usage:/);
+    expect(text).not.toMatch(/Lint bucket summary/);
+  });
+
+  it('--top=abc exits 2 with usage before probing', () => {
+    const r = spawnSync(process.execPath, [SCRIPT, '--top=abc'], {
+      encoding: 'utf8',
+    });
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/Missing or invalid value for --top/);
+    expect(text).toMatch(/Usage:/);
+    expect(text).not.toMatch(/Lint bucket summary/);
+  });
+
+  it('--top 1.5 exits 2 with usage before probing', () => {
+    const r = spawnSync(process.execPath, [SCRIPT, '--top', '1.5'], {
+      encoding: 'utf8',
+    });
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/Missing or invalid value for --top/);
+    expect(text).toMatch(/Usage:/);
+    expect(text).not.toMatch(/Lint bucket summary/);
+  });
+
+  it('--rule= exits 2 with usage before probing', () => {
+    const r = spawnSync(process.execPath, [SCRIPT, '--rule='], {
+      encoding: 'utf8',
+    });
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/Missing or invalid value for --rule/);
+    expect(text).toMatch(/Usage:/);
+    expect(text).not.toMatch(/Lint bucket summary/);
+  });
+});
+
 describe('report-lint-buckets.mjs CLI unknown flags (q-mp-943)', () => {
   it('--wat exits 2 with usage before probing', () => {
     const r = spawnSync(process.execPath, [SCRIPT, '--wat'], {
@@ -142,3 +237,4 @@ describe('report-lint-buckets.mjs CLI unknown flags (q-mp-943)', () => {
     expect(r.stdout).not.toMatch(/Lint bucket summary/);
   });
 });
+
