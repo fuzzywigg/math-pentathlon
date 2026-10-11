@@ -69,10 +69,12 @@ describe('workflow contract helpers', () => {
     expect(hasPullRequestTrigger(['push', 'pull_request'])).toBe(true);
     expect(hasPullRequestTrigger(['pull_request_target'])).toBe(true);
     expect(hasPullRequestTrigger(['push', 'workflow_dispatch'])).toBe(false);
-    expect(onIncludesEvent(['pull_request_target'], 'pull_request_target')).toBe(
-      true
+    expect(
+      onIncludesEvent(['pull_request_target'], 'pull_request_target')
+    ).toBe(true);
+    expect(onIncludesEvent(['pull_request'], 'pull_request_target')).toBe(
+      false
     );
-    expect(onIncludesEvent(['pull_request'], 'pull_request_target')).toBe(false);
   });
 });
 
@@ -159,12 +161,11 @@ jobs:
   it('accepts quoted YAML bools for cancel / persist-credentials (q-mp-1078)', () => {
     expect(isYamlTrue(true)).toBe(true);
     expect(isYamlTrue('true')).toBe(true);
+    // Bare True/False are booleans under js-yaml CORE; quoted "True" stays a string.
     expect(isYamlTrue('True')).toBe(false);
-    expect(isYamlTrue('yes')).toBe(false);
     expect(isYamlFalse(false)).toBe(true);
     expect(isYamlFalse('false')).toBe(true);
     expect(isYamlFalse('False')).toBe(false);
-    expect(isYamlFalse('no')).toBe(false);
 
     const quoted = GOOD_CI.replace(
       'cancel-in-progress: true',
@@ -172,23 +173,77 @@ jobs:
     ).replace('persist-credentials: false', 'persist-credentials: "false"');
     expect(auditWorkflow('ci.yml', yaml.load(quoted), quoted)).toEqual([]);
 
-    const badCancel = GOOD_CI.replace(
+    const junkCancel = GOOD_CI.replace(
       'cancel-in-progress: true',
-      'cancel-in-progress: "yes"'
+      'cancel-in-progress: "maybe"'
     );
     expect(
-      auditWorkflow('ci.yml', yaml.load(badCancel), badCancel).some((v) =>
+      auditWorkflow('ci.yml', yaml.load(junkCancel), junkCancel).some((v) =>
         v.message.includes('cancel-in-progress must be true')
       )
     ).toBe(true);
 
-    const badPersist = GOOD_CI.replace(
+    const junkPersist = GOOD_CI.replace(
       'persist-credentials: false',
-      'persist-credentials: "no"'
+      'persist-credentials: "maybe"'
     );
     expect(
-      auditWorkflow('ci.yml', yaml.load(badPersist), badPersist).some((v) =>
+      auditWorkflow('ci.yml', yaml.load(junkPersist), junkPersist).some((v) =>
         v.message.includes('persist-credentials: false')
+      )
+    ).toBe(true);
+  });
+
+  it('accepts YAML 1.1 yes/on/no/off for cancel / persist-credentials (q-mp-1097)', () => {
+    expect(isYamlTrue('yes')).toBe(true);
+    expect(isYamlTrue('Yes')).toBe(true);
+    expect(isYamlTrue('YES')).toBe(true);
+    expect(isYamlTrue('on')).toBe(true);
+    expect(isYamlTrue('ON')).toBe(true);
+    expect(isYamlTrue('maybe')).toBe(false);
+    expect(isYamlTrue(1)).toBe(false);
+
+    expect(isYamlFalse('no')).toBe(true);
+    expect(isYamlFalse('No')).toBe(true);
+    expect(isYamlFalse('off')).toBe(true);
+    expect(isYamlFalse('OFF')).toBe(true);
+    expect(isYamlFalse('maybe')).toBe(false);
+    expect(isYamlFalse(0)).toBe(false);
+
+    for (const cancel of ['yes', 'on', 'Yes', 'ON', '"yes"']) {
+      const raw = GOOD_CI.replace(
+        'cancel-in-progress: true',
+        `cancel-in-progress: ${cancel}`
+      );
+      expect(auditWorkflow('ci.yml', yaml.load(raw), raw)).toEqual([]);
+    }
+
+    for (const persist of ['no', 'off', 'No', 'OFF', '"no"']) {
+      const raw = GOOD_CI.replace(
+        'persist-credentials: false',
+        `persist-credentials: ${persist}`
+      );
+      expect(auditWorkflow('ci.yml', yaml.load(raw), raw)).toEqual([]);
+    }
+
+    // Truthy persist / falsy cancel still fail the pin.
+    const badPersistYes = GOOD_CI.replace(
+      'persist-credentials: false',
+      'persist-credentials: yes'
+    );
+    expect(
+      auditWorkflow('ci.yml', yaml.load(badPersistYes), badPersistYes).some(
+        (v) => v.message.includes('persist-credentials: false')
+      )
+    ).toBe(true);
+
+    const badCancelNo = GOOD_CI.replace(
+      'cancel-in-progress: true',
+      'cancel-in-progress: no'
+    );
+    expect(
+      auditWorkflow('ci.yml', yaml.load(badCancelNo), badCancelNo).some((v) =>
+        v.message.includes('cancel-in-progress must be true')
       )
     ).toBe(true);
   });
