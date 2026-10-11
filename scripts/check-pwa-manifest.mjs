@@ -37,13 +37,105 @@ const SUMMARY_JSON = path.join(OUT_DIR, 'summary.json');
 const REPORT_ONLY = process.env.REPORT_ONLY !== '0';
 
 /**
+ * True when html has a <link> with rel=manifest and an href ending in
+ * site.webmanifest — either attribute order, double or single quotes.
+ * (Harness leftover; contract helpers stay untouched.)
+ * @param {string} html
+ * @returns {boolean}
+ */
+export function hasSiteWebmanifestLink(html) {
+  if (typeof html !== 'string' || html.length === 0) return false;
+  const linkRe = /<link\b[^>]*>/gi;
+  const relRe = /\brel=["']manifest["']/i;
+  const hrefRe = /\bhref=["'][^"']*site\.webmanifest["']/i;
+  let match;
+  while ((match = linkRe.exec(html)) !== null) {
+    const tag = match[0];
+    if (relRe.test(tag) && hrefRe.test(tag)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Resolve a manifest icon `src` to an absolute path under `distRoot`.
+ * Rejects scheme-bearing URLs, non-root-absolute paths, and traversal that
+ * escapes `distRoot` (path.join alone would false-pass `../…`).
+ *
+ * @param {string} distRoot
+ * @param {string} src
+ * @returns {{ ok: true, abs: string } | { ok: false, error: string }}
+ */
+export function resolveManifestIconPath(distRoot, src) {
+  if (typeof src !== 'string' || src.length === 0) {
+    return { ok: false, error: `invalid icon src: ${JSON.stringify(src)}` };
+  }
+  // scheme-bearing (https:, data:, …) or protocol-relative //host/…
+  if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(src) || src.startsWith('//')) {
+    return { ok: false, error: `icon src must not be a URL: ${src}` };
+  }
+  if (!src.startsWith('/')) {
+    return { ok: false, error: `icon src must be root-absolute: ${src}` };
+  }
+  const rel = src.slice(1);
+  if (
+    rel.length === 0 ||
+    path.isAbsolute(rel) ||
+    rel.split(/[/\\]/).includes('..')
+  ) {
+    return { ok: false, error: `icon src escapes dist/: ${src}` };
+  }
+  const distResolved = path.resolve(distRoot);
+  const abs = path.resolve(distResolved, rel);
+  const prefix = distResolved.endsWith(path.sep)
+    ? distResolved
+    : `${distResolved}${path.sep}`;
+  if (abs !== distResolved && !abs.startsWith(prefix)) {
+    return { ok: false, error: `icon src escapes dist/: ${src}` };
+  }
+  return { ok: true, abs };
+}
+
+/**
+ * Collect icon on-disk errors for a parsed manifest icons array.
+ * @param {string} distRoot
+ * @param {unknown} icons
+ * @returns {string[]}
+ */
+export function collectManifestIconErrors(distRoot, icons) {
+  /** @type {string[]} */
+  const errors = [];
+  if (!Array.isArray(icons)) return errors;
+  for (const icon of icons) {
+    if (!icon || typeof icon !== 'object') continue;
+    const src = /** @type {{src?: unknown}} */ (icon).src;
+    if (typeof src !== 'string') continue;
+    const resolved = resolveManifestIconPath(distRoot, src);
+    if (!resolved.ok) {
+      errors.push(resolved.error);
+      continue;
+    }
+    if (!fs.existsSync(resolved.abs)) {
+      errors.push(`missing dist asset for icon ${src}`);
+    }
+  }
+  return errors;
+}
+
+/**
  * @param {string[]} lines
+ * @param {Record<string, unknown>} payload
  * @returns {never | void}
  */
 function writeSummary(lines, payload) {
   fs.mkdirSync(OUT_DIR, { recursive: true });
   fs.writeFileSync(SUMMARY_MD, `${lines.join('\n')}\n`, 'utf8');
-  fs.writeFileSync(SUMMARY_JSON, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+  fs.writeFileSync(
+    SUMMARY_JSON,
+    `${JSON.stringify(payload, null, 2)}\n`,
+    'utf8'
+  );
   console.log(lines.join('\n'));
 }
 
@@ -55,10 +147,14 @@ function main() {
   const viteConfigPath = path.join(ROOT, 'vite.config.ts');
 
   if (!fs.existsSync(manifestPath)) {
-    errors.push(`missing ${path.relative(ROOT, manifestPath)} (run npm run build)`);
+    errors.push(
+      `missing ${path.relative(ROOT, manifestPath)} (run npm run build)`
+    );
   }
   if (!fs.existsSync(indexPath)) {
-    errors.push(`missing ${path.relative(ROOT, indexPath)} (run npm run build)`);
+    errors.push(
+      `missing ${path.relative(ROOT, indexPath)} (run npm run build)`
+    );
   }
 
   /** @type {unknown} */
@@ -79,8 +175,10 @@ function main() {
     const html = fs.readFileSync(indexPath, 'utf8');
     const result = validateIndexHtml(html);
     errors.push(...result.errors);
-    if (!/rel=["']manifest["'][^>]*href=["'][^"']*site\.webmanifest["']/.test(html)) {
-      errors.push('dist/index.html missing <link rel="manifest" href="…site.webmanifest">');
+    if (!hasSiteWebmanifestLink(html)) {
+      errors.push(
+        'dist/index.html missing <link rel="manifest" href="…site.webmanifest">'
+      );
     }
   }
 
@@ -91,15 +189,9 @@ function main() {
   }
 
   // Icon files referenced by manifest must exist under dist/
-  if (manifest && typeof manifest === 'object' && Array.isArray(/** @type {{icons?: unknown}} */ (manifest).icons)) {
-    for (const icon of /** @type {{src?: string}[]} */ (/** @type {{icons: unknown}} */ (manifest).icons)) {
-      if (!icon || typeof icon.src !== 'string') continue;
-      const rel = icon.src.replace(/^\//, '');
-      const abs = path.join(DIST, rel);
-      if (!fs.existsSync(abs)) {
-        errors.push(`missing dist asset for icon ${icon.src}`);
-      }
-    }
+  if (manifest && typeof manifest === 'object') {
+    const icons = /** @type {{icons?: unknown}} */ (manifest).icons;
+    errors.push(...collectManifestIconErrors(DIST, icons));
   }
 
   const appleTouch = path.join(DIST, 'icons', 'icon-180.png');
@@ -114,7 +206,7 @@ function main() {
     `- ok: **${ok}**`,
     `- reportOnly: ${REPORT_ONLY}`,
     `- manifest: \`${path.relative(ROOT, manifestPath)}\``,
-    "",
+    '',
     ok ? 'All installability contract checks passed.' : '## Violations',
     ...(ok ? [] : errors.map((e) => `- ${e}`)),
     '',
@@ -133,4 +225,10 @@ function main() {
   }
 }
 
-main();
+const isMain =
+  Boolean(process.argv[1]) &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (isMain) {
+  main();
+}
