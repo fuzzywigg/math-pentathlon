@@ -1,6 +1,9 @@
 /**
  * Cheap guard: every `npm run <script>` named in developer-facing docs
  * must exist in package.json. No network, no browsers.
+ *
+ * Glob family mentions (`npm run playtest:*`) must not be treated as a
+ * script name — the regex stops at `*`, leaving a trailing-`:` token.
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
@@ -12,10 +15,14 @@ const DOC_FILES = [
   'docs/wiki/development.md',
 ] as const;
 
-function extractNpmRunScripts(markdown: string): string[] {
+/** Exported for hermetic fixture asserts (and one-liner checks). */
+export function extractNpmRunScripts(markdown: string): string[] {
   const found = new Set<string>();
   for (const match of markdown.matchAll(/npm run ([a-zA-Z0-9:_-]+)/g)) {
-    found.add(match[1]!);
+    const name = match[1]!;
+    // Glob shorthand (`npm run foo:*`) captures as `foo:` — ignore it.
+    if (name.endsWith(':')) continue;
+    found.add(name);
   }
   return [...found].sort();
 }
@@ -37,5 +44,23 @@ describe('developer docs npm scripts', () => {
   it('npm test script runs unit then Chromium e2e', () => {
     expect(pkg.scripts.test).toMatch(/test:unit/);
     expect(pkg.scripts.test).toMatch(/test:e2e:chromium/);
+  });
+
+  it('ignores npm run playtest:* glob / trailing-colon tokens', () => {
+    const mentioned = extractNpmRunScripts(
+      'Cheat sheet: `npm run playtest:*` → scripts; also `npm run playtest:calla`.'
+    );
+    expect(mentioned).toEqual(['playtest:calla']);
+    expect(mentioned).not.toContain('playtest:');
+  });
+
+  it('still reports genuinely missing script names', () => {
+    const mentioned = extractNpmRunScripts(
+      'Do not invent `npm run definitely-missing-xyzzy` in docs.'
+    );
+    expect(mentioned).toEqual(['definitely-missing-xyzzy']);
+    expect(defined.has('definitely-missing-xyzzy')).toBe(false);
+    const missing = mentioned.filter((name) => !defined.has(name));
+    expect(missing).toEqual(['definitely-missing-xyzzy']);
   });
 });
