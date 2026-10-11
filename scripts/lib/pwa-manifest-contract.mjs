@@ -184,6 +184,29 @@ function hasThemeColorForScheme(html, content, scheme) {
 }
 
 /**
+ * True when html has a link tag with rel=apple-touch-icon and the brand
+ * href — either attribute order, double or single quotes.
+ * @param {string} html
+ * @returns {boolean}
+ */
+function hasAppleTouchIcon(html) {
+  const linkRe = /<link\b[^>]*>/gi;
+  const relRe = /\brel=["']apple-touch-icon["']/i;
+  const hrefRe = new RegExp(
+    `\\bhref=["']${APPLE_TOUCH_ICON.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["']`,
+    'i'
+  );
+  let match;
+  while ((match = linkRe.exec(html)) !== null) {
+    const tag = match[0];
+    if (relRe.test(tag) && hrefRe.test(tag)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Validate index.html install meta tags (apple + theme-color light/dark).
  * @param {string} html
  * @returns {{ ok: boolean, errors: string[] }}
@@ -195,10 +218,7 @@ export function validateIndexHtml(html) {
     return { ok: false, errors: ['index.html is empty'] };
   }
 
-  if (
-    !html.includes(`rel="apple-touch-icon" href="${APPLE_TOUCH_ICON}"`) &&
-    !html.includes(`rel='apple-touch-icon' href='${APPLE_TOUCH_ICON}'`)
-  ) {
+  if (!hasAppleTouchIcon(html)) {
     errors.push(`missing apple-touch-icon ${APPLE_TOUCH_ICON}`);
   }
 

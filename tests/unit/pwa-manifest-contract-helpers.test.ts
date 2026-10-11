@@ -74,6 +74,40 @@ describe('pwa-manifest-contract helpers', () => {
     expect(validateIndexHtml(full)).toEqual({ ok: true, errors: [] });
   });
 
+  it('validateIndexHtml accepts apple-touch-icon when href precedes rel', () => {
+    const chrome = `
+      <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
+      <meta name="theme-color" content="#102a43" media="(prefers-color-scheme: dark)" />
+      <meta name="theme-color" content="#102a43" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-title" content="Math Pentathlon" />`;
+
+    const attributeOrders = [
+      // rel then href (live index.html order)
+      `<link rel="apple-touch-icon" href="/icons/icon-180.png" />`,
+      // href before rel (ticket baseline)
+      `<link href="/icons/icon-180.png" rel="apple-touch-icon" />`,
+      // single quotes, href first
+      `<link href='/icons/icon-180.png' rel='apple-touch-icon' />`,
+      // single quotes, rel first
+      `<link rel='apple-touch-icon' href='/icons/icon-180.png' />`,
+    ];
+
+    for (const icon of attributeOrders) {
+      const html = `<html><head>${chrome}${icon}</head></html>`;
+      expect(validateIndexHtml(html)).toEqual({ ok: true, errors: [] });
+    }
+
+    const wrongHref = `<html><head>${chrome}
+      <link href="/icons/wrong.png" rel="apple-touch-icon" />
+    </head></html>`;
+    const wrong = validateIndexHtml(wrongHref);
+    expect(wrong.ok).toBe(false);
+    expect(wrong.errors.join('\n')).toMatch(
+      /missing apple-touch-icon \/icons\/icon-180\.png/
+    );
+  });
+
   it('validateIndexHtml accepts theme-color when media/content precede name', () => {
     const chrome = `
       <meta name="apple-mobile-web-app-capable" content="yes" />
