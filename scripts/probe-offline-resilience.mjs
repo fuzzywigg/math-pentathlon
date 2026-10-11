@@ -14,6 +14,14 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { artifactPath } from './lib/artifact-dir.mjs';
+import {
+  isOfflineProbeMountOk,
+  OFFLINE_PROBE_CALLA_MOUNT,
+  OFFLINE_PROBE_HAG_MOUNT,
+  OFFLINE_PROBE_HEX_MOUNT,
+  OFFLINE_PROBE_LOAD_ERROR,
+  OFFLINE_PROBE_PENT_MOUNT,
+} from './lib/offline-probe-board.mjs';
 import { classifyOfflineProbeUrl } from './lib/offline-probe-classify.mjs';
 import { applyOfflineProbeCli } from './lib/offline-probe-cli.mjs';
 import { waitForUrl as waitForUrlReady } from './lib/offline-probe-ready.mjs';
@@ -173,7 +181,7 @@ async function main() {
         timeout: 60_000,
       });
       await page.waitForSelector(
-        '.hex-board, #board, [data-testid="game-load-error"]',
+        `${OFFLINE_PROBE_HEX_MOUNT}, #board, ${OFFLINE_PROBE_LOAD_ERROR}`,
         {
           timeout: 30_000,
         }
@@ -198,16 +206,22 @@ async function main() {
       });
       await page
         .waitForSelector(
-          '.hex-board, #board, [data-testid="game-load-error"]',
+          `${OFFLINE_PROBE_HEX_MOUNT}, #board, ${OFFLINE_PROBE_LOAD_ERROR}`,
           {
             timeout: 20_000,
           }
         )
         .catch(() => null);
-      offlineNav.hexBoard =
-        (await page.locator('.hex-board, #board').count()) > 0;
-      offlineNav.hexLoadError =
-        (await page.locator('[data-testid="game-load-error"]').count()) > 0;
+      {
+        const hexMount = await page.locator(OFFLINE_PROBE_HEX_MOUNT).count();
+        const hexErr = await page.locator(OFFLINE_PROBE_LOAD_ERROR).count();
+        // q-mp-1295: game mount + !*LoadError; shell #board alone is not ok.
+        offlineNav.hexBoard = isOfflineProbeMountOk({
+          mountCount: hexMount,
+          loadErrorCount: hexErr,
+        });
+        offlineNav.hexLoadError = hexErr > 0;
+      }
       offlineNav.hexHint = await page
         .locator('[data-testid="game-load-error-hint"]')
         .textContent()
@@ -221,16 +235,22 @@ async function main() {
       });
       await page
         .waitForSelector(
-          '.pent-board, #board, [data-testid="game-load-error"]',
+          `${OFFLINE_PROBE_PENT_MOUNT}, #board, ${OFFLINE_PROBE_LOAD_ERROR}`,
           {
             timeout: 20_000,
           }
         )
         .catch(() => null);
-      offlineNav.pentBoard =
-        (await page.locator('.pent-board, #board, h1').count()) > 0;
-      offlineNav.pentLoadError =
-        (await page.locator('[data-testid="game-load-error"]').count()) > 0;
+      {
+        const pentMount = await page.locator(OFFLINE_PROBE_PENT_MOUNT).count();
+        const pentErr = await page.locator(OFFLINE_PROBE_LOAD_ERROR).count();
+        // q-mp-1295: .pent-board only; shell #board / h1 must not count.
+        offlineNav.pentBoard = isOfflineProbeMountOk({
+          mountCount: pentMount,
+          loadErrorCount: pentErr,
+        });
+        offlineNav.pentLoadError = pentErr > 0;
+      }
 
       // Font face check while offline
       offlineNav.fontFaces = await page.evaluate(async () => {
@@ -313,14 +333,20 @@ async function main() {
       timeout: 120_000,
     });
     await page
-      .waitForSelector('.hex-board, #board, [data-testid="game-load-error"]', {
-        timeout: 120_000,
-      })
+      .waitForSelector(
+        `${OFFLINE_PROBE_HEX_MOUNT}, #board, ${OFFLINE_PROBE_LOAD_ERROR}`,
+        {
+          timeout: 120_000,
+        }
+      )
       .catch(() => null);
     timings.hexReadyMs = Date.now() - tHex;
-    const hexOk = (await page.locator('.hex-board, #board').count()) > 0;
-    const hexErr =
-      (await page.locator('[data-testid="game-load-error"]').count()) > 0;
+    const hexErrCount = await page.locator(OFFLINE_PROBE_LOAD_ERROR).count();
+    const hexOk = isOfflineProbeMountOk({
+      mountCount: await page.locator(OFFLINE_PROBE_HEX_MOUNT).count(),
+      loadErrorCount: hexErrCount,
+    });
+    const hexErr = hexErrCount > 0;
 
     const t3d = Date.now();
     await page.goto(baseURL + '/#/game/hex-a-gone', {
@@ -329,17 +355,17 @@ async function main() {
     });
     await page
       .waitForSelector(
-        '.hex-a-gone-board, #board, [data-testid="game-load-error"], canvas[data-mp3d]',
+        `${OFFLINE_PROBE_HAG_MOUNT}, #board, ${OFFLINE_PROBE_LOAD_ERROR}`,
         { timeout: 120_000 }
       )
       .catch(() => null);
     timings.hexAGoneReadyMs = Date.now() - t3d;
-    const hagOk =
-      (await page
-        .locator('.hex-a-gone-board, #board, canvas[data-mp3d]')
-        .count()) > 0;
-    const hagErr =
-      (await page.locator('[data-testid="game-load-error"]').count()) > 0;
+    const hagErrCount = await page.locator(OFFLINE_PROBE_LOAD_ERROR).count();
+    const hagOk = isOfflineProbeMountOk({
+      mountCount: await page.locator(OFFLINE_PROBE_HAG_MOUNT).count(),
+      loadErrorCount: hagErrCount,
+    });
+    const hagErr = hagErrCount > 0;
     const threeRequested = await page.evaluate(() =>
       performance
         .getEntriesByType('resource')
@@ -388,14 +414,14 @@ async function main() {
     });
     await page
       .waitForSelector(
-        '[data-testid="game-load-error"], .calla-wrapper, .calla-pit, #board',
+        `${OFFLINE_PROBE_LOAD_ERROR}, ${OFFLINE_PROBE_CALLA_MOUNT}, #board`,
         {
           timeout: 20_000,
         }
       )
       .catch(() => null);
     const errorVisible =
-      (await page.locator('[data-testid="game-load-error"]').count()) > 0;
+      (await page.locator(OFFLINE_PROBE_LOAD_ERROR).count()) > 0;
     const retryVisible =
       (await page.locator('[data-action="retry"]').count()) > 0;
     const hint = await page
@@ -407,13 +433,19 @@ async function main() {
     let recovered = false;
     if (retryVisible) {
       await page.locator('[data-action="retry"]').click();
+      // q-mp-1296: wait for Calla mounts (not shell #board).
       await page
-        .waitForSelector('.calla-wrapper, .calla-pit, #board', {
-          timeout: 30_000,
-        })
+        .waitForSelector(
+          `${OFFLINE_PROBE_CALLA_MOUNT}, ${OFFLINE_PROBE_LOAD_ERROR}`,
+          {
+            timeout: 30_000,
+          }
+        )
         .catch(() => null);
-      recovered =
-        (await page.locator('.calla-wrapper, .calla-pit, #board').count()) > 0;
+      recovered = isOfflineProbeMountOk({
+        mountCount: await page.locator(OFFLINE_PROBE_CALLA_MOUNT).count(),
+        loadErrorCount: await page.locator(OFFLINE_PROBE_LOAD_ERROR).count(),
+      });
     }
 
     findings.scenarios.chunkLoadFailureRetry = {
