@@ -18,6 +18,7 @@ import { dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { parseHelpOnlyArgv } from './lib/help-only-cli.mjs';
+import { waitForGameReady } from './lib/page-ready.mjs';
 
 export const RENDER_PERF_MODE_USAGE = `Usage: node scripts/render-perf-mode.mjs [--help]
 
@@ -155,11 +156,7 @@ export async function measureTTI(page, navigateFn) {
   const t0 = await page.evaluate(() => performance.now());
   await navigateFn();
   // Interactive: loading gone + new-game control or board chrome present
-  await page
-    .locator('[data-testid="game-loading"]')
-    .waitFor({ state: 'hidden', timeout: 20_000 })
-    .catch(() => {});
-  await page.locator('#new-game-btn, h1').first().waitFor({ timeout: 20_000 });
+  await waitForGameReady(page, { timeoutMs: 20_000 });
   await waitDoubleRaf(page);
   const t1 = await page.evaluate(() => performance.now());
   return t1 - t0;
