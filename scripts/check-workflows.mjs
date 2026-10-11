@@ -43,12 +43,30 @@ function isObject(value) {
 }
 
 /**
+ * GitHub Actions accepts `on` as a mapping (`on: pull_request:`) or a
+ * sequence shorthand (`on: [pull_request]`). Treat both forms the same.
+ *
+ * @param {unknown} on
+ * @param {string} event
+ * @returns {boolean}
+ */
+export function onIncludesEvent(on, event) {
+  if (Array.isArray(on)) {
+    return on.includes(event);
+  }
+  if (!isObject(on)) return false;
+  return event in on;
+}
+
+/**
  * @param {unknown} on
  * @returns {boolean}
  */
 export function hasPullRequestTrigger(on) {
-  if (!isObject(on)) return false;
-  return 'pull_request' in on || 'pull_request_target' in on;
+  return (
+    onIncludesEvent(on, 'pull_request') ||
+    onIncludesEvent(on, 'pull_request_target')
+  );
 }
 
 /**
@@ -122,7 +140,7 @@ export function auditWorkflow(file, doc, raw) {
 
   // --- pull_request_target / secrets ---
   const on = doc.on ?? doc.true;
-  if (isObject(on) && 'pull_request_target' in on) {
+  if (onIncludesEvent(on, 'pull_request_target')) {
     fail('pull_request_target is forbidden (fork secret exfiltration risk)');
   }
   if (hasPullRequestTrigger(on)) {

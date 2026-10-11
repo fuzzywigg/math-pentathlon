@@ -15,6 +15,7 @@ import {
   auditWorkflow,
   auditWorkflowsDir,
   hasPullRequestTrigger,
+  onIncludesEvent,
   parseUses,
 } from '../../scripts/check-workflows.mjs';
 
@@ -59,6 +60,17 @@ describe('workflow contract helpers', () => {
     expect(hasPullRequestTrigger({ push: { branches: ['alpha'] } })).toBe(
       false
     );
+  });
+
+  it('hasPullRequestTrigger honors list-form on: [pull_request] (q-mp-1077)', () => {
+    expect(hasPullRequestTrigger(['pull_request'])).toBe(true);
+    expect(hasPullRequestTrigger(['push', 'pull_request'])).toBe(true);
+    expect(hasPullRequestTrigger(['pull_request_target'])).toBe(true);
+    expect(hasPullRequestTrigger(['push', 'workflow_dispatch'])).toBe(false);
+    expect(onIncludesEvent(['pull_request_target'], 'pull_request_target')).toBe(
+      true
+    );
+    expect(onIncludesEvent(['pull_request'], 'pull_request_target')).toBe(false);
   });
 });
 
@@ -152,6 +164,40 @@ jobs:
       (v) => v.message
     );
     expect(messages.some((m) => m.includes('secrets.*'))).toBe(true);
+  });
+
+  it('rejects secrets on list-form on: [pull_request] (q-mp-1077)', () => {
+    const listForm = GOOD_CI.replace(
+      'on:\n  pull_request:\n    branches: [alpha]',
+      'on: [pull_request]'
+    );
+    const withSecret = `${listForm}      - name: leak
+        env:
+          TOKEN: \${{ secrets.NPM_TOKEN }}
+        run: echo hi
+`;
+    expect(auditWorkflow('ci.yml', yaml.load(listForm), listForm)).toEqual([]);
+    const messages = auditWorkflow(
+      'ci.yml',
+      yaml.load(withSecret),
+      withSecret
+    ).map((v) => v.message);
+    expect(messages.some((m) => m.includes('secrets.*'))).toBe(true);
+  });
+
+  it('forbids list-form on: [pull_request_target] (q-mp-1077)', () => {
+    const listTarget = GOOD_CI.replace(
+      'on:\n  pull_request:\n    branches: [alpha]',
+      'on: [pull_request_target]'
+    );
+    const messages = auditWorkflow(
+      'ci.yml',
+      yaml.load(listTarget),
+      listTarget
+    ).map((v) => v.message);
+    expect(
+      messages.some((m) => m.includes('pull_request_target is forbidden'))
+    ).toBe(true);
   });
 
   it('requires Playwright cache keyed on package-lock.json', () => {
