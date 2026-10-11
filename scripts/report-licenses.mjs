@@ -164,6 +164,8 @@ export function emptyPackagesMessage(lockPath = LOCK_PATH) {
 const DENIED_LICENSE_PATTERNS = [
   // `\bAGPL` covers SPDX (AGPL-3.0) and legacy AGPLv3 (q-mp-1079).
   /\bAGPL/i,
+  // Affero / GNU Affero long prose (q-mp-1127); SPDX AGPL-* already via `\bAGPL`.
+  /\bAffero\s+General\s+Public\s+License\b/i,
   /\bGPL-2\.0\b/i,
   /\bGPL-3\.0\b/i,
   // Legacy npm spellings (q-mp-1054).
@@ -180,6 +182,9 @@ const DENIED_LICENSE_PATTERNS = [
   /\bBusiness\s+Source\s+License\b/i,
   /\bCommons\s*Clause\b/i,
   /\bCPAL\b/i,
+  // Common Public Attribution License prose (q-mp-1131); SPDX CPAL-* via `\bCPAL`.
+  // Distinct from copyleft CPL / Common Public License (q-mp-1103).
+  /\bCommon\s+Public\s+Attribution\s+License\b/i,
 ];
 
 /**
@@ -192,6 +197,9 @@ const COPYLEFT_OR_REVIEW_PATTERNS = [
   /\bMozilla\s+Public\s+License\b/i,
   // `\bLGPL` covers SPDX LGPL-2.1 and legacy LGPLv2.1 / LGPLv3 (q-mp-1079).
   /\bLGPL/i,
+  // GNU Lesser / Library GPL prose (q-mp-1128); SPDX LGPL-* already via `\bLGPL`.
+  /\bGNU\s+Lesser\s+General\s+Public\s+License\b/i,
+  /\bGNU\s+Library\s+General\s+Public\s+License\b/i,
   /\bEPL\b/i,
   // Eclipse Public License prose (q-mp-1104); SPDX EPL-* already via `\bEPL\b`.
   /\bEclipse\s+Public\s+License\b/i,
@@ -201,6 +209,9 @@ const COPYLEFT_OR_REVIEW_PATTERNS = [
   /\bCDDL\b/i,
   /\bEUPL\b/i,
   /\bOSL\b/i,
+  // EUPL / OSL long prose (q-mp-1129); SPDX EUPL-* / OSL-* already via short tokens.
+  /\bEuropean\s+Union\s+Public\s+License\b/i,
+  /\bOpen\s+Software\s+License\b/i,
   /\bPython-2\.0\b/i,
 ];
 
@@ -215,7 +226,8 @@ const UNKNOWN_LICENSE_PATTERNS = [
   /^$/i,
   /^UNKNOWN$/i,
   /^UNLICENSED$/i,
-  /^SEE\s+LICENSE/i,
+  // American SEE LICENSE + British SEE LICENCE (q-mp-1130).
+  /^SEE\s+LICEN[CS]E/i,
   /^PROPRIETARY$/i,
   /^NONE$/i,
   // npm "Custom" / "Custom: https://…" (q-mp-1102).

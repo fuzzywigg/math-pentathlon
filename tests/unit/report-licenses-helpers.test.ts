@@ -43,10 +43,32 @@ describe('report-licenses helpers', () => {
     expect(classifyLicense('GNU General Public License v2.0')).toBe('denied');
     expect(classifyLicense('Server Side Public License')).toBe('denied');
     expect(classifyLicense('Business Source License 1.1')).toBe('denied');
+    // Affero / GNU Affero prose (q-mp-1127); SPDX AGPL-* already denied
+    expect(classifyLicense('GNU Affero General Public License v3.0')).toBe(
+      'denied'
+    );
+    expect(classifyLicense('Affero General Public License')).toBe('denied');
+    expect(classifyLicense('AGPL-3.0')).toBe('denied');
+    // CPAL prose (q-mp-1131); SPDX CPAL-* already denied; not CPL (1103)
+    expect(classifyLicense('Common Public Attribution License 1.0')).toBe(
+      'denied'
+    );
+    expect(
+      classifyLicense('Common Public Attribution License Version 1.0')
+    ).toBe('denied');
+    expect(classifyLicense('CPAL-1.0')).toBe('denied');
     expect(classifyLicense('MPL-2.0')).toBe('copyleft_or_review');
     expect(classifyLicense('LGPL-2.1')).toBe('copyleft_or_review');
     expect(classifyLicense('LGPLv2.1')).toBe('copyleft_or_review');
     expect(classifyLicense('LGPLv3')).toBe('copyleft_or_review');
+    expect(classifyLicense('LGPL-3.0')).toBe('copyleft_or_review');
+    // GNU Lesser / Library GPL prose (q-mp-1128)
+    expect(classifyLicense('GNU Lesser General Public License v3.0')).toBe(
+      'copyleft_or_review'
+    );
+    expect(classifyLicense('GNU Library General Public License')).toBe(
+      'copyleft_or_review'
+    );
     expect(classifyLicense('MPLv2')).toBe('copyleft_or_review');
     expect(classifyLicense('Mozilla Public License 2.0')).toBe(
       'copyleft_or_review'
@@ -66,6 +88,15 @@ describe('report-licenses helpers', () => {
     expect(classifyLicense('Eclipse Public License v1.0')).toBe(
       'copyleft_or_review'
     );
+    // EUPL / OSL prose (q-mp-1129); SPDX short forms already review
+    expect(classifyLicense('European Union Public License 1.2')).toBe(
+      'copyleft_or_review'
+    );
+    expect(classifyLicense('Open Software License 3.0')).toBe(
+      'copyleft_or_review'
+    );
+    expect(classifyLicense('EUPL-1.2')).toBe('copyleft_or_review');
+    expect(classifyLicense('OSL-3.0')).toBe('copyleft_or_review');
     expect(classifyLicense('')).toBe('unknown');
     expect(classifyLicense('UNLICENSED')).toBe('unknown');
     // Bare / URL Custom* must not be ok (q-mp-1102)
@@ -79,6 +110,10 @@ describe('report-licenses helpers', () => {
     expect(classifyLicense('NONE OR Apache-2.0')).toBe('unknown');
     expect(classifyLicense('UNKNOWN OR MIT')).toBe('unknown');
     expect(classifyLicense('Custom OR MIT')).toBe('unknown');
+    // American SEE LICENSE + British SEE LICENCE (q-mp-1130)
+    expect(classifyLicense('SEE LICENSE IN COPYING')).toBe('unknown');
+    expect(classifyLicense('SEE LICENCE IN COPYING')).toBe('unknown');
+    expect(classifyLicense('see licence in copying')).toBe('unknown');
     expect(classifyLicense('MIT')).toBe('ok');
     expect(classifyLicense('Apache-2.0')).toBe('ok');
     expect(classifyLicense('(MIT OR CC0-1.0)')).toBe('ok');
