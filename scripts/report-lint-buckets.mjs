@@ -38,6 +38,31 @@ function isMissingOrFlagLike(value) {
 }
 
 /**
+ * Positive integer for `--top` (q-mp-968). Rejects 0, negatives, non-integers,
+ * and non-numeric tokens instead of silently keeping the default.
+ * @param {string} raw
+ * @returns {{ ok: true, value: number } | { ok: false, message: string }}
+ */
+function parsePositiveIntTop(raw) {
+  if (!/^\d+$/.test(raw)) {
+    return {
+      ok: false,
+      message:
+        'Missing or invalid value for --top (expected a positive integer).',
+    };
+  }
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < 1) {
+    return {
+      ok: false,
+      message:
+        'Missing or invalid value for --top (expected a positive integer).',
+    };
+  }
+  return { ok: true, value: n };
+}
+
+/**
  * @param {string[]} argv
  * @returns {| { ok: true, rule: string | null, top: number, json: boolean, help: boolean }
  *   | { ok: false, message: string }}
@@ -62,7 +87,15 @@ export function parseArgs(argv) {
       opts.rule = value;
       i += 1;
     } else if (arg.startsWith('--rule=')) {
-      opts.rule = arg.slice('--rule='.length) || null;
+      // q-mp-968: empty `--rule=` must not silently mean "all rules".
+      const value = arg.slice('--rule='.length);
+      if (value === '') {
+        return {
+          ok: false,
+          message: 'Missing or invalid value for --rule (expected a rule id).',
+        };
+      }
+      opts.rule = value;
     } else if (arg === '--top') {
       const value = argv[i + 1];
       if (isMissingOrFlagLike(value)) {
@@ -72,12 +105,14 @@ export function parseArgs(argv) {
             'Missing or invalid value for --top (expected a positive integer).',
         };
       }
-      const n = Number.parseInt(value, 10);
-      if (Number.isFinite(n) && n > 0) opts.top = n;
+      const parsedTop = parsePositiveIntTop(value);
+      if (!parsedTop.ok) return parsedTop;
+      opts.top = parsedTop.value;
       i += 1;
     } else if (arg.startsWith('--top=')) {
-      const n = Number.parseInt(arg.slice('--top='.length), 10);
-      if (Number.isFinite(n) && n > 0) opts.top = n;
+      const parsedTop = parsePositiveIntTop(arg.slice('--top='.length));
+      if (!parsedTop.ok) return parsedTop;
+      opts.top = parsedTop.value;
     } else if (arg.startsWith('-')) {
       // q-mp-943: reject typos / unknown flags before the eslint probe.
       return { ok: false, message: `Unknown flag: ${arg}` };
