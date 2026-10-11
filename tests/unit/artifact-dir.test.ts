@@ -54,6 +54,32 @@ describe('resolveArtifactDir (q-mp-955)', () => {
     expect(got).toBe(CLOUD_ARTIFACT_DIR);
   });
 
+  it('trims MP_ARTIFACT_DIR before mkdir (q-mp-1263)', () => {
+    const created: string[] = [];
+    const got = resolveArtifactDir({
+      env: { MP_ARTIFACT_DIR: '  spaced  ' },
+      cwd: '/tmp',
+      mkdirSync: (p) => {
+        created.push(p);
+      },
+    });
+    expect(got).toBe(resolve('/tmp', 'spaced'));
+    expect(created).toEqual([resolve('/tmp', 'spaced')]);
+  });
+
+  it('trims absolute MP_ARTIFACT_DIR before mkdir (q-mp-1263)', () => {
+    const created: string[] = [];
+    const got = resolveArtifactDir({
+      env: { MP_ARTIFACT_DIR: '  /tmp/mp-artifact-trim  ' },
+      cwd: '/repo',
+      mkdirSync: (p) => {
+        created.push(p);
+      },
+    });
+    expect(got).toBe('/tmp/mp-artifact-trim');
+    expect(created).toEqual(['/tmp/mp-artifact-trim']);
+  });
+
   it('falls back to repo-local when the cloud root is not creatable', () => {
     const created: string[] = [];
     const got = resolveArtifactDir({

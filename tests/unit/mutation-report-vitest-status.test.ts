@@ -10,6 +10,10 @@
  * Also covers mutateGame baseline gate (q-mp-1243): `no-tests` baseline must
  * skip mutants (score null / skipReason). Kept in this unit-node file so the
  * suite stays off unit-shared jsdom setup without editing vitest.config.ts.
+ *
+ * Also covers frac-fact test globs (q-mp-1264): expandExistingTests must drop
+ * *difficulty* overnight suites while keeping other wave54 rules files.
+ * Leave games dedupe (#1365/1232) and Vitest classify (#1351/1217) alone.
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'node:fs';
@@ -18,7 +22,10 @@ import path from 'node:path';
 import { classifyVitestRunResult } from '../../scripts/lib/mutation-report-vitest-status.mjs';
 import {
   baselineAllowsMutantRuns,
+  expandExistingTests,
+  isExcludedMutationSuiteName,
   mutateGame,
+  testGlobsForGame,
 } from '../../scripts/mutation-report.mjs';
 
 describe('classifyVitestRunResult (q-mp-1038, q-mp-1156, q-mp-1182, q-mp-1205)', () => {
@@ -278,3 +285,53 @@ describe('mutateGame baseline no-tests skip (q-mp-1243)', () => {
   });
 });
 
+describe('testGlobsForGame / expandExistingTests (q-mp-1264)', () => {
+  it('marks difficulty / scoring / ai suite basenames as excluded', () => {
+    expect(
+      isExcludedMutationSuiteName(
+        'tests/unit/overnight-wave54-frac-rules-difficulty-operand-denoms.test.ts'
+      )
+    ).toBe(true);
+    expect(
+      isExcludedMutationSuiteName('tests/unit/some-game-scoring-rules.test.ts')
+    ).toBe(true);
+    expect(
+      isExcludedMutationSuiteName(
+        'tests/unit/overnight-wave1-hex-ai-rules.test.ts'
+      )
+    ).toBe(true);
+    expect(
+      isExcludedMutationSuiteName(
+        'tests/unit/overnight-wave54-frac-rules-subtract-operand-order.test.ts'
+      )
+    ).toBe(false);
+  });
+
+  it('frac-fact globs include wave54 frac-rules wildcard', () => {
+    const globs = testGlobsForGame('frac-fact');
+    expect(globs).toContain('tests/unit/overnight-wave54-frac-rules-*.test.ts');
+  });
+
+  it('frac-fact expanded tests exclude difficulty overnight and keep other wave54 rules', () => {
+    const tests = expandExistingTests(testGlobsForGame('frac-fact'));
+    const wave54 = tests.filter((t) =>
+      t.includes('overnight-wave54-frac-rules-')
+    );
+    expect(wave54.length).toBeGreaterThanOrEqual(3);
+    expect(wave54.every((t) => !t.toLowerCase().includes('difficulty'))).toBe(
+      true
+    );
+    expect(wave54).toContain(
+      'tests/unit/overnight-wave54-frac-rules-subtract-operand-order.test.ts'
+    );
+    expect(wave54).toContain(
+      'tests/unit/overnight-wave54-frac-rules-next-overshoot-clears.test.ts'
+    );
+    expect(wave54).toContain(
+      'tests/unit/overnight-wave54-frac-rules-start-does-not-mutate.test.ts'
+    );
+    expect(wave54).not.toContain(
+      'tests/unit/overnight-wave54-frac-rules-difficulty-operand-denoms.test.ts'
+    );
+  });
+});

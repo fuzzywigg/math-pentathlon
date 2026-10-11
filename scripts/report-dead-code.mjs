@@ -350,15 +350,26 @@ function runKnip() {
 
 /**
  * Normalize knip JSON ({ files, issues[] }) into flat candidate records.
+ * Null / non-object `files` entries are skipped (q-mp-1255).
  * @param {*} knip
  */
-function flattenKnip(knip) {
+export function flattenKnip(knip) {
   /** @type {Array<{kind:string,path:string,symbol?:string,source:string}>} */
   const out = [];
   for (const f of knip.files || []) {
+    if (f == null) continue;
+    let filePath;
+    if (typeof f === 'string') {
+      filePath = f;
+    } else if (typeof f === 'object' && typeof f.file === 'string') {
+      filePath = f.file;
+    } else {
+      continue;
+    }
+    if (!filePath) continue;
     out.push({
       kind: 'file',
-      path: typeof f === 'string' ? f : f.file,
+      path: filePath,
       source: 'knip',
     });
   }
@@ -472,6 +483,20 @@ function collectDynamicAndRegistry() {
 }
 
 /**
+ * True when a dynamic-import specifier references `gameId` on a path-segment
+ * boundary (e.g. `/games/hex/` or `games/hex` at end). Avoids substring false
+ * hits such as `hex` ⊂ `hex-a-gone` (q-mp-1256).
+ *
+ * @param {string} dynSpec
+ * @param {string | null | undefined} gameId
+ */
+export function dynamicImportHitsGameId(dynSpec, gameId) {
+  if (!gameId || typeof dynSpec !== 'string') return false;
+  const escaped = String(gameId).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(?:^|/)games/${escaped}(?:/|$)`).test(dynSpec);
+}
+
+/**
  * Verify a symbol/path candidate via grep + dynamic-import / registry checks.
  * @param {{ kind: string, path: string, symbol?: string }} cand
  */
@@ -552,7 +577,11 @@ function verifyCandidate(cand) {
     const needle = cand.path
       .replace(/^src\//, '')
       .replace(/\.ts$/, '');
-    if (dynamicImports.some((d) => d.includes(needle) || d.includes(gameId || ''))) {
+    if (
+      dynamicImports.some(
+        (d) => d.includes(needle) || dynamicImportHitsGameId(d, gameId)
+      )
+    ) {
       dynamicHit = true;
       evidence.push('dynamic-import: referenced from mounts/prefetch/main');
     }
@@ -800,6 +829,28 @@ function catalogFeatureFlags() {
 }
 
 /**
+ * Public export names from an `export { … }` brace body (q-mp-1257).
+ * For `export { a as b }` records `b` (the public name), not the local `a`.
+ *
+ * @param {string} braceBody
+ * @returns {string[]}
+ */
+export function publicNamesFromExportBrace(braceBody) {
+  /** @type {string[]} */
+  const names = [];
+  if (typeof braceBody !== 'string') return names;
+  for (const part of braceBody.split(',')) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+    const asParts = trimmed.split(/\s+as\s+/);
+    let name = (asParts[asParts.length - 1] || '').trim();
+    name = name.replace(/^type(?:of)?\s+/, '');
+    if (name && /^\w+$/.test(name)) names.push(name);
+  }
+  return names;
+}
+
+/**
  * Test helper modules: files under helpers/ or *helpers*.ts that are not *.test.ts
  */
 function scanTestHelpers() {
@@ -860,9 +911,8 @@ function scanTestHelpers() {
       exportNames.add(m[1]);
     }
     for (const m of text.matchAll(/^export\s+\{([^}]+)\}/gm)) {
-      for (const part of m[1].split(',')) {
-        const name = part.trim().split(/\s+as\s+/)[0].trim();
-        if (name) exportNames.add(name);
+      for (const name of publicNamesFromExportBrace(m[1])) {
+        exportNames.add(name);
       }
     }
     for (const name of exportNames) {

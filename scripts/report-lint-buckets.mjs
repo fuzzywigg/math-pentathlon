@@ -26,7 +26,59 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const CEILINGS_PATH = path.join(ROOT, 'docs/dev/lint-ratchet-ceilings.json');
 
-/** @typedef {{ rules: Record<string, number>, notes?: string }} CeilingFile */
+/** @typedef {{ rules: Record<string, unknown>, notes?: string }} CeilingFile */
+
+/**
+ * Coerce a ceiling value to a finite number for headroom math (q-mp-1254).
+ * Accepts finite numbers and finite numeric strings; rejects NaN / Infinity /
+ * non-numeric strings / other types so `'abc' - total` cannot yield silent
+ * blank headroom notes.
+ *
+ * @param {unknown} value
+ * @returns {number | null}
+ */
+export function coerceCeilingNumber(value) {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null;
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (trimmed === '') return null;
+    const n = Number(trimmed);
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
+}
+
+/**
+ * Resolve printable / JSON headroom for one rule against its ceiling.
+ * Non-numeric ceilings → explicit skip (no NaN arithmetic).
+ *
+ * @param {unknown} ceilingRaw
+ * @param {number} total
+ * @returns {| { ok: true, ceiling: number, headroom: number, note: string }
+ *   | { ok: false, ceiling: unknown, headroom: null, note: string, error: string }}
+ */
+export function resolveRuleHeadroom(ceilingRaw, total) {
+  const ceiling = coerceCeilingNumber(ceilingRaw);
+  if (ceiling == null) {
+    return {
+      ok: false,
+      ceiling: ceilingRaw,
+      headroom: null,
+      note: ' (invalid ceiling: non-numeric; headroom skipped)',
+      error: 'non-numeric ceiling',
+    };
+  }
+  const headroom = ceiling - total;
+  const note =
+    headroom > 0
+      ? ` (−${headroom} headroom; lower the ceiling after cleanup)`
+      : headroom < 0
+        ? ` (+${-headroom} OVER ceiling)`
+        : '';
+  return { ok: true, ceiling, headroom, note };
+}
 
 /**
  * True when the next argv token cannot be a value for `--top` / `--rule`
@@ -301,13 +353,22 @@ export default [
       };
       for (const rule of selected) {
         const entry = summary[rule];
-        payload.rules[rule] = {
+        const resolved = resolveRuleHeadroom(
+          ceilings.rules[rule],
+          entry.total
+        );
+        /** @type {Record<string, unknown>} */
+        const rulePayload = {
           total: entry.total,
-          ceiling: ceilings.rules[rule],
-          headroom: ceilings.rules[rule] - entry.total,
+          ceiling: resolved.ok ? resolved.ceiling : ceilings.rules[rule],
+          headroom: resolved.headroom,
           buckets: Object.fromEntries(topEntries(entry.buckets, opts.top)),
           files: Object.fromEntries(topEntries(entry.files, opts.top)),
         };
+        if (!resolved.ok) {
+          rulePayload.headroomError = resolved.error;
+        }
+        payload.rules[rule] = rulePayload;
       }
       console.log(JSON.stringify(payload, null, 2));
       process.exit(0);
@@ -319,16 +380,15 @@ export default [
 
     for (const rule of selected) {
       const entry = summary[rule];
-      const ceiling = ceilings.rules[rule];
-      const headroom = ceiling - entry.total;
-      const headroomNote =
-        headroom > 0
-          ? ` (−${headroom} headroom; lower the ceiling after cleanup)`
-          : headroom < 0
-            ? ` (+${-headroom} OVER ceiling)`
-            : '';
+      const resolved = resolveRuleHeadroom(
+        ceilings.rules[rule],
+        entry.total
+      );
+      const ceilingLabel = resolved.ok
+        ? String(resolved.ceiling)
+        : String(ceilings.rules[rule]);
       console.log(
-        `${rule}: ${entry.total} / ceiling ${ceiling}${headroomNote}`
+        `${rule}: ${entry.total} / ceiling ${ceilingLabel}${resolved.note}`
       );
 
       const buckets = topEntries(entry.buckets, opts.top);

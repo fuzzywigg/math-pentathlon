@@ -38,7 +38,7 @@ npm run build
 npm run preview                  # serve dist/ after build
 npm run lint
 npm run lint:fix
-npm run lint:ratchet             # curly:all ceiling (CI lint job; ratchet only goes down)
+npm run lint:ratchet             # 12-rule ceilings (docs/dev/lint-ratchet-ceilings.json; CI lint job; ratchet only goes down)
 npm run format                   # Prettier write under src/
 npm run format:check
 npm run typecheck                # tsc --noEmit (same as CI)
@@ -139,7 +139,7 @@ Workflows under `.github/workflows/`:
 
 ### Unit job runtime
 
-Live tip `cursor/mp-tip-post2590` (cut from `alpha` @ `2590f354` after #1353 squash-merge, 2026-10-11): tip-owner fold on draft tip PR (q-mp-026ab); live unit suite **3419** files @ tip open (remasure). Counts move every fold — tip owner remasures; do not treat these numbers as tip-head truth between folds. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
+Live tip `cursor/mp-tip-post99ba` (cut from `alpha` @ `99ba642f` after #1367 squash-merge, 2026-10-11): tip-owner fold on draft tip PR (q-mp-026ac); live unit suite **3424** files @ tip open (remasure). Counts move every fold — tip owner remasures; do not treat these numbers as tip-head truth between folds. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
 
 - Job `timeout-minutes: 14` and step `timeout-minutes: 12` so overrun fails loudly
 - CI prints the unit file count up front

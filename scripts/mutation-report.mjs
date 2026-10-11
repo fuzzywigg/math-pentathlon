@@ -107,8 +107,13 @@ function listGames() {
     .sort();
 }
 
-/** Focused rules-unit globs; excludes AI / scoring / difficulty suites by name. */
-function testGlobsForGame(game) {
+/**
+ * Focused rules-unit globs; excludes AI / scoring / difficulty suites by name
+ * (enforced in expandExistingTests via isExcludedMutationSuiteName).
+ *
+ * Exported for hermetic unit coverage (q-mp-1264).
+ */
+export function testGlobsForGame(game) {
   const globs = [
     `tests/unit/${game}-rules.test.ts`,
     `tests/unit/${game}-rules.*.test.ts`,
@@ -151,6 +156,7 @@ function testGlobsForGame(game) {
   }
   if (game === 'frac-fact') {
     // Overnight suites use abbreviated "frac" not "frac-fact".
+    // wave54 includes a *difficulty* suite; expandExistingTests drops it.
     globs.push('tests/unit/overnight-wave54-frac-rules-*.test.ts');
     globs.push('tests/unit/burn-wave31-expr-target-validate-rules.test.ts');
   }
@@ -159,7 +165,29 @@ function testGlobsForGame(game) {
   return globs;
 }
 
-function expandExistingTests(globs) {
+/**
+ * True when a suite basename is AI / scoring / difficulty (excluded by name).
+ * q-mp-1264: overnight-wave54-frac-rules-difficulty-*.test.ts must not run.
+ *
+ * @param {string} relPath
+ * @returns {boolean}
+ */
+export function isExcludedMutationSuiteName(relPath) {
+  const base = path.basename(relPath).toLowerCase();
+  return (
+    base.includes('difficulty') ||
+    base.includes('scoring') ||
+    /(^|[-.])ai([-.]|$)/.test(base.replace(/\.test\.ts$/, ''))
+  );
+}
+
+/**
+ * Expand globs to existing test paths, dropping AI / scoring / difficulty
+ * suites by basename (see testGlobsForGame header).
+ *
+ * Exported for hermetic unit coverage (q-mp-1264).
+ */
+export function expandExistingTests(globs) {
   const found = new Set();
   for (const g of globs) {
     // vitest accepts globs; still prefer existing files for dry messaging
@@ -178,7 +206,7 @@ function expandExistingTests(globs) {
       if (re.test(name)) found.add(path.join(dir, name));
     }
   }
-  return [...found].sort();
+  return [...found].filter((p) => !isExcludedMutationSuiteName(p)).sort();
 }
 
 function lineOf(sourceFile, pos) {

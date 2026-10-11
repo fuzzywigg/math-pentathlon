@@ -6,6 +6,7 @@ import {
   mapGameChunks,
   partitionOvers,
   resolveSizeCheckExitCode,
+  resolveSizeCheckCatchExitCode,
   parseSizeCheckArgs,
 } from '../../scripts/check-bundle-budgets.mjs';
 
@@ -136,6 +137,42 @@ describe('known vs NEW OVER allowlist (q-mp-123)', () => {
     expect(parseSizeCheckArgs(['--fail-on-new-over'])).toEqual({
       failOnNewOver: true,
     });
+  });
+
+  // q-mp-1253: NaN / negative / non-finite novelCount must not green-wash the soft gate
+  it('fails closed on non-finite or negative novelCount under --fail-on-new-over (q-mp-1253)', () => {
+    expect(
+      resolveSizeCheckExitCode({ novelCount: Number.NaN, failOnNewOver: true })
+    ).toBe(2);
+    expect(
+      resolveSizeCheckExitCode({ novelCount: -1, failOnNewOver: true })
+    ).toBe(2);
+    expect(
+      resolveSizeCheckExitCode({
+        novelCount: Number.POSITIVE_INFINITY,
+        failOnNewOver: true,
+      })
+    ).toBe(2);
+    // Default (no flag) stays report-only 0 even for invalid counts.
+    expect(
+      resolveSizeCheckExitCode({ novelCount: Number.NaN, failOnNewOver: false })
+    ).toBe(0);
+    expect(
+      resolveSizeCheckExitCode({ novelCount: -1, failOnNewOver: false })
+    ).toBe(0);
+    // Finite positives / zero unchanged.
+    expect(
+      resolveSizeCheckExitCode({ novelCount: 2, failOnNewOver: true })
+    ).toBe(1);
+    expect(
+      resolveSizeCheckExitCode({ novelCount: 0, failOnNewOver: true })
+    ).toBe(0);
+  });
+
+  // q-mp-1265: measurement throw under --fail-on-new-over must not force exit 0
+  it('catch exit is non-zero under --fail-on-new-over (q-mp-1265)', () => {
+    expect(resolveSizeCheckCatchExitCode(false)).toBe(0);
+    expect(resolveSizeCheckCatchExitCode(true)).toBe(2);
   });
 
   it('committed knownOvers matches tip measurement (empty after q-mp-110)', () => {

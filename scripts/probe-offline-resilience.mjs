@@ -14,7 +14,9 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { artifactPath } from './lib/artifact-dir.mjs';
+import { classifyOfflineProbeUrl } from './lib/offline-probe-classify.mjs';
 import { applyOfflineProbeCli } from './lib/offline-probe-cli.mjs';
+import { waitForUrl as waitForUrlReady } from './lib/offline-probe-ready.mjs';
 
 const USAGE = `Usage: node scripts/probe-offline-resilience.mjs
 
@@ -54,17 +56,9 @@ async function getFreePort() {
 }
 
 async function waitForUrl(url, timeoutMs = 90_000) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(url);
-      if (res.ok || res.status === 404) return;
-    } catch {
-      // booting
-    }
-    await new Promise((r) => setTimeout(r, 250));
-  }
-  throw new Error(`Timed out waiting for ${url}`);
+  return waitForUrlReady(url, timeoutMs, {
+    timeoutMessage: (u) => `Timed out waiting for ${u}`,
+  });
 }
 
 function run(cmd, args) {
@@ -80,7 +74,8 @@ function run(cmd, args) {
     });
     child.on('exit', (code) => {
       if (code === 0) resolve();
-      else reject(new Error(`${cmd} ${args.join(' ')} failed (${code}): ${err}`));
+      else
+        reject(new Error(`${cmd} ${args.join(' ')} failed (${code}): ${err}`));
     });
   });
 }
@@ -128,12 +123,7 @@ async function collectFailed(page, action) {
 }
 
 function classify(url) {
-  if (/\/fonts\/|\.woff2?(?:\?|$)/i.test(url)) return 'font';
-  if (/three|board-3d|vendor\/three/i.test(url)) return '3d-asset';
-  if (/game-controller|\.worker|\/games\//i.test(url)) return 'lazy-game-chunk';
-  if (/\.js(\?|$)/i.test(url)) return 'js';
-  if (/\.css(\?|$)/i.test(url)) return 'css';
-  return 'other';
+  return classifyOfflineProbeUrl(url, { mode: 'prod' });
 }
 
 async function main() {
@@ -151,7 +141,15 @@ async function main() {
   const baseURL = `http://127.0.0.1:${port}`;
   const preview = spawn(
     'npx',
-    ['vite', 'preview', '--host', '127.0.0.1', '--port', String(port), '--strictPort'],
+    [
+      'vite',
+      'preview',
+      '--host',
+      '127.0.0.1',
+      '--port',
+      String(port),
+      '--strictPort',
+    ],
     { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'], env: process.env }
   );
   await waitForUrl(baseURL);
@@ -164,22 +162,31 @@ async function main() {
     const context = await browser.newContext();
     const page = await context.newPage();
     const failedOnline = await collectFailed(page, async () => {
-      await page.goto(baseURL + '/', { waitUntil: 'networkidle', timeout: 60_000 });
+      await page.goto(baseURL + '/', {
+        waitUntil: 'networkidle',
+        timeout: 60_000,
+      });
       await waitForSw(page);
       // Warm menu + one game so game chunk is definitely requested while online.
       await page.goto(baseURL + '/#/game/hex', {
         waitUntil: 'networkidle',
         timeout: 60_000,
       });
-      await page.waitForSelector('.hex-board, #board, [data-testid="game-load-error"]', {
-        timeout: 30_000,
-      });
+      await page.waitForSelector(
+        '.hex-board, #board, [data-testid="game-load-error"]',
+        {
+          timeout: 30_000,
+        }
+      );
     });
 
     await context.setOffline(true);
     const offlineNav = {};
     const failedOffline = await collectFailed(page, async () => {
-      await page.goto(baseURL + '/#/', { waitUntil: 'domcontentloaded', timeout: 30_000 });
+      await page.goto(baseURL + '/#/', {
+        waitUntil: 'domcontentloaded',
+        timeout: 30_000,
+      });
       offlineNav.menuCards = await page.locator('.game-card').count();
       offlineNav.menuVisible = offlineNav.menuCards > 0;
       offlineNav.dataOffline =
@@ -190,11 +197,15 @@ async function main() {
         timeout: 30_000,
       });
       await page
-        .waitForSelector('.hex-board, #board, [data-testid="game-load-error"]', {
-          timeout: 20_000,
-        })
+        .waitForSelector(
+          '.hex-board, #board, [data-testid="game-load-error"]',
+          {
+            timeout: 20_000,
+          }
+        )
         .catch(() => null);
-      offlineNav.hexBoard = (await page.locator('.hex-board, #board').count()) > 0;
+      offlineNav.hexBoard =
+        (await page.locator('.hex-board, #board').count()) > 0;
       offlineNav.hexLoadError =
         (await page.locator('[data-testid="game-load-error"]').count()) > 0;
       offlineNav.hexHint = await page
@@ -209,9 +220,12 @@ async function main() {
         timeout: 30_000,
       });
       await page
-        .waitForSelector('.pent-board, #board, [data-testid="game-load-error"]', {
-          timeout: 20_000,
-        })
+        .waitForSelector(
+          '.pent-board, #board, [data-testid="game-load-error"]',
+          {
+            timeout: 20_000,
+          }
+        )
         .catch(() => null);
       offlineNav.pentBoard =
         (await page.locator('.pent-board, #board, h1').count()) > 0;
@@ -242,7 +256,10 @@ async function main() {
         ...f,
         kind: classify(f.url),
       })),
-      failedOffline: failedOffline.map((f) => ({ ...f, kind: classify(f.url) })),
+      failedOffline: failedOffline.map((f) => ({
+        ...f,
+        kind: classify(f.url),
+      })),
       failedOfflineByKind: failedOffline.reduce((acc, f) => {
         const k = classify(f.url);
         acc[k] = (acc[k] || 0) + 1;
@@ -273,15 +290,19 @@ async function main() {
     });
 
     const t0 = Date.now();
-    await page.goto(baseURL + '/', { waitUntil: 'domcontentloaded', timeout: 120_000 });
+    await page.goto(baseURL + '/', {
+      waitUntil: 'domcontentloaded',
+      timeout: 120_000,
+    });
     await page.waitForSelector('.game-card', { timeout: 120_000 });
     timings.menuDomMs = Date.now() - t0;
 
     const fontStatus = await page.evaluate(async () => {
       await document.fonts.ready;
       return {
-        interLoaded: [...document.fonts].filter((f) => f.family.includes('Inter'))
-          .length,
+        interLoaded: [...document.fonts].filter((f) =>
+          f.family.includes('Inter')
+        ).length,
         documentFontsStatus: document.fonts.status,
       };
     });
@@ -298,7 +319,8 @@ async function main() {
       .catch(() => null);
     timings.hexReadyMs = Date.now() - tHex;
     const hexOk = (await page.locator('.hex-board, #board').count()) > 0;
-    const hexErr = (await page.locator('[data-testid="game-load-error"]').count()) > 0;
+    const hexErr =
+      (await page.locator('[data-testid="game-load-error"]').count()) > 0;
 
     const t3d = Date.now();
     await page.goto(baseURL + '/#/game/hex-a-gone', {
@@ -313,8 +335,9 @@ async function main() {
       .catch(() => null);
     timings.hexAGoneReadyMs = Date.now() - t3d;
     const hagOk =
-      (await page.locator('.hex-a-gone-board, #board, canvas[data-mp3d]').count()) >
-      0;
+      (await page
+        .locator('.hex-a-gone-board, #board, canvas[data-mp3d]')
+        .count()) > 0;
     const hagErr =
       (await page.locator('[data-testid="game-load-error"]').count()) > 0;
     const threeRequested = await page.evaluate(() =>
@@ -324,7 +347,8 @@ async function main() {
     );
 
     findings.scenarios.slow3g = {
-      description: 'CDP Network.emulateNetworkConditions Slow 3G (500kbps / 400ms)',
+      description:
+        'CDP Network.emulateNetworkConditions Slow 3G (500kbps / 400ms)',
       timings,
       fontStatus,
       hexOk,
@@ -412,7 +436,10 @@ async function main() {
     await context.setOffline(true);
     let coldError = null;
     try {
-      await page.goto(baseURL + '/', { waitUntil: 'domcontentloaded', timeout: 10_000 });
+      await page.goto(baseURL + '/', {
+        waitUntil: 'domcontentloaded',
+        timeout: 10_000,
+      });
     } catch (e) {
       coldError = String(e.message || e);
     }
@@ -422,7 +449,12 @@ async function main() {
       error: coldError,
       bodyText: coldError
         ? null
-        : (await page.locator('body').innerText().catch(() => '')).slice(0, 200),
+        : (
+            await page
+              .locator('body')
+              .innerText()
+              .catch(() => '')
+          ).slice(0, 200),
     };
     await context.close();
   }

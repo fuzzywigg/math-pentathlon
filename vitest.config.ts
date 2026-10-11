@@ -160,6 +160,8 @@ const nodePureFiles = [
   'tests/unit/deep-playtest-cli-help.test.ts',
   // deep-playtest page-ready adoption (q-mp-925); spawnSync + source asserts need node.
   'tests/unit/deep-playtest-page-ready.test.ts',
+  // deep-playtest end word-boundaries + PAR55_QUICK (q-mp-1259 / 1260); hermetic node.
+  'tests/unit/q-mp-1259-1260-deep-playtest-end.test.ts',
   // help-only CLI argv (q-mp-885); spawnSync CLI check needs node env.
   'tests/unit/help-only-cli.test.ts',
   // report-licenses --dry-run write guard (q-mp-979); spawnSync CLI check needs node env.
@@ -184,6 +186,8 @@ const nodePureFiles = [
   'tests/unit/check-perf-lh-timeout-kill.test.ts',
   // check:perf missing LH performance score fail-closed (q-mp-1208); fixture JSON.
   'tests/unit/check-perf-missing-score.test.ts',
+  // check:perf out-of-range LH performance score fail-closed (q-mp-1246); fixture JSON.
+  'tests/unit/check-perf-out-of-range-score.test.ts',
   // page-settle double-rAF helper (q-mp-920); hermetic fake page.evaluate needs node.
   'tests/unit/page-settle.test.ts',
   // memory-leak-audit page-ready adoption (q-mp-923); spawnSync --check/--help.

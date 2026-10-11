@@ -11,7 +11,9 @@ import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { artifactPath } from './lib/artifact-dir.mjs';
+import { classifyOfflineProbeUrl } from './lib/offline-probe-classify.mjs';
 import { applyOfflineProbeCli } from './lib/offline-probe-cli.mjs';
+import { waitForUrl as waitForUrlReady } from './lib/offline-probe-ready.mjs';
 
 const USAGE = `Usage: node scripts/probe-offline-resilience-dev.mjs
 
@@ -52,26 +54,13 @@ async function getFreePort() {
 }
 
 async function waitForUrl(url, timeoutMs = 60_000) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    try {
-      const res = await fetch(url);
-      if (res.ok || res.status === 404) return;
-    } catch {
-      // booting
-    }
-    await new Promise((r) => setTimeout(r, 250));
-  }
-  throw new Error(`Timed out waiting for ${url}`);
+  return waitForUrlReady(url, timeoutMs, {
+    timeoutMessage: (u) => `Timed out waiting for ${u}`,
+  });
 }
 
 function classify(url) {
-  if (/\/fonts\/|\.woff2?(?:\?|$)/i.test(url)) return 'font';
-  if (/three|board-3d|\/ui\/three/i.test(url)) return '3d-asset';
-  if (/game-controller|\/games\//i.test(url)) return 'lazy-game-chunk';
-  if (/\.css(\?|$)/i.test(url)) return 'css';
-  if (/\.js|\.ts(\?|$)/i.test(url)) return 'js';
-  return 'other';
+  return classifyOfflineProbeUrl(url, { mode: 'dev' });
 }
 
 function shorten(url) {
@@ -126,7 +115,10 @@ async function main() {
       });
     });
 
-    await page.goto(baseURL + '/', { waitUntil: 'networkidle', timeout: 60_000 });
+    await page.goto(baseURL + '/', {
+      waitUntil: 'networkidle',
+      timeout: 60_000,
+    });
     await page.waitForSelector('.game-card', { timeout: 30_000 });
 
     const fontsOnline = await page.evaluate(async () => {
@@ -151,9 +143,12 @@ async function main() {
       location.hash = '#/game/calla';
     });
     await page
-      .waitForSelector('[data-testid="game-load-error"], .calla-wrapper, .calla-pit', {
-        timeout: 15_000,
-      })
+      .waitForSelector(
+        '[data-testid="game-load-error"], .calla-wrapper, .calla-pit',
+        {
+          timeout: 15_000,
+        }
+      )
       .catch(() => null);
 
     findings.scenarios.devOfflineAfterFirstLoad = {
@@ -161,7 +156,8 @@ async function main() {
         'Vite dev (no SW): menu online → offline → open Calla (unwarmed lazy chunk)',
       fontsOnline,
       menuStillVisible,
-      dataOffline: (await page.locator('html[data-offline="true"]').count()) > 0,
+      dataOffline:
+        (await page.locator('html[data-offline="true"]').count()) > 0,
       callaBoard:
         (await page.locator('.calla-wrapper, .calla-pit, #board').count()) > 0,
       callaLoadError:
@@ -182,11 +178,16 @@ async function main() {
     const context = await browser.newContext();
     const page = await context.newPage();
     await page.route('**/fonts/**', (route) => route.abort('failed'));
-    await page.goto(baseURL + '/', { waitUntil: 'domcontentloaded', timeout: 60_000 });
+    await page.goto(baseURL + '/', {
+      waitUntil: 'domcontentloaded',
+      timeout: 60_000,
+    });
     await page.waitForSelector('.game-card', { timeout: 30_000 });
     const fontInfo = await page.evaluate(async () => {
       await document.fonts.ready;
-      const inter = [...document.fonts].filter((f) => f.family.includes('Inter'));
+      const inter = [...document.fonts].filter((f) =>
+        f.family.includes('Inter')
+      );
       return {
         interCount: inter.length,
         interStatuses: inter.map((f) => f.status),
@@ -194,7 +195,8 @@ async function main() {
       };
     });
     findings.scenarios.fontAbort = {
-      description: 'Abort /fonts/* on cold load — Inter fails, system stack remains',
+      description:
+        'Abort /fonts/* on cold load — Inter fails, system stack remains',
       fontInfo,
       menuVisible: (await page.locator('.game-card').count()) > 0,
     };
@@ -209,7 +211,9 @@ async function main() {
     page.on('requestfailed', (req) => {
       failed.push({ url: shorten(req.url()), kind: classify(req.url()) });
     });
-    await page.route('**/node_modules/three/**', (route) => route.abort('failed'));
+    await page.route('**/node_modules/three/**', (route) =>
+      route.abort('failed')
+    );
     await page.route('**/ui/three/**', (route) => route.abort('failed'));
     await page.goto(baseURL + '/#/game/hex-a-gone', {
       waitUntil: 'domcontentloaded',
@@ -228,7 +232,10 @@ async function main() {
         (await page.locator('[data-testid="game-load-error"]').count()) > 0,
       board2d: (await page.locator('.hex-a-gone-board, #board').count()) > 0,
       canvas3d: (await page.locator('canvas[data-mp3d]').count()) > 0,
-      title: await page.locator('h1').textContent().catch(() => null),
+      title: await page
+        .locator('h1')
+        .textContent()
+        .catch(() => null),
       failed: failed.slice(0, 20),
     };
     await context.close();
@@ -251,7 +258,10 @@ async function main() {
     });
 
     const t0 = Date.now();
-    await page.goto(baseURL + '/', { waitUntil: 'domcontentloaded', timeout: 180_000 });
+    await page.goto(baseURL + '/', {
+      waitUntil: 'domcontentloaded',
+      timeout: 180_000,
+    });
     await page.waitForSelector('.game-card', { timeout: 180_000 });
     const menuMs = Date.now() - t0;
 
@@ -273,7 +283,8 @@ async function main() {
       callaMs,
       callaOk:
         (await page.locator('.calla-wrapper, .calla-pit, #board').count()) > 0,
-      callaErr: (await page.locator('[data-testid="game-load-error"]').count()) > 0,
+      callaErr:
+        (await page.locator('[data-testid="game-load-error"]').count()) > 0,
       failed: failed.slice(0, 30),
       failedByKind: tally(failed),
     };
@@ -308,7 +319,9 @@ async function main() {
       page.locator('[data-action="retry"]').click(),
     ]);
     await page
-      .waitForSelector('.calla-wrapper, .calla-pit, #board', { timeout: 20_000 })
+      .waitForSelector('.calla-wrapper, .calla-pit, #board', {
+        timeout: 20_000,
+      })
       .catch(() => null);
     findings.scenarios.devChunkRetry = {
       description:

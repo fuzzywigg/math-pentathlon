@@ -46,12 +46,16 @@ A file may also carry a secondary class when both AI timing and copy change (lis
 
 ## Counts
 
-| Primary classification | Files |
-| --- | ---: |
-| `OK` | 1010 |
-| `PLAYER_FACING_COPY` | 32 |
-| `AI_BEHAVIOR_CHANGE` | 16 |
-| **Total** | **1058** |
+Primary vs any (matches companion JSON `counts.by_primary_classification` / `counts.by_any_classification`). Primary is mutually exclusive; any counts a file under every entry in `classifications[]` (so secondary copy on an AI-primary file appears in both).
+
+| Classification | Primary | Any |
+| --- | ---: | ---: |
+| `OK` | 1010 | 1010 |
+| `PLAYER_FACING_COPY` | 32 | 38 |
+| `AI_BEHAVIOR_CHANGE` | 16 | 16 |
+| **Total files** | **1058** | — |
+
+`PLAYER_FACING_COPY` any **38** = **32** primary + **6** secondary-only (AI-primary game-controller files that also carry copy). Detailed findings below enumerate the any metric.
 
 Non-OK findings (detailed): **54**.
 
@@ -377,7 +381,7 @@ Every finding below was opened on the tip tree (and alpha contrast where cited).
   - #549: S&B uncapped separate
 - **Surgical remediation (tip owner):** Restore alpha AI delay constants from `origin/alpha:src/games/stars-bars/game-controller.ts` (or cherry-pick only timer-cancel / generation-token hunks from tip). Exact: `git show origin/alpha:src/games/stars-bars/game-controller.ts` and re-apply tip non-timing fixes.
 
-### `PLAYER_FACING_COPY` (38)
+### `PLAYER_FACING_COPY` (38 — by any classification; 32 primary + 6 secondary)
 
 #### `src/games/calla/board-ui.ts`
 
