@@ -87,7 +87,7 @@ npm test                    # unit then Chromium e2e (CI required pair)
 npm run test:unit
 npm run test:e2e:chromium   # required CI e2e path
 npm run lint
-npm run lint:ratchet        # curly:all ceiling (CI lint job)
+npm run lint:ratchet        # 12-rule ceilings in docs/dev/lint-ratchet-ceilings.json (CI lint job)
 npm run format:check
 npm run typecheck           # tsc --noEmit
 npm run typecheck:ratchet   # ui/core shell + Phase-2 ceiling
@@ -109,7 +109,7 @@ Contributor checklist: [CONTRIBUTING.md](./CONTRIBUTING.md). Full scripts (cover
 
 - 20 registered games in `src/core/game-registry.ts` (all `available: true`)
 - Tests: **3083** Vitest files under `tests/unit` (excl. `_tokenmaxx_archive`; **11361** passed / 19 skipped on tip CI) + **34** Playwright specs under `tests/e2e` excl. `fullgame/` (visual baselines in `tests/e2e/visual-baselines/`; required Chromium e2e **204** passed on tip CI). Plus 20 report-only `@fullgame` specs under `tests/e2e/fullgame/`.
-- CI (`ci.yml`): lint, `lint:ratchet`, Prettier `format:check`, `typecheck`, `typecheck:ratchet`, `check:boundaries`, `npm audit --audit-level=high`, build (+ hard 250 kB JS chunk budget; report-only `size:check`), unit (required), Chromium e2e (required); report-only `mobile-touch`, `e2e-cross-browser`, `e2e-fullgame`, and `visual-baseline` (see `docs/wiki/development.md`)
+- CI (`ci.yml`): lint (`npm run verify` = lint → `lint:ratchet` → `format:check` → `typecheck` → `typecheck:ratchet` → `check:boundaries`; then soft `check:copy-pins -- --fail`), `npm audit --audit-level=high`, build (hard 250 kB JS chunk budget; soft `size:check -- --fail-on-new-over` + soft `check:pwa-manifest`), unit (required), Chromium e2e (required); report-only `knip`, `mobile-touch`, `zoom-reflow`, `forced-colors`, `e2e-cross-browser`, `e2e-fullgame`, and `visual-baseline` (see `docs/wiki/development.md`)
 - `origin/alpha` is the trunk tip; the integration tip may be ahead of alpha.
 
 ## Agent rules
