@@ -184,6 +184,8 @@ const nodePureFiles = [
   'tests/unit/check-perf-lh-timeout-kill.test.ts',
   // check:perf missing LH performance score fail-closed (q-mp-1208); fixture JSON.
   'tests/unit/check-perf-missing-score.test.ts',
+  // check:perf out-of-range LH performance score fail-closed (q-mp-1246); fixture JSON.
+  'tests/unit/check-perf-out-of-range-score.test.ts',
   // page-settle double-rAF helper (q-mp-920); hermetic fake page.evaluate needs node.
   'tests/unit/page-settle.test.ts',
   // memory-leak-audit page-ready adoption (q-mp-923); spawnSync --check/--help.
