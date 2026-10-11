@@ -1,10 +1,11 @@
 /**
  * @vitest-environment node
  *
- * Hermetic coverage for q-mp-1215 + q-mp-1216 + q-mp-1310:
+ * Hermetic coverage for q-mp-1215 + q-mp-1216 + q-mp-1310 + q-mp-1331:
  *  - analyzeHeapSnapshot fail-closed when self_size (or name) is missing
  *  - metricDelta never coerces null heap metrics to 0
  *  - non-finite / non-number self_size coerced to 0 (no concat / NaN)
+ *  - truncated trailing field groups skipped (finite totals; no phantom node)
  *  - fmtMb returns n/a for non-finite
  * Fixture JSON only — no Playwright / CDP / vite.
  */
@@ -155,5 +156,60 @@ describe('analyzeHeapSnapshot finite self_size (q-mp-1310)', () => {
     expect(r.detachedSelfSize).toBe(0);
     expect(Number.isFinite(r.totalSelfSize)).toBe(true);
     expect(Number.isFinite(r.detachedSelfSize)).toBe(true);
+  });
+});
+
+describe('analyzeHeapSnapshot truncated nodes (q-mp-1331)', () => {
+  it('skips incomplete trailing field groups; totals stay finite', () => {
+    // nodes length 3 with fieldCount 2 → drop trailing name index only
+    const snap = {
+      snapshot: { meta: { node_fields: ['name', 'self_size'] } },
+      nodes: [0, 10, 1],
+      strings: ['Object', 'Detached HTMLDivElement'],
+    };
+    const r = analyzeHeapSnapshot(JSON.stringify(snap));
+    expect(r).toEqual({
+      detachedDomNodes: 0,
+      detachedSelfSize: 0,
+      totalSelfSize: 10,
+    });
+    expect(Number.isFinite(r.totalSelfSize)).toBe(true);
+    expect(Number.isNaN(r.totalSelfSize)).toBe(false);
+    expect(Number.isFinite(r.detachedSelfSize)).toBe(true);
+  });
+
+  it('skips 3-field truncated trailing slice without phantom Detached*', () => {
+    const snap = {
+      snapshot: { meta: { node_fields: ['type', 'name', 'self_size'] } },
+      // one complete node + truncated (type, name) with Detached name index
+      nodes: [1, 0, 16, 1, 1],
+      strings: ['Object', 'Detached HTMLDivElement'],
+    };
+    const r = analyzeHeapSnapshot(JSON.stringify(snap));
+    expect(r).toEqual({
+      detachedDomNodes: 0,
+      detachedSelfSize: 0,
+      totalSelfSize: 16,
+    });
+    expect(Number.isFinite(r.totalSelfSize)).toBe(true);
+  });
+
+  it('empty / exact-multiple nodes arrays still sum as before', () => {
+    const empty = analyzeHeapSnapshot(
+      JSON.stringify({
+        snapshot: { meta: { node_fields: ['name', 'self_size'] } },
+        nodes: [],
+        strings: [],
+      })
+    );
+    expect(empty).toEqual({
+      detachedDomNodes: 0,
+      detachedSelfSize: 0,
+      totalSelfSize: 0,
+    });
+
+    const exact = analyzeHeapSnapshot(JSON.stringify(WELL_FORMED));
+    expect(exact.totalSelfSize).toBe(56);
+    expect(exact.detachedDomNodes).toBe(1);
   });
 });

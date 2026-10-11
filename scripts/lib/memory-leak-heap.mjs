@@ -1,7 +1,7 @@
 /**
  * Pure heap-snapshot helpers for scripts/memory-leak-audit.mjs
- * (q-mp-1215 / 1216 / 1310). Kept free of Playwright / vite so unit tests
- * can import hermetically.
+ * (q-mp-1215 / 1216 / 1310 / 1331). Kept free of Playwright / vite so unit
+ * tests can import hermetically.
  */
 
 /**
@@ -50,6 +50,8 @@ export function metricDelta(after, warm) {
  * Parse Chrome heap snapshot for Detached DOM counts + total self size.
  * Fail closed when required node_fields are missing (q-mp-1215) — never NaN.
  * Coerce non-finite / non-number self_size to 0 (q-mp-1310) — never concat.
+ * Skip incomplete trailing field groups when `nodes.length` is not a multiple
+ * of `fieldCount` (q-mp-1331) — never invent a phantom last node / NaN totals.
  *
  * @param {string} jsonText
  * @returns {{ detachedDomNodes: number, detachedSelfSize: number, totalSelfSize: number }}
@@ -84,7 +86,8 @@ export function analyzeHeapSnapshot(jsonText) {
   let detachedSelfSize = 0;
   let totalSelfSize = 0;
 
-  for (let i = 0; i < nodes.length; i += fieldCount) {
+  // Only walk complete field groups; drop a truncated trailing slice.
+  for (let i = 0; i + fieldCount <= nodes.length; i += fieldCount) {
     const selfSize = finiteSelfSize(nodes[i + selfSizeOffset]);
     totalSelfSize += selfSize;
     const name = strings[nodes[i + nameOffset]];
