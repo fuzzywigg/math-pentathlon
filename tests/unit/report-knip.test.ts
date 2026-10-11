@@ -164,7 +164,28 @@ describe('report-knip helpers', () => {
       const result = validateBaselineMetrics({ ...full, unusedTypes: bad });
       expect(result.ok).toBe(false);
       if (!result.ok) {
-        expect(result.message).toMatch(/schema invalid|finite number/i);
+        expect(result.message).toMatch(
+          /schema invalid|finite (number|integer)/i,
+        );
+      }
+    }
+  });
+
+  it('validateBaselineMetrics rejects negative / non-integer counts (q-mp-1155)', () => {
+    const full = {
+      unusedFiles: 0,
+      unusedExports: 3,
+      unusedTypes: 36,
+      unusedDependencies: 0,
+      unusedDevDependencies: 0,
+      unlisted: 3,
+      duplicates: 0,
+    };
+    for (const bad of [-1, 0.5, -0.5, 1.25]) {
+      const result = validateBaselineMetrics({ ...full, unusedFiles: bad });
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.message).toMatch(/integer\s*≥\s*0|finite integer/i);
       }
     }
   });
