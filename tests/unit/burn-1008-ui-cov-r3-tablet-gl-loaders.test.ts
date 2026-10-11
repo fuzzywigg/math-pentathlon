@@ -36,6 +36,20 @@ describe('burn-1008 ui-cov-r3 tablet-gl edges', () => {
     window,
     'innerHeight'
   );
+  // unit-shared uses isolate:false — restore document.hidden so later suites
+  // do not see a stuck stub from Object.defineProperty (q-mp-1393).
+  const originalDocumentHidden = Object.getOwnPropertyDescriptor(
+    document,
+    'hidden'
+  );
+
+  function restoreDocumentHidden(): void {
+    if (originalDocumentHidden) {
+      Object.defineProperty(document, 'hidden', originalDocumentHidden);
+    } else {
+      Reflect.deleteProperty(document, 'hidden');
+    }
+  }
 
   beforeEach(() => {
     localStorage.clear();
@@ -61,6 +75,7 @@ describe('burn-1008 ui-cov-r3 tablet-gl edges', () => {
     if (originalInnerHeight) {
       Object.defineProperty(window, 'innerHeight', originalInnerHeight);
     }
+    restoreDocumentHidden();
     vi.restoreAllMocks();
     vi.useRealTimers();
   });
