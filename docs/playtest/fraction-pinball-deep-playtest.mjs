@@ -2,14 +2,19 @@
  * Deep playtest harness for Fraction Pinball.
  * Desktop + tablet Chromium, Easy/Medium/Hard, 10+ full games each.
  * Outputs JSON summary + screenshots under docs/playtest/fraction-pinball-deep-2026-10-07/
+ *
+ * Env:
+ *   PLAYTEST_BASE   Base URL (default http://localhost:5173)
+ *   PLAYTEST_GAMES  Games per difficulty×viewport (default 10; rejects NaN / non-positive)
  */
 import { chromium, devices } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
+import { requireEnvNumber } from '../../scripts/lib/env-number.mjs';
 
 const BASE = process.env.PLAYTEST_BASE || 'http://localhost:5173';
 const OUT = path.resolve('docs/playtest/fraction-pinball-deep-2026-10-07');
-const GAMES_PER = Number(process.env.PLAYTEST_GAMES || 10);
+const GAMES_PER = requireEnvNumber('PLAYTEST_GAMES', 10);
 const DIFFICULTIES = ['easy', 'medium', 'hard'];
 
 fs.mkdirSync(OUT, { recursive: true });
@@ -256,7 +261,10 @@ const summary = {
   crashed: all.filter((r) => r.crash).length,
   withConsoleErrors: all.filter((r) => r.consoleErrors.length).length,
   withPageErrors: all.filter((r) => r.pageErrors.length).length,
-  avgDurationMs: Math.round(all.reduce((a, b) => a + b.durationMs, 0) / all.length),
+  avgDurationMs:
+    all.length === 0
+      ? null
+      : Math.round(all.reduce((a, b) => a + b.durationMs, 0) / all.length),
   touchSamples: all.filter((r) => r.touch?.choice).map((r) => ({
     profile: r.profile,
     difficulty: r.difficulty,
