@@ -15,6 +15,7 @@
 import { test } from './fixtures';
 import { expect, type Page } from '@playwright/test';
 import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process';
+import { once } from 'node:events';
 import { createServer } from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -45,18 +46,75 @@ async function getFreePort(): Promise<number> {
   });
 }
 
-async function waitForUrl(url: string, timeoutMs = 60_000): Promise<void> {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
+/**
+ * Wait until `url` responds (ok/404). Retries are driven by preview stdout/stderr
+ * activity or an initial probe — not a fixed wall-clock sleep.
+ */
+async function waitForUrl(
+  url: string,
+  child: ChildProcessWithoutNullStreams,
+  timeoutMs = 60_000
+): Promise<void> {
+  const signal = AbortSignal.timeout(timeoutMs);
+
+  const tryFetch = async (): Promise<boolean> => {
     try {
-      const res = await fetch(url);
-      if (res.ok || res.status === 404) return;
+      const res = await fetch(url, { signal });
+      return res.ok || res.status === 404;
     } catch {
-      // still booting
+      return false;
     }
-    await new Promise((r) => setTimeout(r, 250));
-  }
-  throw new Error(`Timed out waiting for ${url}`);
+  };
+
+  if (await tryFetch()) return;
+
+  await new Promise<void>((resolve, reject) => {
+    let settled = false;
+    let probing = false;
+
+    const cleanup = () => {
+      child.stdout.off('data', onActivity);
+      child.stderr.off('data', onActivity);
+      child.off('exit', onExit);
+      signal.removeEventListener('abort', onAbort);
+    };
+
+    const finish = (err?: Error) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      if (err) reject(err);
+      else resolve();
+    };
+
+    const probe = () => {
+      if (settled || probing) return;
+      probing = true;
+      void tryFetch().then((ok) => {
+        probing = false;
+        if (ok) finish();
+      });
+    };
+
+    const onActivity = () => {
+      probe();
+    };
+    const onExit = (code: number | null) => {
+      finish(
+        new Error(`preview exited before ${url} was ready (code ${code})`)
+      );
+    };
+    const onAbort = () => {
+      finish(new Error(`Timed out waiting for ${url}`));
+    };
+
+    child.stdout.on('data', onActivity);
+    child.stderr.on('data', onActivity);
+    child.on('exit', onExit);
+    signal.addEventListener('abort', onAbort, { once: true });
+    // Server may already be listening before listeners attach.
+    probe();
+  });
 }
 
 async function waitForServiceWorkerControl(page: Page): Promise<void> {
@@ -198,7 +256,7 @@ test.describe('offline PWA', () => {
       }
     );
 
-    await waitForUrl(baseURL);
+    await waitForUrl(baseURL, preview);
   });
 
   test.afterAll(async () => {
@@ -211,12 +269,27 @@ test.describe('offline PWA', () => {
       } catch {
         preview.kill('SIGTERM');
       }
-      // Hard stop if the preview ignores SIGTERM (keeps ports/files open).
-      await new Promise((r) => setTimeout(r, 500));
-      try {
-        process.kill(-pid, 'SIGKILL');
-      } catch {
-        if (!preview.killed) preview.kill('SIGKILL');
+      // Condition wait: exit event, with a grace deadline before SIGKILL.
+      const alreadyExited =
+        preview.exitCode != null || preview.signalCode != null;
+      const exited =
+        alreadyExited ||
+        (await Promise.race([
+          once(preview, 'exit').then(() => true as const),
+          new Promise<false>((resolve) => {
+            AbortSignal.timeout(500).addEventListener(
+              'abort',
+              () => resolve(false),
+              { once: true }
+            );
+          }),
+        ]));
+      if (!exited) {
+        try {
+          process.kill(-pid, 'SIGKILL');
+        } catch {
+          if (!preview.killed) preview.kill('SIGKILL');
+        }
       }
     }
   });
