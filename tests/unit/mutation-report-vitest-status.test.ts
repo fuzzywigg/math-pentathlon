@@ -1,14 +1,15 @@
 /**
  * @vitest-environment node
  *
- * Hermetic coverage for mutation-report Vitest status classification (q-mp-1038).
- * Filter-miss / "No test files found" must score as error, not killed.
- * Empty harness testFiles → no-tests remains a separate path (q-mp-1025).
+ * Hermetic coverage for mutation-report Vitest status classification
+ * (q-mp-1038, q-mp-1156). Filter-miss / no-test phrases must score as error,
+ * not killed. Empty harness testFiles → no-tests remains a separate path
+ * (q-mp-1025).
  */
 import { describe, it, expect } from 'vitest';
 import { classifyVitestRunResult } from '../../scripts/lib/mutation-report-vitest-status.mjs';
 
-describe('classifyVitestRunResult (q-mp-1038)', () => {
+describe('classifyVitestRunResult (q-mp-1038, q-mp-1156)', () => {
   it('maps Vitest "No test files found" (exit 1) to error, not killed', () => {
     const status = classifyVitestRunResult({
       exitCode: 1,
@@ -17,6 +18,26 @@ describe('classifyVitestRunResult (q-mp-1038)', () => {
     });
     expect(status).toBe('error');
     expect(status).not.toBe('killed');
+  });
+
+  it('maps "Found 0 test files" to error, not killed (q-mp-1156)', () => {
+    expect(
+      classifyVitestRunResult({
+        exitCode: 1,
+        stdout: 'Found 0 test files\n',
+        stderr: '',
+      })
+    ).toBe('error');
+  });
+
+  it('maps "filter matched no files" to error, not killed (q-mp-1156)', () => {
+    expect(
+      classifyVitestRunResult({
+        exitCode: 1,
+        stdout: '',
+        stderr: 'filter matched no files\n',
+      })
+    ).toBe('error');
   });
 
   it('detects the phrase in stderr as well as stdout', () => {
