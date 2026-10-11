@@ -6,7 +6,9 @@
  * q-mp-1033 prefer covered/total over contradictory numeric pct;
  * q-mp-1083 clamp covered>total (no >100% rank);
  * q-mp-1084 pct-only rows must not invent 0/0 counts;
- * q-mp-1133 clamp pct-only values to [0,100]).
+ * q-mp-1133 clamp pct-only values to [0,100];
+ * q-mp-1222 reject missing/null istanbul metrics (no fake 0/0);
+ * q-mp-1223 formatRankOutput per-game label matches engine kind).
  */
 import { describe, it, expect, vi } from 'vitest';
 import {
@@ -318,7 +320,9 @@ describe('engine-coverage-rank empty / non-engine summaries (q-mp-992)', () => {
 
 describe('engine-coverage-rank missing / non-numeric pct (q-mp-1018)', () => {
   it('resolveMetric derives from covered/total; pct-only keeps numeric pct', () => {
-    expect(resolveMetric(undefined)).toEqual({ pct: 0, covered: 0, total: 0 });
+    // q-mp-1222: missing/null metric → reject (not fake 0/0).
+    expect(resolveMetric(undefined)).toBeNull();
+    expect(resolveMetric(null)).toBeNull();
     expect(resolveMetric({ pct: 12.5, covered: 1, total: 8 })).toEqual({
       pct: 12.5,
       covered: 1,
@@ -329,6 +333,7 @@ describe('engine-coverage-rank missing / non-numeric pct (q-mp-1018)', () => {
       covered: 50,
       total: 100,
     });
+    // Present 0/0 counts still representable (total===0 → 100%).
     expect(resolveMetric({ total: 0, covered: 0 })).toEqual({
       pct: 100,
       covered: 0,
@@ -365,16 +370,18 @@ describe('engine-coverage-rank missing / non-numeric pct (q-mp-1018)', () => {
     const rows = collectEngineRows({
       'src/games/calla/rules.ts': {
         lines: { total: 100, covered: 50, skipped: 0 },
+        // Explicit present 0/0 branches (not omitted) — still representable.
+        branches: { total: 0, covered: 0, skipped: 0 },
       },
     });
     expect(rows).toHaveLength(1);
     expect(rows[0].linePct).toBe(50);
     expect(rows[0].lineCov).toBe(50);
     expect(rows[0].lineTot).toBe(100);
-    expect(rows[0].branchPct).toBe(0);
+    expect(rows[0].branchPct).toBe(100);
     const out = formatRankOutput(rows);
     expect(out).toContain(
-      '1\tsrc/games/calla/rules.ts\t50.00\t50/100\t0.00\t0/0'
+      '1\tsrc/games/calla/rules.ts\t50.00\t50/100\t100.00\t0/0'
     );
   });
 
@@ -444,6 +451,7 @@ describe('engine-coverage-rank missing / non-numeric pct (q-mp-1018)', () => {
     const fixture = JSON.stringify({
       'src/games/calla/rules.ts': {
         lines: { total: 100, covered: 50, skipped: 0 },
+        branches: { total: 10, covered: 0, skipped: 0 },
       },
     });
     const code = main(['/tmp/cov-rules-nopct.json'], {
@@ -455,7 +463,7 @@ describe('engine-coverage-rank missing / non-numeric pct (q-mp-1018)', () => {
     expect(code).toBe(0);
     expect(errors).toEqual([]);
     expect(logs.join('\n')).toContain(
-      '1\tsrc/games/calla/rules.ts\t50.00\t50/100\t0.00\t0/0'
+      '1\tsrc/games/calla/rules.ts\t50.00\t50/100\t0.00\t0/10'
     );
   });
 
@@ -644,7 +652,7 @@ describe('engine-coverage-rank pct-only counts (q-mp-1084)', () => {
     expect(out).not.toMatch(/70\.00\t0\/0/);
   });
 
-  it('count rows and absent-metric 0/0 remain unchanged', () => {
+  it('count rows with present 0/0 remain unchanged', () => {
     const withCounts = collectEngineRows({
       'src/games/hex/rules.ts': {
         lines: { pct: 90, covered: 9, total: 10 },
@@ -654,15 +662,108 @@ describe('engine-coverage-rank pct-only counts (q-mp-1084)', () => {
     expect(formatRankOutput(withCounts)).toContain(
       '1\tsrc/games/hex/rules.ts\t90.00\t9/10\t80.00\t8/10'
     );
-    // Missing branches metric still defaults to real zeros (legacy), not —.
-    const missingBranches = collectEngineRows({
+    // Present covered/total 0/0 still representable (q-mp-1222 keeps real zeros).
+    const zeroZero = collectEngineRows({
       'src/games/calla/rules.ts': {
+        lines: { total: 100, covered: 50, skipped: 0 },
+        branches: { total: 0, covered: 0, skipped: 0 },
+      },
+    });
+    expect(formatRankOutput(zeroZero)).toContain(
+      '1\tsrc/games/calla/rules.ts\t50.00\t50/100\t100.00\t0/0'
+    );
+  });
+});
+
+describe('engine-coverage-rank reject missing/null metrics (q-mp-1222)', () => {
+  it('resolveMetric rejects undefined/null/non-object (no fake 0/0)', () => {
+    expect(resolveMetric(undefined)).toBeNull();
+    expect(resolveMetric(null)).toBeNull();
+    expect(resolveMetric('branches')).toBeNull();
+    expect(resolveMetric(0)).toBeNull();
+    // Present empty counts still ok.
+    expect(resolveMetric({ covered: 0, total: 0 })).toEqual({
+      pct: 100,
+      covered: 0,
+      total: 0,
+    });
+  });
+
+  it('collectEngineRows throws when branches metric is omitted', () => {
+    expect(() =>
+      collectEngineRows({
+        'src/games/hex/rules.ts': {
+          lines: { total: 100, covered: 50, skipped: 0 },
+        },
+      })
+    ).toThrow(InvalidCoverageMetricError);
+  });
+
+  it('collectEngineRows throws when branches is explicitly null', () => {
+    expect(() =>
+      collectEngineRows({
+        'src/games/hex/rules.ts': {
+          lines: { total: 100, covered: 50, skipped: 0 },
+          branches: null,
+        },
+      })
+    ).toThrow(InvalidCoverageMetricError);
+  });
+
+  it('main exits 2 for lines-only summary (omitted branches)', () => {
+    const logs: string[] = [];
+    const errors: string[] = [];
+    const fixture = JSON.stringify({
+      'src/games/hex/rules.ts': {
         lines: { total: 100, covered: 50, skipped: 0 },
       },
     });
-    expect(formatRankOutput(missingBranches)).toContain(
-      '1\tsrc/games/calla/rules.ts\t50.00\t50/100\t0.00\t0/0'
+    const code = main(['/tmp/lines-only.json'], {
+      existsSync: (p) => p === '/tmp/lines-only.json',
+      readFileSync: () => fixture,
+      log: (s) => logs.push(s),
+      error: (s) => errors.push(s),
+    });
+    expect(code).toBe(2);
+    expect(logs).toEqual([]);
+    expect(errors.join('\n')).toBe(
+      invalidMetricMessage('/tmp/lines-only.json', 'src/games/hex/rules.ts')
     );
+    expect(errors.join('\n')).not.toMatch(/0\.00\t0\/0/);
+  });
+});
+
+describe('engine-coverage-rank per-game kind label (q-mp-1223)', () => {
+  it('types-only primary prints types-branch not rules-branch', () => {
+    const rows = collectEngineRows({
+      'src/games/demo2/types.ts': {
+        lines: { pct: 10, covered: 1, total: 10 },
+        branches: { pct: 20, covered: 1, total: 5 },
+      },
+    });
+    const out = formatRankOutput(rows);
+    expect(out).toContain(
+      'demo2\ttypes-branch 20.00% (1/5)\tline 10.00% (1/10)'
+    );
+    expect(out).not.toContain('rules-branch');
+  });
+
+  it('rules primary still prints rules-branch; companions unchanged', () => {
+    const rows = collectEngineRows({
+      'src/games/hex/rules.ts': {
+        lines: { pct: 90, covered: 9, total: 10 },
+        branches: { pct: 80, covered: 8, total: 10 },
+      },
+      'src/games/hex/board.ts': {
+        lines: { pct: 70, covered: 7, total: 10 },
+        branches: { pct: 60, covered: 6, total: 10 },
+      },
+    });
+    const out = formatRankOutput(rows);
+    expect(out).toContain(
+      'hex\trules-branch 80.00% (8/10)\tline 90.00% (9/10)'
+    );
+    expect(out).toContain('  + board\tbranch 60.00%\tline 70.00%');
   });
 });
 
