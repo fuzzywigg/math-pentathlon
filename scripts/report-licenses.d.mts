@@ -35,14 +35,9 @@ export type BundledAssetInventory = BundledAssetCatalogEntry & {
   sha256: string;
 };
 
-export const DENIED_LICENSE_PATTERNS: RegExp[];
-export const COPYLEFT_OR_REVIEW_PATTERNS: RegExp[];
-export const UNKNOWN_LICENSE_PATTERNS: RegExp[];
 export const BUNDLED_ASSET_CATALOG: BundledAssetCatalogEntry[];
 
 export function normalizeLicense(license: unknown): string;
-
-export function matchesAny(expression: string, patterns: RegExp[]): boolean;
 
 export function classifyLicense(expression: string): LicenseClassification;
 

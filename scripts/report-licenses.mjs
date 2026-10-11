@@ -161,10 +161,15 @@ export function emptyPackagesMessage(lockPath = LOCK_PATH) {
 }
 
 /** Strong copyleft / source-available terms that fail the report if present. */
-export const DENIED_LICENSE_PATTERNS = [
+const DENIED_LICENSE_PATTERNS = [
   /\bAGPL(-|\b)/i,
   /\bGPL-2\.0\b/i,
   /\bGPL-3\.0\b/i,
+  // Legacy npm spellings (q-mp-1054); long-form "GNU General Public License …" left to 1079.
+  /\bGPLv2\b/i,
+  /\bGPLv3\b/i,
+  /\bGNU\s+GPL\b/i,
+  /\bGPL\b/i,
   /\bSSPL\b/i,
   /\bBUSL\b/i,
   /\bCommons\s*Clause\b/i,
@@ -175,7 +180,7 @@ export const DENIED_LICENSE_PATTERNS = [
  * Weak / file-level copyleft and unusual SPDX ids — flag for owner review,
  * do not fail the report.
  */
-export const COPYLEFT_OR_REVIEW_PATTERNS = [
+const COPYLEFT_OR_REVIEW_PATTERNS = [
   /\bMPL-2\.0\b/i,
   /\bLGPL\b/i,
   /\bEPL\b/i,
@@ -185,7 +190,7 @@ export const COPYLEFT_OR_REVIEW_PATTERNS = [
   /\bPython-2\.0\b/i,
 ];
 
-export const UNKNOWN_LICENSE_PATTERNS = [
+const UNKNOWN_LICENSE_PATTERNS = [
   /^$/i,
   /^UNKNOWN$/i,
   /^UNLICENSED$/i,
@@ -311,7 +316,7 @@ export function normalizeLicense(license) {
  * @param {string} expression
  * @param {RegExp[]} patterns
  */
-export function matchesAny(expression, patterns) {
+function matchesAny(expression, patterns) {
   return patterns.some((re) => re.test(expression));
 }
 
