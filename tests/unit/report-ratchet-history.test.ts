@@ -6,6 +6,7 @@ import {
   coerceFiniteNumber,
   extractMetric,
   extractLintMetrics,
+  nullLintMetrics,
   parseGitLogLines,
   mergeHistory,
   escapeXml,
@@ -19,6 +20,8 @@ import {
   OUT_SVG,
   TRACKED,
   LINT_RULE_KEYS,
+  LINT_METRIC_KEYS,
+  LINT_METRIC_LABELS,
 } from '../../scripts/report-ratchet-history.mjs';
 
 const SCRIPT = path.resolve(
@@ -28,27 +31,49 @@ const SCRIPT = path.resolve(
 const MD_PATH = path.resolve(process.cwd(), OUT_MD);
 const SVG_PATH = path.resolve(process.cwd(), OUT_SVG);
 
-describe('report-ratchet-history helpers (q-mp-074 / q-mp-236 / q-mp-290)', () => {
-  it('extracts curly / void / nnnull / dup / type / boundary metrics', () => {
+describe('report-ratchet-history helpers (q-mp-074 / q-mp-236 / q-mp-290 / q-mp-1289)', () => {
+  it('extracts all 12 lint ceiling keys plus type / boundary metrics (q-mp-1289)', () => {
     const lint = {
       rules: {
         curly: 538,
         [LINT_RULE_KEYS.voidExpression]: 118,
         [LINT_RULE_KEYS.nnnull]: 254,
         [LINT_RULE_KEYS.dupImports]: 99,
+        [LINT_RULE_KEYS.radix]: 6,
+        [LINT_RULE_KEYS.defaultCase]: 5,
+        [LINT_RULE_KEYS.nullish]: 65,
+        [LINT_RULE_KEYS.optionalChain]: 21,
+        [LINT_RULE_KEYS.switchExhaustiveness]: 8,
+        [LINT_RULE_KEYS.noShadow]: 3,
+        [LINT_RULE_KEYS.eqeqeq]: 1,
+        [LINT_RULE_KEYS.returnAwait]: 3,
       },
       notes: 'x',
     };
+    expect(LINT_METRIC_KEYS).toHaveLength(12);
+    expect(Object.values(LINT_RULE_KEYS)).toHaveLength(12);
     expect(extractLintMetrics(lint)).toEqual({
       curly: 538,
       voidExpression: 118,
       nnnull: 254,
       dupImports: 99,
+      radix: 6,
+      defaultCase: 5,
+      nullish: 65,
+      optionalChain: 21,
+      switchExhaustiveness: 8,
+      noShadow: 3,
+      eqeqeq: 1,
+      returnAwait: 3,
     });
     expect(extractMetric('curly', lint)).toBe(538);
     expect(extractMetric('voidExpression', lint)).toBe(118);
     expect(extractMetric('nnnull', lint)).toBe(254);
     expect(extractMetric('dupImports', lint)).toBe(99);
+    expect(extractMetric('radix', lint)).toBe(6);
+    expect(extractMetric('eqeqeq', lint)).toBe(1);
+    expect(extractMetric('returnAwait', lint)).toBe(3);
+    expect(extractMetric('nullish', lint)).toBe(65);
     expect(extractMetric('curly', { rules: {} })).toBeNull();
     expect(extractMetric('typePhase2', { outOfScopeErrors: 216 })).toBe(216);
     expect(
@@ -58,6 +83,20 @@ describe('report-ratchet-history helpers (q-mp-074 / q-mp-236 / q-mp-290)', () =
     ).toBe(17);
     expect(extractMetric('boundaries', { ceilings: {} })).toBeNull();
     expect(extractMetric('typePhase2', null)).toBeNull();
+  });
+
+  it('LINT_RULE_KEYS covers every key in live lint-ratchet-ceilings.json (q-mp-1289)', () => {
+    const ceilings = JSON.parse(
+      fs.readFileSync(path.resolve(process.cwd(), TRACKED.lintCeilings), 'utf8')
+    ) as { rules: Record<string, number> };
+    const ceilingKeys = Object.keys(ceilings.rules).sort();
+    const trackedKeys = Object.values(LINT_RULE_KEYS).slice().sort();
+    expect(trackedKeys).toEqual(ceilingKeys);
+    expect(ceilingKeys).toHaveLength(12);
+    const metrics = extractLintMetrics(ceilings);
+    for (const metric of LINT_METRIC_KEYS) {
+      expect(metrics[metric as keyof typeof metrics]).not.toBeNull();
+    }
   });
 
   it('coerceFiniteNumber accepts numbers and finite numeric strings (q-mp-1230 / q-mp-1231)', () => {
@@ -102,13 +141,16 @@ describe('report-ratchet-history helpers (q-mp-074 / q-mp-236 / q-mp-290)', () =
           [LINT_RULE_KEYS.voidExpression]: 5,
           [LINT_RULE_KEYS.nnnull]: '3',
           [LINT_RULE_KEYS.dupImports]: 'x',
+          [LINT_RULE_KEYS.eqeqeq]: '1',
         },
       })
     ).toEqual({
+      ...nullLintMetrics(),
       curly: 10,
       voidExpression: 5,
       nnnull: 3,
       dupImports: null,
+      eqeqeq: 1,
     });
     expect(extractMetric('curly', { rules: { curly: '538' } })).toBe(538);
     expect(
@@ -116,6 +158,9 @@ describe('report-ratchet-history helpers (q-mp-074 / q-mp-236 / q-mp-290)', () =
         rules: { [LINT_RULE_KEYS.voidExpression]: '118' },
       })
     ).toBe(118);
+    expect(
+      extractMetric('eqeqeq', { rules: { [LINT_RULE_KEYS.eqeqeq]: '1' } })
+    ).toBe(1);
   });
 
   it('extractMetric(typePhase2) honors nested totals.outOfScopeErrors (q-mp-1247)', () => {
@@ -343,16 +388,25 @@ describe('report-ratchet-history helpers (q-mp-074 / q-mp-236 / q-mp-290)', () =
     expect(escapeXml(`&<>"'`)).toBe('&amp;&lt;&gt;&quot;&apos;');
   });
 
-  it('renders an SVG polyline chart with lint series and empty-state', () => {
+  it('renders an SVG polyline chart with all 12 lint series and empty-state', () => {
     const svg = renderSvg([
       {
         sha: 'aaaaaaaa',
         date: '2026-10-07T00:00:00Z',
         subject: 'start',
+        ...nullLintMetrics(),
         curly: 1400,
         voidExpression: 183,
         nnnull: 268,
         dupImports: 122,
+        radix: 6,
+        defaultCase: 5,
+        nullish: 65,
+        optionalChain: 21,
+        switchExhaustiveness: 8,
+        noShadow: 3,
+        eqeqeq: 1,
+        returnAwait: 3,
         typeOutOfScope: 400,
         boundarySum: 17,
       },
@@ -360,39 +414,62 @@ describe('report-ratchet-history helpers (q-mp-074 / q-mp-236 / q-mp-290)', () =
         sha: 'bbbbbbbb',
         date: '2026-10-08T00:00:00Z',
         subject: 'lower',
+        ...nullLintMetrics(),
         curly: 538,
         voidExpression: 118,
         nnnull: 254,
         dupImports: 99,
+        radix: 6,
+        defaultCase: 5,
+        nullish: 65,
+        optionalChain: 21,
+        switchExhaustiveness: 8,
+        noShadow: 3,
+        eqeqeq: 1,
+        returnAwait: 3,
         typeOutOfScope: 216,
         boundarySum: 17,
       },
     ]);
     expect(svg).toContain('<svg');
     expect(svg).toContain('polyline');
-    expect(svg).toContain('curly');
-    expect(svg).toContain('void');
-    expect(svg).toContain('nnnull');
-    expect(svg).toContain('dup-imports');
+    for (const metric of LINT_METRIC_KEYS) {
+      expect(svg).toContain(
+        LINT_METRIC_LABELS[metric as keyof typeof LINT_METRIC_LABELS]
+      );
+    }
     expect(svg).toContain('type Phase-2 oos');
     expect(svg).toContain('boundary Σ');
     expect(svg).toContain('aaaaaaaa'.slice(0, 7));
+    expect(svg).toMatch(/all 12 lint ratchet ceilings/);
 
     const empty = renderSvg([]);
     expect(empty).toContain('No history found');
   });
 
-  it('renders a markdown table with live tip snapshot and lint columns', () => {
+  it('renders a markdown table with live tip snapshot and all 12 lint columns', () => {
+    const liveLint = {
+      ...nullLintMetrics(),
+      curly: 538,
+      voidExpression: 118,
+      nnnull: 254,
+      dupImports: 99,
+      radix: 6,
+      defaultCase: 5,
+      nullish: 65,
+      optionalChain: 21,
+      switchExhaustiveness: 8,
+      noShadow: 3,
+      eqeqeq: 1,
+      returnAwait: 3,
+    };
     const md = renderMarkdown(
       [
         {
           sha: 'deadbeef',
           date: '2026-10-08T12:00:00Z',
           subject: 'Tip fold wave5',
-          curly: 538,
-          voidExpression: 118,
-          nnnull: 254,
-          dupImports: 99,
+          ...liveLint,
           typeOutOfScope: 216,
           boundarySum: 17,
         },
@@ -401,28 +478,27 @@ describe('report-ratchet-history helpers (q-mp-074 / q-mp-236 / q-mp-290)', () =
         generatedAt: '2026-10-09T00:00:00.000Z',
         gitMode: 'git log --all',
         tipSha: '23926935deadbeef',
-        liveLint: {
-          curly: 538,
-          voidExpression: 118,
-          nnnull: 254,
-          dupImports: 99,
-          nullish: 65,
-        },
+        liveLint,
       }
     );
     expect(md).toContain('# Ratchet ceiling history');
     expect(md).toContain('q-mp-236');
     expect(md).toContain('q-mp-290');
+    expect(md).toContain('q-mp-1289');
     expect(md).toContain(TRACKED.lintCeilings);
     expect(md).toContain('Live tip snapshot (`2392693`)');
     expect(md).toContain('| curly | 538 |');
+    expect(md).toContain(`| ${LINT_RULE_KEYS.nullish} | 65 |`);
+    expect(md).toContain(`| ${LINT_RULE_KEYS.eqeqeq} | 1 |`);
+    expect(md).toContain(`| ${LINT_RULE_KEYS.returnAwait} | 3 |`);
+    expect(md).not.toContain('HOLD; not charted');
     expect(md).toContain(
-      '| prefer-nullish-coalescing (HOLD; not charted) | 65 |'
-    );
-    expect(md).toContain(
-      '| `deadbee` | 2026-10-08 | 538 | 118 | 254 | 99 | 216 | 17 |'
+      '| `deadbee` | 2026-10-08 | 538 | 118 | 254 | 99 | 6 | 5 | 65 | 21 | 8 | 3 | 1 | 3 | 216 | 17 |'
     );
     expect(md).toContain('./ratchet-ceiling-history.svg');
+    for (const label of Object.values(LINT_METRIC_LABELS)) {
+      expect(md).toContain(label);
+    }
   });
 
   it('collectHistory uses injected git runner (no network)', () => {
@@ -512,11 +588,11 @@ describe('report-ratchet-history helpers (q-mp-074 / q-mp-236 / q-mp-290)', () =
       runGit,
       now: '2026-10-11T00:00:00.000Z',
       liveLint: {
+        ...nullLintMetrics(),
         curly: 1,
         voidExpression: 1,
         nnnull: 1,
         dupImports: 1,
-        nullish: null,
       },
     });
     expect(written.gitMode).toBe('git log --first-parent');
@@ -611,6 +687,7 @@ describe('report-ratchet-history parseArgs / CLI (q-mp-872)', () => {
       runGit,
       now: '2026-10-10T00:00:00.000Z',
       liveLint: {
+        ...nullLintMetrics(),
         curly: 538,
         voidExpression: 118,
         nnnull: 254,
