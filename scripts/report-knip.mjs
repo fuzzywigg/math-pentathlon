@@ -62,10 +62,37 @@ export function countIssueField(value) {
 
 /**
  * Summarize knip JSON reporter output into baseline metrics.
- * @param {*} knip
- * @returns {Record<string, number>}
+ *
+ * Total on unexpected shapes (q-mp-1154 / q-mp-1106b): null/undefined/non-object
+ * roots and non-array `issues` return `{ ok: false, message }` with an
+ * unparseable error (same posture as baseline corrupt path / q-mp-1036) instead
+ * of throwing or fail-open zeroed metrics under --fail.
+ *
+ * @param {unknown} knip
+ * @returns {{ ok: true, metrics: Record<string, number> } | { ok: false, message: string }}
  */
 export function summarizeKnip(knip) {
+  if (knip == null || typeof knip !== 'object' || Array.isArray(knip)) {
+    return {
+      ok: false,
+      message:
+        'report:knip — knip reporter JSON unparseable: root must be a non-null object',
+    };
+  }
+  /** @type {Record<string, unknown>} */
+  const root = /** @type {Record<string, unknown>} */ (knip);
+  // Knip JSON reporter uses issues: []; object / null / other non-array shapes
+  // must not zero metrics (q-mp-1106b follow-up to folded #1311 / q-mp-1106).
+  if (
+    Object.prototype.hasOwnProperty.call(root, 'issues') &&
+    !Array.isArray(root.issues)
+  ) {
+    return {
+      ok: false,
+      message:
+        'report:knip — knip reporter JSON unparseable: issues must be an array',
+    };
+  }
   /** @type {Record<string, number>} */
   const metrics = {
     unusedFiles: 0,
@@ -76,27 +103,25 @@ export function summarizeKnip(knip) {
     unlisted: 0,
     duplicates: 0,
   };
-  metrics.unusedFiles = (knip.files || []).length;
-  // Knip JSON reporter uses issues: []; object / non-array shapes must not
-  // throw mid-report (q-mp-1106). Yield zeroed issue metrics instead.
-  const issues = knip.issues;
-  if (!Array.isArray(issues)) {
-    return metrics;
-  }
+  metrics.unusedFiles = Array.isArray(root.files) ? root.files.length : 0;
+  const issues = Array.isArray(root.issues) ? root.issues : [];
   for (const issue of issues) {
-    metrics.unusedExports += countIssueField(issue.exports);
-    metrics.unusedTypes += countIssueField(issue.types);
-    metrics.unusedDependencies += countIssueField(issue.dependencies);
-    metrics.unusedDevDependencies += countIssueField(issue.devDependencies);
-    metrics.unlisted += countIssueField(issue.unlisted);
-    metrics.duplicates += countIssueField(issue.duplicates);
+    if (issue == null || typeof issue !== 'object') continue;
+    const row = /** @type {Record<string, unknown>} */ (issue);
+    metrics.unusedExports += countIssueField(row.exports);
+    metrics.unusedTypes += countIssueField(row.types);
+    metrics.unusedDependencies += countIssueField(row.dependencies);
+    metrics.unusedDevDependencies += countIssueField(row.devDependencies);
+    metrics.unlisted += countIssueField(row.unlisted);
+    metrics.duplicates += countIssueField(row.duplicates);
   }
-  return metrics;
+  return { ok: true, metrics };
 }
 
 /**
- * Require every METRIC_KEYS entry to be a finite number (q-mp-1036).
+ * Require every METRIC_KEYS entry to be a finite integer ≥ 0 (q-mp-1036 + q-mp-1155).
  * Incomplete / null / "" / non-numeric values must not coerce to 0 and invent growth.
+ * Negatives / fractions must not pass schema (hand-edited baseline hygiene).
  *
  * @param {unknown} metrics
  * @returns {{ ok: true, metrics: Record<string, number> } | { ok: false, message: string }}
@@ -123,10 +148,15 @@ export function validateBaselineMetrics(metrics) {
       };
     }
     const value = record[key];
-    if (typeof value !== 'number' || !Number.isFinite(value)) {
+    if (
+      typeof value !== 'number' ||
+      !Number.isFinite(value) ||
+      !Number.isInteger(value) ||
+      value < 0
+    ) {
       return {
         ok: false,
-        message: `report:knip — baseline metrics schema invalid: "${key}" must be a finite number`,
+        message: `report:knip — baseline metrics schema invalid: "${key}" must be a finite integer ≥ 0`,
       };
     }
   }
@@ -351,7 +381,13 @@ function main() {
     process.exit(0);
   }
 
-  const metrics = summarizeKnip(knip);
+  const summarized = summarizeKnip(knip);
+  if (!summarized.ok) {
+    // Unexpected knip reporter shape: fail closed like baseline unparseable (q-mp-1036 / 1106b).
+    console.error(summarized.message);
+    process.exit(1);
+  }
+  const metrics = summarized.metrics;
   const loaded = loadBaseline();
   // Corrupt / incomplete baselines must fail before any fake growth WARNING (q-mp-1036).
   // --write-baseline may still refresh a broken file; validate only when comparing.

@@ -14,7 +14,9 @@ import yaml from 'js-yaml';
 import {
   auditWorkflow,
   auditWorkflowsDir,
+  hasPackageLockHashFiles,
   hasPullRequestTrigger,
+  isPackageLockDependencyPath,
   isYamlFalse,
   isYamlTrue,
   onIncludesEvent,
@@ -324,6 +326,116 @@ jobs:
       (v) => v.message
     );
     expect(messages.some((m) => m.includes('Playwright install'))).toBe(true);
+  });
+
+  it('accepts YAML-array cache-dependency-path (q-mp-1124)', () => {
+    expect(isPackageLockDependencyPath('package-lock.json')).toBe(true);
+    expect(isPackageLockDependencyPath(['package-lock.json'])).toBe(true);
+    expect(
+      isPackageLockDependencyPath(['other.lock', 'package-lock.json'])
+    ).toBe(true);
+    expect(isPackageLockDependencyPath('package-lock.json\nother.lock')).toBe(
+      true
+    );
+    expect(isPackageLockDependencyPath(['yarn.lock'])).toBe(false);
+    expect(isPackageLockDependencyPath('yarn.lock')).toBe(false);
+    expect(isPackageLockDependencyPath(null)).toBe(false);
+
+    const arrayForm = GOOD_CI.replace(
+      'cache-dependency-path: package-lock.json',
+      'cache-dependency-path: [package-lock.json]'
+    );
+    expect(auditWorkflow('ci.yml', yaml.load(arrayForm), arrayForm)).toEqual(
+      []
+    );
+
+    const wrongArray = GOOD_CI.replace(
+      'cache-dependency-path: package-lock.json',
+      'cache-dependency-path: [yarn.lock]'
+    );
+    expect(
+      auditWorkflow('ci.yml', yaml.load(wrongArray), wrongArray).some((v) =>
+        v.message.includes('cache-dependency-path: package-lock.json')
+      )
+    ).toBe(true);
+  });
+
+  it('accepts double-quoted and glob hashFiles Playwright cache keys (q-mp-1147, q-mp-1148)', () => {
+    expect(
+      hasPackageLockHashFiles("${{ hashFiles('package-lock.json') }}")
+    ).toBe(true);
+    expect(
+      hasPackageLockHashFiles('${{ hashFiles("package-lock.json") }}')
+    ).toBe(true);
+    expect(
+      hasPackageLockHashFiles(
+        "${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}"
+      )
+    ).toBe(true);
+    expect(
+      hasPackageLockHashFiles(
+        '${{ runner.os }}-playwright-${{ hashFiles("package-lock.json") }}'
+      )
+    ).toBe(true);
+    expect(
+      hasPackageLockHashFiles("${{ hashFiles('**/package-lock.json') }}")
+    ).toBe(true);
+    expect(
+      hasPackageLockHashFiles('${{ hashFiles("**/package-lock.json") }}')
+    ).toBe(true);
+    expect(hasPackageLockHashFiles("${{ hashFiles('yarn.lock') }}")).toBe(
+      false
+    );
+    expect(hasPackageLockHashFiles('playwright-cache-v1')).toBe(false);
+
+    const pwJob = (cacheKey: string) => `
+name: CI
+on:
+  push:
+    branches: [alpha]
+permissions:
+  contents: read
+concurrency:
+  group: ci
+  cancel-in-progress: true
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - uses: actions/cache@cccccccccccccccccccccccccccccccccccccccc
+        with:
+          path: ~/.cache/ms-playwright
+          key: \${{ ${cacheKey} }}
+      - run: npx playwright install chromium
+`;
+
+    for (const key of [
+      "hashFiles('package-lock.json')",
+      'hashFiles("package-lock.json")',
+      "hashFiles('**/package-lock.json')",
+      'hashFiles("**/package-lock.json")',
+      "runner.os }}-pw-${{ hashFiles('package-lock.json')",
+      'runner.os }}-pw-${{ hashFiles("package-lock.json")',
+    ]) {
+      const raw = pwJob(key);
+      expect(auditWorkflow('ci.yml', yaml.load(raw), raw)).toEqual([]);
+    }
+
+    const wrongTarget = pwJob("hashFiles('yarn.lock')");
+    expect(
+      auditWorkflow('ci.yml', yaml.load(wrongTarget), wrongTarget).some((v) =>
+        v.message.includes('Playwright install')
+      )
+    ).toBe(true);
   });
 
   it('rejects mixed SHA and major action pins', () => {

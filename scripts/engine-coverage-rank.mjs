@@ -167,8 +167,9 @@ export function formatCounts(covered, total) {
  * including when a finite numeric pct contradicts the counts (stale istanbul
  * rows). Covered is clamped to [0, total] before derive so pct ≤ 100
  * (q-mp-1083). total===0 → 100. Absent metric → zeros (legacy default for
- * missing branches). Pct-only numeric (no covered/total) keeps the supplied pct
- * with unknown counts (q-mp-1084). Non-numeric / missing pct without
+ * missing branches). Pct-only numeric (no covered/total) keeps unknown counts
+ * (q-mp-1084) and clamps pct to [0, 100] for display/rank parity with
+ * report-coverage-map (q-mp-1133). Non-numeric / missing pct without
  * covered/total → null (q-mp-1018).
  *
  * @param {unknown} m
@@ -197,8 +198,9 @@ export function resolveMetric(m) {
 
   if (typeof pct === 'number' && Number.isFinite(pct)) {
     // q-mp-1084: do not invent 0 for missing covered/total on pct-only rows.
+    // q-mp-1133: clamp pct-only values to [0, 100] (match report-coverage-map).
     return {
-      pct,
+      pct: Math.min(100, Math.max(0, pct)),
       covered: coveredOk ? covered : null,
       total: totalOk ? total : null,
     };

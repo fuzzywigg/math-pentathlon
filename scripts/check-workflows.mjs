@@ -70,6 +70,38 @@ export function isYamlFalse(value) {
 }
 
 /**
+ * setup-node `cache-dependency-path` may be a scalar, a newline-joined
+ * multi-line string, or a YAML sequence. Accept any form that includes
+ * `package-lock.json` (q-mp-1124).
+ *
+ * @param {unknown} depPath
+ * @returns {boolean}
+ */
+export function isPackageLockDependencyPath(depPath) {
+  if (depPath === 'package-lock.json') return true;
+  if (Array.isArray(depPath)) {
+    return depPath.some((p) => String(p).trim() === 'package-lock.json');
+  }
+  if (typeof depPath === 'string') {
+    return depPath.split(/\n/).some((l) => l.trim() === 'package-lock.json');
+  }
+  return false;
+}
+
+/**
+ * Playwright `actions/cache` keys must hash the npm lockfile. Accept single-
+ * or double-quoted `package-lock.json` and the common recursive lockfile glob
+ * (`**` + `/package-lock.json`) (q-mp-1147, q-mp-1148). Unrelated hashFiles
+ * targets still fail.
+ *
+ * @param {string} key
+ * @returns {boolean}
+ */
+export function hasPackageLockHashFiles(key) {
+  return /hashFiles\(\s*['"](?:\*\*\/)?package-lock\.json['"]\s*\)/.test(key);
+}
+
+/**
  * GitHub Actions accepts `on` as a mapping (`on: pull_request:`) or a
  * sequence shorthand (`on: [pull_request]`). Treat both forms the same.
  *
@@ -240,13 +272,7 @@ export function auditWorkflow(file, doc, raw) {
             setupNodeCacheOk = false;
           }
           const depPath = withObj['cache-dependency-path'];
-          const depOk =
-            depPath === 'package-lock.json' ||
-            (typeof depPath === 'string' &&
-              depPath
-                .split(/\n/)
-                .some((l) => l.trim() === 'package-lock.json'));
-          if (!depOk) {
+          if (!isPackageLockDependencyPath(depPath)) {
             setupNodeCacheOk = false;
           }
         }
@@ -257,7 +283,7 @@ export function auditWorkflow(file, doc, raw) {
           const key = String(withObj.key ?? '');
           if (
             cachePath.includes('ms-playwright') &&
-            key.includes("hashFiles('package-lock.json')")
+            hasPackageLockHashFiles(key)
           ) {
             hasPlaywrightCache = true;
           }

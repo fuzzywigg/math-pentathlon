@@ -24,7 +24,7 @@ describe('report-knip helpers', () => {
   });
 
   it('summarizeKnip aggregates unused export / type / file totals', () => {
-    const metrics = summarizeKnip({
+    const result = summarizeKnip({
       files: ['src/orphan.ts'],
       issues: [
         {
@@ -47,6 +47,9 @@ describe('report-knip helpers', () => {
         },
       ],
     });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const { metrics } = result;
     expect(metrics.unusedFiles).toBe(1);
     expect(metrics.unusedExports).toBe(3);
     expect(metrics.unusedTypes).toBe(2);
@@ -59,18 +62,35 @@ describe('report-knip helpers', () => {
     }
   });
 
-  it('summarizeKnip does not throw when issues is a non-array object (q-mp-1106)', () => {
-    const metrics = summarizeKnip({
+  it('summarizeKnip rejects non-array issues as unparseable (q-mp-1106b)', () => {
+    const result = summarizeKnip({
       files: ['src/orphan.ts'],
       issues: { exports: [{ name: 'unusedA' }] },
     });
-    expect(metrics.unusedFiles).toBe(1);
-    expect(metrics.unusedExports).toBe(0);
-    expect(metrics.unusedTypes).toBe(0);
-    expect(metrics.unusedDependencies).toBe(0);
-    expect(metrics.unusedDevDependencies).toBe(0);
-    expect(metrics.unlisted).toBe(0);
-    expect(metrics.duplicates).toBe(0);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.message).toMatch(/unparseable/i);
+      expect(result.message).toMatch(/issues must be an array/i);
+    }
+  });
+
+  it('summarizeKnip rejects null / undefined / non-object roots without throw (q-mp-1154)', () => {
+    for (const bad of [null, undefined, 42, 'x', []]) {
+      const result = summarizeKnip(bad);
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.message).toMatch(/unparseable/i);
+        expect(result.message).toMatch(/root must be a non-null object/i);
+      }
+    }
+  });
+
+  it('summarizeKnip accepts object root with missing issues as empty (q-mp-1154)', () => {
+    const result = summarizeKnip({ files: ['src/orphan.ts'] });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.metrics.unusedFiles).toBe(1);
+    expect(result.metrics.unusedExports).toBe(0);
   });
 
   it('diffMetrics flags growth vs baseline (ratchet-down posture)', () => {
@@ -144,7 +164,28 @@ describe('report-knip helpers', () => {
       const result = validateBaselineMetrics({ ...full, unusedTypes: bad });
       expect(result.ok).toBe(false);
       if (!result.ok) {
-        expect(result.message).toMatch(/schema invalid|finite number/i);
+        expect(result.message).toMatch(
+          /schema invalid|finite (number|integer)/i,
+        );
+      }
+    }
+  });
+
+  it('validateBaselineMetrics rejects negative / non-integer counts (q-mp-1155)', () => {
+    const full = {
+      unusedFiles: 0,
+      unusedExports: 3,
+      unusedTypes: 36,
+      unusedDependencies: 0,
+      unusedDevDependencies: 0,
+      unlisted: 3,
+      duplicates: 0,
+    };
+    for (const bad of [-1, 0.5, -0.5, 1.25]) {
+      const result = validateBaselineMetrics({ ...full, unusedFiles: bad });
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.message).toMatch(/integer\s*≥\s*0|finite integer/i);
       }
     }
   });

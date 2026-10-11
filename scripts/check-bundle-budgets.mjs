@@ -38,15 +38,18 @@ function gzipByteLength(absPath) {
 
 /**
  * Collect JS/CSS hrefs from the built menu shell HTML.
+ * Matches real `src`/`href` only (word-boundary; not data-src/ng-src/xsrc),
+ * single- or double-quoted values, case-insensitive attribute names
+ * (q-mp-1132, q-mp-1150, q-mp-1151).
  * @param {string} html
  * @returns {string[]} paths relative to dist/ (no leading slash)
  */
 export function parseMenuCriticalRefs(html) {
   const refs = new Set();
   for (const match of html.matchAll(
-    /(?:src|href)="(\/(?:assets|vendor)\/[^"]+\.(?:js|css))"/g
+    /(?<![A-Za-z0-9_-])(?:src|href)=(["'])(\/(?:assets|vendor)\/[^"']+\.(?:js|css))\1/gi
   )) {
-    refs.add(match[1].slice(1));
+    refs.add(match[2].slice(1));
   }
   return [...refs].sort();
 }

@@ -5,7 +5,8 @@
  * q-mp-1018 derive or reject missing/non-numeric pct;
  * q-mp-1033 prefer covered/total over contradictory numeric pct;
  * q-mp-1083 clamp covered>total (no >100% rank);
- * q-mp-1084 pct-only rows must not invent 0/0 counts).
+ * q-mp-1084 pct-only rows must not invent 0/0 counts;
+ * q-mp-1133 clamp pct-only values to [0,100]).
  */
 import { describe, it, expect, vi } from 'vitest';
 import {
@@ -650,5 +651,73 @@ describe('engine-coverage-rank pct-only counts (q-mp-1084)', () => {
     expect(formatRankOutput(missingBranches)).toContain(
       '1\tsrc/games/calla/rules.ts\t50.00\t50/100\t0.00\t0/0'
     );
+  });
+});
+
+describe('engine-coverage-rank clamp pct-only values (q-mp-1133)', () => {
+  it('resolveMetric clamps pct-only finite values to [0, 100]', () => {
+    expect(resolveMetric({ pct: 150 })).toEqual({
+      pct: 100,
+      covered: null,
+      total: null,
+    });
+    expect(resolveMetric({ pct: -5 })).toEqual({
+      pct: 0,
+      covered: null,
+      total: null,
+    });
+    expect(resolveMetric({ pct: 0 })).toEqual({
+      pct: 0,
+      covered: null,
+      total: null,
+    });
+    expect(resolveMetric({ pct: 100 })).toEqual({
+      pct: 100,
+      covered: null,
+      total: null,
+    });
+    expect(resolveMetric({ pct: 88.5 })).toEqual({
+      pct: 88.5,
+      covered: null,
+      total: null,
+    });
+  });
+
+  it('non-finite pct still rejected; counts path clamp preserved', () => {
+    expect(resolveMetric({ pct: Number.NaN })).toBeNull();
+    expect(resolveMetric({ pct: Number.POSITIVE_INFINITY })).toBeNull();
+    expect(resolveMetric({ pct: '150' })).toBeNull();
+    // q-mp-1083 counts path still clamps covered>total (not pct-only path).
+    expect(resolveMetric({ covered: 12, total: 10, pct: 999 })).toEqual({
+      pct: 100,
+      covered: 10,
+      total: 10,
+    });
+  });
+
+  it('pct-only rank table never shows >100% or negative pct', () => {
+    const rows = collectEngineRows({
+      'src/games/hex/rules.ts': {
+        lines: { pct: 150 },
+        branches: { pct: -10 },
+      },
+      'src/games/ramrod/board.ts': {
+        lines: { pct: 50, covered: 5, total: 10 },
+        branches: { pct: 40, covered: 4, total: 10 },
+      },
+    });
+    expect(rows).toHaveLength(2);
+    const hex = rows.find((r) => r.file.includes('hex'));
+    expect(hex).toBeDefined();
+    expect(hex!.linePct).toBe(100);
+    expect(hex!.branchPct).toBe(0);
+    expect(hex!.lineCov).toBeNull();
+    expect(hex!.lineTot).toBeNull();
+    const out = formatRankOutput(rows);
+    expect(out).toContain('src/games/hex/rules.ts\t100.00\t—\t0.00\t—');
+    expect(out).not.toMatch(/150\.00/);
+    expect(out).not.toMatch(/-10\.00/);
+    // q-mp-1084: still em dash, not invented 0/0.
+    expect(out).not.toMatch(/100\.00\t0\/0/);
   });
 });

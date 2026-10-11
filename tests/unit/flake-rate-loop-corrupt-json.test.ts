@@ -33,17 +33,21 @@ function tempDir(prefix: string): string {
 function writeFakeNpx(
   binDir: string,
   kind: 'unit' | 'e2e',
-  body: 'corrupt' | 'valid'
+  body: 'corrupt' | 'valid' | 'null'
 ): void {
   const scriptPath = join(binDir, 'npx');
   const unitPayload =
     body === 'corrupt'
       ? 'printf "{" > "$out"'
-      : 'printf \'{"success":true,"numPassedTests":1,"numFailedTests":0,"testResults":[]}\' > "$out"';
+      : body === 'null'
+        ? 'printf "null" > "$out"'
+        : 'printf \'{"success":true,"numPassedTests":1,"numFailedTests":0,"testResults":[]}\' > "$out"';
   const e2ePayload =
     body === 'corrupt'
       ? 'printf "{"'
-      : 'printf \'{"suites":[],"stats":{"expected":1,"unexpected":0,"flaky":0,"duration":1}}\'';
+      : body === 'null'
+        ? 'printf "null"'
+        : 'printf \'{"suites":[],"stats":{"expected":1,"unexpected":0,"flaky":0,"duration":1}}\'';
   const contents =
     kind === 'unit'
       ? `#!/bin/sh
@@ -154,6 +158,31 @@ describe('flake-rate loops tolerate corrupt reporter JSON (q-mp-1024)', () => {
     };
     expect(summary.runSummaries).toEqual([
       { runId: 'e2e-1', ok: false, error: 'corrupt json' },
+    ]);
+  });
+
+  it('e2e loop records non-object json root for JSON null (q-mp-1153)', () => {
+    const out = tempDir('flake-e2e-null-out-');
+    const bin = tempDir('flake-e2e-null-bin-');
+    writeFakeNpx(bin, 'e2e', 'null');
+    const result = spawnSync(
+      process.execPath,
+      [E2E_LOOP, '--runs', '1', '--out', out],
+      {
+        encoding: 'utf8',
+        env: { ...process.env, PATH: `${bin}:${process.env.PATH}` },
+      }
+    );
+    const combined = `${result.stdout}${result.stderr}`;
+    expect(combined).not.toMatch(/TypeError/);
+    expect(combined).not.toMatch(/Cannot read properties of null/i);
+    const summary = JSON.parse(
+      readFileSync(join(out, 'e2e-summary.json'), 'utf8')
+    ) as {
+      runSummaries: Array<{ ok: boolean; error?: string }>;
+    };
+    expect(summary.runSummaries).toEqual([
+      { runId: 'e2e-1', ok: false, error: 'non-object json root' },
     ]);
   });
 

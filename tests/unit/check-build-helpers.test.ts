@@ -95,6 +95,67 @@ describe('check-build helpers', () => {
     ]);
   });
 
+  it('accepts whitespace around JSON-quoted keys (q-mp-1125)', () => {
+    // Spaced JSON keys (formatter padding); tight JSON from 1087 still works.
+    expect(
+      parsePrecacheManifest('{ "url" : "/a.js" , "revision" : "1" }')
+    ).toEqual([{ url: '/a.js', revision: '1' }]);
+    expect(
+      parsePrecacheManifest('{ "revision" : "1" , "url" : "/a.js" }')
+    ).toEqual([{ url: '/a.js', revision: '1' }]);
+    expect(parsePrecacheManifest('{"url":"/a.js","revision":"1"}')).toEqual([
+      { url: '/a.js', revision: '1' },
+    ]);
+  });
+
+  it('ignores optional Workbox integrity field (q-mp-1126)', () => {
+    expect(
+      parsePrecacheManifest('{url: "/a.js", revision: "1", integrity: null}')
+    ).toEqual([{ url: '/a.js', revision: '1' }]);
+    expect(
+      parsePrecacheManifest('{url:"/a.js",revision:"1",integrity:"sha384-abc"}')
+    ).toEqual([{ url: '/a.js', revision: '1' }]);
+    expect(
+      parsePrecacheManifest('{"url":"/a.js","revision":"1","integrity":null}')
+    ).toEqual([{ url: '/a.js', revision: '1' }]);
+    expect(
+      parsePrecacheManifest('{ revision: "1", url: "/a.js", integrity: null }')
+    ).toEqual([{ url: '/a.js', revision: '1' }]);
+    // url/revision still required; integrity alone is not an entry.
+    expect(parsePrecacheManifest('{integrity: null}')).toEqual([]);
+    // Compact path without integrity still works.
+    expect(parsePrecacheManifest('{url:"/a.js",revision:"1"}')).toEqual([
+      { url: '/a.js', revision: '1' },
+    ]);
+  });
+
+  it('ignores optional Workbox size field (q-mp-1149)', () => {
+    expect(parsePrecacheManifest('{url:"/a.js",revision:"1",size:12}')).toEqual(
+      [{ url: '/a.js', revision: '1' }]
+    );
+    expect(
+      parsePrecacheManifest('{url:"/a.js",revision:"1",size:null}')
+    ).toEqual([{ url: '/a.js', revision: '1' }]);
+    expect(
+      parsePrecacheManifest('{"url":"/a.js","revision":"1","size":12}')
+    ).toEqual([{ url: '/a.js', revision: '1' }]);
+    expect(
+      parsePrecacheManifest('{url:"/a.js",revision:"1",integrity:null,size:12}')
+    ).toEqual([{ url: '/a.js', revision: '1' }]);
+    expect(
+      parsePrecacheManifest(
+        '{url:"/a.js",revision:"1",size:12,integrity:"sha384-x"}'
+      )
+    ).toEqual([{ url: '/a.js', revision: '1' }]);
+    // Trailing comma after size (1098) still works.
+    expect(
+      parsePrecacheManifest('{url:"/a.js",revision:"1",size:12,}')
+    ).toEqual([{ url: '/a.js', revision: '1' }]);
+    expect(parsePrecacheManifest('{url:"/a.js",revision:"1"}')).toEqual([
+      { url: '/a.js', revision: '1' },
+    ]);
+  });
+
   it('diffs hash trees for only-A / only-B / content', () => {
     const a = new Map([
       ['a.js', '111'],
