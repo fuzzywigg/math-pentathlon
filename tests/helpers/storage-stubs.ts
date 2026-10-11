@@ -32,6 +32,10 @@ export async function withThrowingLocalStorageAccess<T>(
   } finally {
     if (original) {
       Object.defineProperty(globalThis, 'localStorage', original);
+    } else {
+      // No prior own descriptor (e.g. deleted before enter): drop the
+      // temporary throwing getter so it cannot leak into later tests.
+      Reflect.deleteProperty(globalThis, 'localStorage');
     }
   }
 }

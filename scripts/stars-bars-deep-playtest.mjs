@@ -19,6 +19,12 @@ import {
 } from './lib/deep-playtest-end.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
+import {
+  installHarnessSeededRandom,
+  installPageSeededRandom,
+  resolvePlaytestSeed,
+} from './lib/playtest-seed.mjs';
+import { joinPlaytestGameUrl } from './lib/playtest-url.mjs';
 
 const USAGE = `Usage: node scripts/stars-bars-deep-playtest.mjs
 
@@ -28,6 +34,7 @@ Requires Vite on PLAYTEST_BASE (default http://127.0.0.1:5173).
 Env:
   PLAYTEST_BASE   Base URL (default http://127.0.0.1:5173)
   STARS_GAMES     Games per difficulty×viewport (default 10)
+  PLAYTEST_SEED   Move/AI RNG seed (default 0x70a71e57); written to results
 
 Options:
   -h, --help      Show this help and exit (no browser launch)`;
@@ -35,6 +42,8 @@ Options:
 applyDeepPlaytestCli(process.argv.slice(2), USAGE);
 
 const BASE = process.env.PLAYTEST_BASE || 'http://127.0.0.1:5173';
+const SEED = resolvePlaytestSeed(process.env);
+installHarnessSeededRandom(SEED);
 const OUT = path.resolve('docs/playtest/stars-bars-deep-2026-10-07');
 const ART = resolveArtifactDir();
 const GAMES_PER_DIFF = requireEnvNumber('STARS_GAMES', 10);
@@ -84,7 +93,7 @@ async function expectHidden(locator) {
 }
 
 async function startVsAi(page, difficulty) {
-  await page.goto(`${BASE}/#/game/stars-bars`, {
+  await page.goto(joinPlaytestGameUrl(BASE, 'stars-bars'), {
     waitUntil: 'domcontentloaded',
   });
   await waitForGameReady(page);
@@ -256,6 +265,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
     locale: 'en-US',
   });
   const page = await context.newPage();
+  await installPageSeededRandom(page, SEED);
   const consoleErrors = [];
   const pageErrors = [];
   page.on('console', (msg) => {
@@ -436,6 +446,7 @@ async function main() {
       locale: 'en-US',
     });
     const page = await context.newPage();
+    await installPageSeededRandom(page, SEED);
     let race;
     try {
       race = await probeNewGameRace(page, 'medium');
@@ -473,6 +484,7 @@ async function main() {
 
   const summary = {
     generatedAt: new Date().toISOString(),
+    seed: SEED,
     gamesPerDiff: GAMES_PER_DIFF,
     total: results.length,
     byOutcome: {},

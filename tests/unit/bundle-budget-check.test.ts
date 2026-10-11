@@ -83,6 +83,44 @@ describe('bundle budget helpers', () => {
     expect(map.get('hex-a-gone')).toBe('game-hex-a-gone-bbbbbbbb.js');
     expect(map.get('queens-guards')).toBe('game-queens-guards--cccccccc.js');
   });
+
+  // q-mp-1300: duplicate hashes must not follow readdir order
+  it('leaves game id unmapped when duplicate hashes exist (q-mp-1300)', () => {
+    const oldFirst = mapGameChunks(
+      ['game-hex-old.js', 'game-hex-new.js'],
+      ['hex']
+    );
+    const newFirst = mapGameChunks(
+      ['game-hex-new.js', 'game-hex-old.js'],
+      ['hex']
+    );
+    expect(oldFirst.has('hex')).toBe(false);
+    expect(newFirst.has('hex')).toBe(false);
+    expect(oldFirst.size).toBe(0);
+    expect(newFirst.size).toBe(0);
+  });
+
+  it('preserves hex vs hex-a-gone when hex has duplicate hashes (q-mp-1300)', () => {
+    const files = [
+      'game-hex-old.js',
+      'game-hex-new.js',
+      'game-hex-a-gone-bbbbbbbb.js',
+    ];
+    const map = mapGameChunks(files, ['hex', 'hex-a-gone']);
+    expect(map.get('hex-a-gone')).toBe('game-hex-a-gone-bbbbbbbb.js');
+    expect(map.has('hex')).toBe(false);
+  });
+
+  it('does not let hex steal ambiguous hex-a-gone duplicates (q-mp-1300)', () => {
+    const files = [
+      'game-hex-aaaaaaaa.js',
+      'game-hex-a-gone-old.js',
+      'game-hex-a-gone-new.js',
+    ];
+    const map = mapGameChunks(files, ['hex', 'hex-a-gone']);
+    expect(map.has('hex-a-gone')).toBe(false);
+    expect(map.get('hex')).toBe('game-hex-aaaaaaaa.js');
+  });
 });
 
 describe('known vs NEW OVER allowlist (q-mp-123)', () => {

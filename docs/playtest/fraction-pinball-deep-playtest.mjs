@@ -11,6 +11,7 @@ import { chromium, devices } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import { requireEnvNumber } from '../../scripts/lib/env-number.mjs';
+import { joinPlaytestGameUrl } from '../../scripts/lib/playtest-url.mjs';
 
 const BASE = process.env.PLAYTEST_BASE || 'http://localhost:5173';
 const OUT = path.resolve('docs/playtest/fraction-pinball-deep-2026-10-07');
@@ -27,7 +28,7 @@ async function dismissOwl(page) {
 }
 
 async function startVsAi(page, difficulty) {
-  await page.goto(`${BASE}/#/game/fraction-pinball`);
+  await page.goto(joinPlaytestGameUrl(BASE, 'fraction-pinball'));
   await page.getByTestId('game-loading').waitFor({ state: 'hidden', timeout: 15000 }).catch(() => {});
   await page.locator('#new-game-btn, h1').first().waitFor({ timeout: 15000 });
   await dismissOwl(page);

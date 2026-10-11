@@ -19,6 +19,7 @@ import path from 'node:path';
 import { artifactPath } from '../../scripts/lib/artifact-dir.mjs';
 import { dismissOwl } from '../../scripts/lib/dismiss-owl.mjs';
 import { requireEnvNumber } from '../../scripts/lib/env-number.mjs';
+import { joinPlaytestGameUrl } from '../../scripts/lib/playtest-url.mjs';
 import {
   isSkipExtraShotsEnabled,
   resolveFabDifficulties,
@@ -56,7 +57,7 @@ const ONLY_DIFF = diffResolved.onlyDiff;
 const DIFFICULTIES = diffResolved.difficulties;
 
 async function startVsAi(page, difficulty) {
-  await page.goto(`${BASE}/#/game/fab-a-diffy`, {
+  await page.goto(joinPlaytestGameUrl(BASE, 'fab-a-diffy'), {
     waitUntil: 'domcontentloaded',
   });
   await page.waitForSelector('#new-game-btn', { timeout: 20_000 });

@@ -36,15 +36,36 @@ export function installSeededRandom(seed: number): void {
   Math.random = createSeededRng(seed >>> 0);
 }
 
+function isThenable(value: unknown): value is PromiseLike<unknown> {
+  return (
+    value !== null &&
+    (typeof value === 'object' || typeof value === 'function') &&
+    typeof (value as { then?: unknown }).then === 'function'
+  );
+}
+
 /**
- * Install a seeded Math.random for the duration of `fn`.
+ * Install a seeded Math.random for the duration of a **sync** `fn`.
  * Restores the previous Math.random afterward.
+ *
+ * Async callbacks are rejected with TypeError: a `finally` that ran before the
+ * promise settled used to restore the native RNG while the callback was still
+ * awaiting, so later `Math.random()` draws were unseeded. Hold global RNG only
+ * for the sync body — await outside this helper, or pass entropy via
+ * `createSeededRng` / an explicit `rng` argument.
  */
 export function withSeededRandom<T>(seed: number, fn: () => T): T {
   const previous = Math.random;
   installSeededRandom(seed);
   try {
-    return fn();
+    const result = fn();
+    if (isThenable(result)) {
+      throw new TypeError(
+        'withSeededRandom does not support async callbacks (thenables); ' +
+          'use a sync fn, or seed via createSeededRng / an explicit rng argument'
+      );
+    }
+    return result;
   } finally {
     Math.random = previous;
   }

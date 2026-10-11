@@ -14,6 +14,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { artifactPath } from '../../scripts/lib/artifact-dir.mjs';
 import { dismissOwl } from '../../scripts/lib/dismiss-owl.mjs';
+import { joinPlaytestGameUrl } from '../../scripts/lib/playtest-url.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '../..');
@@ -84,7 +85,7 @@ async function playOneGame(
   let softLock = false;
   let turnCopySamples = [];
 
-  await page.goto(`${BASE}/#/game/star-track`);
+  await page.goto(joinPlaytestGameUrl(BASE, 'star-track'));
   await startVsAi(page, difficulty);
 
   // Opening screenshot for first game of each cell
