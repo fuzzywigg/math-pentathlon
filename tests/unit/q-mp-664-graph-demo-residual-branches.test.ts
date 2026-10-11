@@ -75,7 +75,9 @@ describe('q-mp-664 graph-demo — residual missing-host arms', () => {
     spyMissingIds('back-btn');
     expect(() => mountDemo()).not.toThrow();
     expect(document.getElementById('back-btn')).toBeNull();
-    expect(document.querySelectorAll('.demo-section').length).toBeGreaterThan(0);
+    expect(document.querySelectorAll('.demo-section').length).toBeGreaterThan(
+      0
+    );
   });
 
   it('missing template hosts early-return renderCurrentGraph (L285 true)', () => {
