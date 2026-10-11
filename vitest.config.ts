@@ -59,7 +59,8 @@ const isolatedFiles = [
   // q-mp-653: game-prefetch residual branches — resetModules + doMock loaders.
   'tests/unit/q-mp-653-game-prefetch-residuals.test.ts',
   // Real controller imports + destroyGame mutates module singletons.
-  'tests/unit/burn-1008-registry-module-contract.test.ts',
+  // q-mp-1188: shards share isolate (real controller imports + destroyGame).
+  'tests/unit/burn-1008-registry-module-contract*.test.ts',
   // q-mp-117: generation-gated timeout characterization — fake timers +
   // isolate so shared-graph timer pollution cannot starve awaits (CI flake).
   'tests/unit/ui-helper-dedupe-characterization.test.ts',
