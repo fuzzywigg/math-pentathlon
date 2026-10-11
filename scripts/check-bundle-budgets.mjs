@@ -93,6 +93,10 @@ export function listGameIds(root) {
 /**
  * Find the Vite-emitted lazy chunk for a game id.
  * Match longest id first so "hex" does not steal "hex-a-gone".
+ * When multiple `game-<id>-*.js` hashes exist for one id, leave that id
+ * unmapped (measureGameChunks → MISSING) instead of picking by readdir order
+ * (q-mp-1300). Ambiguous matches are still claimed so a shorter id cannot
+ * steal a longer id's duplicate files.
  * @param {string[]} assetFiles
  * @param {string[]} gameIds
  * @returns {Map<string, string>}
@@ -102,17 +106,20 @@ export function mapGameChunks(assetFiles, gameIds) {
   const map = new Map();
   const claimed = new Set();
   for (const id of byLength) {
-    const file = assetFiles.find(
+    const matches = assetFiles.filter(
       (f) =>
         !claimed.has(f) &&
         f.startsWith(`game-${id}-`) &&
         f.endsWith('.js') &&
         !f.includes('.map')
     );
-    if (file) {
-      map.set(id, file);
-      claimed.add(file);
+    if (matches.length === 1) {
+      map.set(id, matches[0]);
+      claimed.add(matches[0]);
+      continue;
     }
+    // 0 → missing; >1 → ambiguous hashes (fail closed / MISSING).
+    for (const f of matches) claimed.add(f);
   }
   return map;
 }
