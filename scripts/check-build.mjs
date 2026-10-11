@@ -378,7 +378,8 @@ export function printHelp() {
   console.log(`Usage: node scripts/check-build.mjs
 
 Report-only dual clean build + PWA precache audit.
-Writes test-results/build/summary.md (+ JSON). Default path always exits 0.
+Writes test-results/build/summary.md (+ JSON). Default report-only path
+exits 0. Unknown flags and misuse exit 2; --help/-h exit 0.
 
 Options:
   -h, --help     Show this help and exit 0 (no builds)
