@@ -21,6 +21,24 @@ async function waitForViewportSettle(
   await waitDoubleRaf(page);
 }
 
+/** Wait until the viewport matches and two paint frames have run (no fixed sleep). */
+async function waitForViewportSettle(
+  page: Page,
+  width: number,
+  height: number
+) {
+  await page.waitForFunction(
+    ({ w, h }) => window.innerWidth === w && window.innerHeight === h,
+    { w: width, h: height }
+  );
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      })
+  );
+}
+
 const DPR_CASES = [1, 2, 3] as const;
 
 for (const dpr of DPR_CASES) {
