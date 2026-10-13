@@ -34,8 +34,12 @@ const MATCHER_RE =
   /\.\s*(?:not\s*\.\s*)?(?:toBeInTheDocument|toHaveAccessibleDescription|toHaveAccessibleName|toHaveTextContent|toHaveAttribute|toHaveValue|toHaveText|toBe|toEqual|toStrictEqual|toMatch|toContain)\s*\(/;
 const EXPECT_RE = /\bexpect\s*\(/;
 const COMING_SOON_LIT_RE = /(['"`])Coming Soon\1|\/Coming Soon\/[gimsuy]*/;
-/** How many lines after `expect(` to join for multi-line asserts. */
-const WINDOW_LINES = 6;
+/**
+ * How many lines after `expect(` to join for multi-line asserts.
+ * Wave-55 style `expect(getCurrentPhaseMessage({…})).toBe(…)` spans 7–8 lines;
+ * a 6-line window undercounts those pins (q-mp-1453).
+ */
+const WINDOW_LINES = 8;
 
 /** Known examples dropped by reviews 7/8 — used by --self-test. */
 const REVIEW_EXAMPLES = [
@@ -239,12 +243,14 @@ function relRoot(abs) {
 }
 
 /**
+ * Strip comments while preserving newlines so 1-based line numbers in the
+ * stripped text still map to the original source (q-mp-1454).
  * @param {string} text
  * @returns {string}
  */
 function stripComments(text) {
   return text
-    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/\/\*[\s\S]*?\*\//g, (block) => block.replace(/[^\n]/g, ''))
     .replace(/(^|[^:])\/\/.*$/gm, '$1');
 }
 
@@ -294,15 +300,22 @@ function harvestCopyRegistry() {
   /** @param {string} value @param {string} source */
   function add(value, source) {
     const v = value.replace(/\s+/g, ' ').trim();
-    // Keep short but distinctive menu copy; otherwise require meaningful phrase.
+    // Keep short but distinctive menu copy / win-banner suffixes; otherwise
+    // require a meaningful phrase (q-mp-1455 keeps `wins!` from `${name} wins!`).
     if (v === 'Coming Soon') {
       /* ok */
+    } else if (/^wins!?\.?$/i.test(v)) {
+      /* ok — distinctive phase-message template suffix */
     } else if (v.length < 10) {
       return;
     }
     if (!/[A-Za-z]{3,}/.test(v)) return;
     // Skip identifiers / enum-like tokens mistakenly near returns.
     if (/^[A-Za-z][A-Za-z0-9]*$/.test(v) && !/\s/.test(v)) return;
+    // Template-split debris: unmatched paren fragments (q-mp-1456), e.g.
+    // `remaining)` from `Place…(${remaining} remaining)` or trailing `(`.
+    if (/\)\s*$/.test(v) && !/\(/.test(v)) return;
+    if (/\(\s*$/.test(v) && !/\)/.test(v)) return;
     const key = v.toLowerCase();
     if (seen.has(key)) return;
     seen.add(key);
@@ -529,9 +542,11 @@ function scanSource(fileRel, source, registry) {
         // Exact full-string pin in matcher arg
         const exactRe = new RegExp(String.raw`^\s*(['"\`])${litEsc}\1\s*$`);
         const needles = [];
-        if (lit.length >= 12) needles.push(lit);
+        const winSuffix = /^wins!?\.?$/i.test(lit);
+        // Short win-banner suffixes stay soft-matchable (q-mp-1455).
+        if (lit.length >= 12 || winSuffix) needles.push(lit);
         const fragMatch = lit.match(
-          /(?:green square|Place a Quadraphage|Click your King|distributing cubes|Coming Soon|It's a tie|It's a draw|Select 1-3|Draw chains|Choose a chain)/i
+          /(?:green square|Place a Quadraphage|Click your King|distributing cubes|Coming Soon|It's a tie|It's a draw|Select 1-3|Draw chains|Choose a chain|wins!?)/i
         );
         if (fragMatch) needles.push(fragMatch[0]);
 
@@ -539,7 +554,7 @@ function scanSource(fileRel, source, registry) {
         let detailLit = lit;
         if (!hit) {
           for (const needle of needles) {
-            if (needle.length < 8) continue;
+            if (needle.length < 8 && !/^wins!?\.?$/i.test(needle)) continue;
             const nEsc = escapeRegExp(needle);
             const softRe = new RegExp(
               String.raw`(['"\`])[^'"\`]*(?:${nEsc})[^'"\`]*\1|\/[^/\n]*(?:${nEsc})[^/\n]*\/`
@@ -727,4 +742,19 @@ function main() {
   }
 }
 
-main();
+function isMain() {
+  const entry = process.argv[1] ? path.resolve(process.argv[1]) : '';
+  return entry === fileURLToPath(import.meta.url);
+}
+
+export {
+  WINDOW_LINES,
+  stripComments,
+  extractExpectUnit,
+  harvestCopyRegistry,
+  scanSource,
+};
+
+if (isMain()) {
+  main();
+}
