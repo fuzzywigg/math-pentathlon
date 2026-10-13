@@ -61,25 +61,6 @@ function expectRequireEnvNumberWiring(
   }
 }
 
-/** Assert a harness imports env-number and calls requireEnvNumber for `name`. */
-function expectRequireEnvNumberWiring(
-  scriptPath: string,
-  envName: string
-): void {
-  const src = readFileSync(scriptPath, 'utf8');
-  expect(src).toMatch(/from\s+['"]\.\/lib\/env-number\.mjs['"]/);
-  expect(src).toMatch(new RegExp(`requireEnvNumber\\(\\s*['"]${envName}['"]`));
-  // Top-level validation must run before any Playwright launch call site.
-  const requireIdx = src.search(
-    new RegExp(`requireEnvNumber\\(\\s*['"]${envName}['"]`)
-  );
-  const launchIdx = src.search(/chromium\.launch|browserType\.launch/);
-  expect(requireIdx).toBeGreaterThanOrEqual(0);
-  if (launchIdx >= 0) {
-    expect(requireIdx).toBeLessThan(launchIdx);
-  }
-}
-
 describe('parseEnvNumber (q-mp-876)', () => {
   it('uses the default when the env var is unset', () => {
     expect(parseEnvNumber({}, 'PERF_MOVES', 30)).toEqual({
