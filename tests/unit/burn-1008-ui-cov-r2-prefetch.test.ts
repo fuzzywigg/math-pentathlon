@@ -29,6 +29,16 @@ const GAME_IDS = [
   'stars-bars',
 ] as const;
 
+// unit-shared uses isolate:false — clear navigator.connection so later suites
+// do not see a stuck saveData stub from Object.defineProperty (q-mp-1458).
+function clearNavigatorConnection(): void {
+  try {
+    delete (navigator as Navigator & { connection?: unknown }).connection;
+  } catch {
+    /* ignore */
+  }
+}
+
 describe('burn-1008 ui-cov-r2 game-prefetch imports', () => {
   beforeEach(() => {
     vi.stubEnv('MODE', 'development');
@@ -40,6 +50,7 @@ describe('burn-1008 ui-cov-r2 game-prefetch imports', () => {
     vi.resetModules();
     vi.restoreAllMocks();
     vi.useRealTimers();
+    clearNavigatorConnection();
   });
 
   async function loadPrefetch() {
