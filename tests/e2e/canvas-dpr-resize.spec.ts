@@ -1,5 +1,5 @@
-/**
- * DPR + resize/orientation hit-test guards.
+ok 6384 -> 5907
+ize/orientation hit-test guards.
  *
  * Emulates deviceScaleFactor 1/2/3 and portrait↔landscape flips, then clicks
  * a known cell and asserts the registered move/selection advanced correctly.
@@ -19,24 +19,6 @@ async function waitForViewportSettle(
     { w: width, h: height }
   );
   await waitDoubleRaf(page);
-}
-
-/** Wait until the viewport matches and two paint frames have run (no fixed sleep). */
-async function waitForViewportSettle(
-  page: Page,
-  width: number,
-  height: number
-) {
-  await page.waitForFunction(
-    ({ w, h }) => window.innerWidth === w && window.innerHeight === h,
-    { w: width, h: height }
-  );
-  await page.evaluate(
-    () =>
-      new Promise<void>((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-      })
-  );
 }
 
 const DPR_CASES = [1, 2, 3] as const;
