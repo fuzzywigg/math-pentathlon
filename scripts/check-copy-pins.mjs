@@ -26,7 +26,10 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
-const TESTS_DIR = path.join(ROOT, 'tests');
+/** Optional hermetic override (tests only). Unset → tip `tests/` (CI unchanged). */
+const TESTS_DIR = process.env.CHECK_COPY_PINS_TESTS_DIR
+  ? path.resolve(process.env.CHECK_COPY_PINS_TESTS_DIR)
+  : path.join(ROOT, 'tests');
 
 const MESSAGE_APIS = ['getPhaseMessage', 'getCurrentPhaseMessage'];
 /** Content matchers that can pin player-facing copy (incl. jest-dom / Playwright). */
