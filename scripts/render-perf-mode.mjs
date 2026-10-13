@@ -178,16 +178,6 @@ async function waitForReadySoft(page, selector, timeout = 2_000) {
   await waitDoubleRaf(page);
 }
 
-/** Soft condition wait + paint settle (no fixed sleep). */
-async function waitForReadySoft(page, selector, timeout = 2_000) {
-  await page
-    .locator(selector)
-    .first()
-    .waitFor({ state: 'visible', timeout })
-    .catch(() => {});
-  await waitDoubleRaf(page);
-}
-
 export async function measureTTI(page, navigateFn) {
   const t0 = await page.evaluate(() => performance.now());
   await navigateFn();
