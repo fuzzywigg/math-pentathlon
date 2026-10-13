@@ -1,5 +1,5 @@
-ok 6384 -> 5907
-ize/orientation hit-test guards.
+/**
+ * DPR + resize/orientation hit-test guards.
  *
  * Emulates deviceScaleFactor 1/2/3 and portrait↔landscape flips, then clicks
  * a known cell and asserts the registered move/selection advanced correctly.
