@@ -87,7 +87,9 @@ export function pathNotInRepoErrorMessage(file) {
 
 /**
  * Usage text when a list/positional path carries `?` / `#` / NUL / control
- * junk (q-mp-1464) or ADS / percent-encoded / `&` / `*` junk (q-mp-1473).
+ * junk (q-mp-1464), ADS / percent-encoded / `&` / `*` junk (q-mp-1473),
+ * shell-metachar junk (q-mp-1478), unicode format/invisible junk (q-mp-1479),
+ * or junk `\segment` after a file path (q-mp-1480).
  * @param {string} file
  */
 export function pathJunkErrorMessage(file) {
@@ -112,14 +114,19 @@ export function pathIsDirectoryErrorMessage(file) {
 }
 
 /**
- * `?` / `#` / NUL / C0+DEL (q-mp-1464); `%` / `&` / `*` (q-mp-1473).
- * Colon (ADS) is checked separately so Windows drive absolutes stay valid.
+ * `?` / `#` / NUL / C0+DEL (q-mp-1464); `%` / `&` / `*` (q-mp-1473);
+ * shell metachar `|<>;"'\`$` (q-mp-1478); Unicode Format (`\p{Cf}`) invisibles
+ * such as ZWSP / soft hyphen / RLO (q-mp-1479). Bare `\` is not junk here —
+ * Windows relatives stay accepted (q-mp-1463); junk `file.ts\extra` is gated
+ * in normalize (q-mp-1480). Colon (ADS) is checked separately so Windows
+ * drive absolutes stay valid.
  */
-const PATH_JUNK_RE = /[?#\u0000-\u001F\u007F%&*]/;
+const PATH_JUNK_RE = /[?#\u0000-\u001F\u007F%&*|<>;"'`$]|\p{Cf}/u;
 
 /**
- * True when `raw` has invalid path characters (q-mp-1464 / q-mp-1473).
- * Allows a Windows drive absolute (`C:\` / `C:/`) but rejects ADS colons.
+ * True when `raw` has invalid path characters (q-mp-1464 / q-mp-1473 /
+ * q-mp-1478 / q-mp-1479). Allows a Windows drive absolute (`C:\` / `C:/`)
+ * but rejects ADS colons.
  * @param {string} raw
  */
 export function pathHasInvalidCharacters(raw) {
@@ -127,6 +134,20 @@ export function pathHasInvalidCharacters(raw) {
   if (!raw.includes(':')) return false;
   const rest = /^[A-Za-z]:[\\/]/.test(raw) ? raw.slice(2) : raw;
   return rest.includes(':');
+}
+
+/**
+ * True when converting Windows `\` would invent a fake nested path after a
+ * filename segment (e.g. `ai.ts\extra` → `ai.ts/extra`) — q-mp-1480.
+ * Real relatives like `src\games\hex\ai.ts` stay accepted (q-mp-1463).
+ * @param {string} convertedPosix
+ */
+export function pathHasJunkBackslashExtra(convertedPosix) {
+  const parts = String(convertedPosix ?? '').split('/');
+  for (let i = 0; i < parts.length - 1; i++) {
+    if (/\.[A-Za-z0-9]+$/.test(parts[i])) return true;
+  }
+  return false;
 }
 
 /**
@@ -146,6 +167,8 @@ export function stripInlinePathComment(line) {
  * paths under the repo root to repo-relative, accept Windows-style relative
  * `\` separators as `/` (q-mp-1463), reject `?`/`#`/NUL/control junk
  * (q-mp-1464), reject ADS / `%` / `&` / `*` junk (q-mp-1473), reject
+ * shell-metachar junk (q-mp-1478), reject unicode format/invisible junk
+ * (q-mp-1479), reject junk `file.ts\extra` remaps (q-mp-1480), reject
  * remaining `//` (q-mp-1471), reject directories (q-mp-1472), reject escapes
  * (q-mp-1429 / q-mp-1430).
  * @param {string} file
@@ -169,9 +192,14 @@ export function normalizeRepoRelativePath(file, root = ROOT) {
   let candidate = raw;
   // POSIX `path.resolve` treats `\` as a literal filename char; convert
   // Windows-style relative separators before join (q-mp-1463). Absolute
-  // inputs keep platform semantics via path.isAbsolute(raw).
+  // inputs keep platform semantics via path.isAbsolute(raw). Reject
+  // `file.ts\extra` before it becomes a fake `file.ts/extra` (q-mp-1480).
   if (!path.isAbsolute(raw) && candidate.includes('\\')) {
-    candidate = candidate.split('\\').join('/');
+    const converted = candidate.split('\\').join('/');
+    if (pathHasJunkBackslashExtra(converted)) {
+      return { ok: false, message: pathJunkErrorMessage(raw) };
+    }
+    candidate = converted;
   }
   while (candidate.startsWith('./')) {
     candidate = candidate.slice(2);
@@ -217,9 +245,10 @@ export function dedupePreserveOrder(files) {
  * Normalizes `./`, Windows-style relative `\`, and absolute-under-root paths;
  * skips `#` and full-line `//` comments (q-mp-1471); strips trailing
  * ` // …` comments; rejects path junk (`?`/`#`/NUL/controls / ADS / `%` /
- * `&` / `*`), directories, and escapes; first-wins dedupe within the list
- * (q-mp-1429 / q-mp-1430 / q-mp-1463 / q-mp-1464 / q-mp-1471 / q-mp-1472 /
- * q-mp-1473).
+ * `&` / `*` / shell metachar / unicode format / junk `\extra`), directories,
+ * and escapes; first-wins dedupe within the list (q-mp-1429 / q-mp-1430 /
+ * q-mp-1463 / q-mp-1464 / q-mp-1471 / q-mp-1472 / q-mp-1473 / q-mp-1478 /
+ * q-mp-1479 / q-mp-1480).
  * @param {string} filesFrom
  * @param {{
  *   existsSync?: (p: string) => boolean,
