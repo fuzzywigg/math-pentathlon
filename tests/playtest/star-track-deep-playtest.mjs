@@ -19,6 +19,11 @@ import { joinPlaytestGameUrl } from '../../scripts/lib/playtest-url.mjs';
 // q-mp-1475: gate confusing_turn_copy — do not flag normal "Blue's turn" /
 // "Blue:" drawChains/selectChain statuses (see star-track-confusing-turn-copy.mjs).
 import { confusingTurnCopyFinding } from './star-track-confusing-turn-copy.mjs';
+// q-mp-1483: live HvA human win is "You Wins!" (board-ui `${winnerName} Wins!`).
+import {
+  STAR_TRACK_END_WIN_STATUS_RE_SOURCE,
+  isStarTrackEndWinStatus,
+} from './star-track-end-status.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '../..');
@@ -144,9 +149,9 @@ async function playOneGame(
       };
     });
 
-    // Note: do not use a trailing \b after "Win!" — "!" is already non-word.
+    // Note: do not use a trailing \b after "Wins!" — "!" is already non-word.
     if (
-      /(You Win!|AI Wins!|Blue Wins!|Red Wins!)/i.test(snap.status) ||
+      isStarTrackEndWinStatus(snap.status) ||
       /It's a draw!/i.test(snap.status) ||
       /reaches the star/i.test(snap.winner) ||
       /draw — chains exhausted/i.test(snap.winner)
@@ -267,7 +272,7 @@ async function playOneGame(
     const remainingGame = Math.max(1, deadline - Date.now());
     await page
       .waitForFunction(
-        (prevFp) => {
+        ({ prevFp, endWinReSource }) => {
           const status =
             document.querySelector('.status-turn')?.textContent || '';
           const progress = [
@@ -284,10 +289,8 @@ async function playOneGame(
           if (document.querySelector('.star-track-chain-btn:not([disabled])')) {
             return true;
           }
-          if (
-            /(You Win!|AI Wins!|Blue Wins!|Red Wins!)/i.test(status) ||
-            /It's a draw!/i.test(status)
-          ) {
+          const endWinRe = new RegExp(endWinReSource, 'i');
+          if (endWinRe.test(status) || /It's a draw!/i.test(status)) {
             return true;
           }
           const winner =
@@ -297,7 +300,10 @@ async function playOneGame(
             /draw — chains exhausted/i.test(winner)
           );
         },
-        fingerprint,
+        {
+          prevFp: fingerprint,
+          endWinReSource: STAR_TRACK_END_WIN_STATUS_RE_SOURCE,
+        },
         { timeout: Math.min(remainingStall, remainingGame) }
       )
       .catch(() => {});
