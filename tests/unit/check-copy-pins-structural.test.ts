@@ -1,8 +1,9 @@
 /**
- * Hermetic structural coverage for check-copy-pins (q-mp-1453…1456, 1465, 1477, 1481):
+ * Hermetic structural coverage for check-copy-pins (q-mp-1453…1456, 1465, 1477, 1481, 1488, 1489):
  * multiline WINDOW_LINES, stripComments line map, wins! registry suffixes,
  * template-split debris rejection (paren + name/prefix + mid-fragment),
- * and softRe honesty for seat-status apostrophes (`Blue's` / `Red's`).
+ * softRe honesty for seat-status apostrophes (`Blue's` / `Red's`),
+ * extractExpectUnit regex apostrophes (1488) and char-class `)` (1489).
  * No tip-wide scan / findings-total stamp.
  *
  * Stays on the default unit-shared project (no vitest.config nodePureFiles edit).
@@ -54,7 +55,7 @@ describe('wave55 shape', () => {
 });
 `;
 
-describe('check-copy-pins structural (q-mp-1453…1456, 1465, 1477, 1481)', () => {
+describe('check-copy-pins structural (q-mp-1453…1456, 1465, 1477, 1481, 1488, 1489)', () => {
   it('WINDOW_LINES covers 7–8 line phase-message expects (q-mp-1453)', () => {
     expect(WINDOW_LINES).toBeGreaterThanOrEqual(8);
 
@@ -318,5 +319,45 @@ it('pins phase', () => {
       registry
     );
     expect(junkDebug.some((f) => f.kind === 'registry-string')).toBe(true);
+  });
+
+  it('extractExpectUnit keeps matcherArg for regex apostrophes (q-mp-1488)', () => {
+    // Measured null: `'` inside `/It's…/` entered string mode and never
+    // found the matcher `)`.
+    const draw = extractExpectUnit("expect(msg).toMatch(/It's a draw!/);");
+    expect(draw).not.toBeNull();
+    expect(draw?.matcherArg).toBe("/It's a draw!/");
+
+    const tie = extractExpectUnit("expect(msg).toMatch(/It's a tie!/i);");
+    expect(tie).not.toBeNull();
+    expect(tie?.matcherArg).toBe("/It's a tie!/i");
+
+    // Twin without apostrophe still extracts (control).
+    const blue = extractExpectUnit('expect(msg).toMatch(/Blue wins!/i);');
+    expect(blue).not.toBeNull();
+    expect(blue?.matcherArg).toBe('/Blue wins!/i');
+
+    // String / toBe paths unchanged.
+    const toBeDq = extractExpectUnit('expect(msg).toBe("Blue\'s turn");');
+    expect(toBeDq).not.toBeNull();
+    expect(toBeDq?.matcherArg).toBe('"Blue\'s turn"');
+
+    const toBeSq = extractExpectUnit("expect(msg).toBe('It\\'s a draw!');");
+    expect(toBeSq).not.toBeNull();
+    expect(toBeSq?.matcherArg).toBe("'It\\'s a draw!'");
+  });
+
+  it('extractExpectUnit does not truncate on ) inside regex char classes (q-mp-1489)', () => {
+    // Measured truncate: `)` in `/[^)]+/` closed the matcher early.
+    const charClass = extractExpectUnit('expect(x).toMatch(/[^)]+/);');
+    expect(charClass).not.toBeNull();
+    expect(charClass?.matcherArg).toBe('/[^)]+/');
+
+    // OWL-shaped soft-fail residual pin (escaped groups + char-class `)`).
+    const owl = extractExpectUnit(
+      String.raw`expect(x).not.toMatch(/\.get\([^)]+\)\s*\?\?\s*\[\]/);`
+    );
+    expect(owl).not.toBeNull();
+    expect(owl?.matcherArg).toBe(String.raw`/\.get\([^)]+\)\s*\?\?\s*\[\]/`);
   });
 });
