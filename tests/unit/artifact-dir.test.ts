@@ -135,3 +135,67 @@ describe('artifactPath (q-mp-955)', () => {
     }
   });
 });
+
+describe('artifactPath containment (q-mp-1495)', () => {
+  function withArtifactRoot(run: (root: string) => void): void {
+    const root = mkdtempSync(join(tmpdir(), 'mp-artifact-contain-'));
+    const prev = process.env.MP_ARTIFACT_DIR;
+    process.env.MP_ARTIFACT_DIR = root;
+    try {
+      run(root);
+    } finally {
+      if (prev === undefined) {
+        delete process.env.MP_ARTIFACT_DIR;
+      } else {
+        process.env.MP_ARTIFACT_DIR = prev;
+      }
+      rmSync(root, { recursive: true, force: true });
+    }
+  }
+
+  it('UNDER: plain filename stays under the artifact root', () => {
+    withArtifactRoot((root) => {
+      expect(artifactPath('ok.json')).toBe(join(root, 'ok.json'));
+    });
+  });
+
+  it('UNDER: nested relative segments stay under the root', () => {
+    withArtifactRoot((root) => {
+      expect(artifactPath('subdir', 'nested', 'out.json')).toBe(
+        join(root, 'subdir', 'nested', 'out.json')
+      );
+    });
+  });
+
+  it('ESCAPE: rejects ../ that leaves the artifact root', () => {
+    withArtifactRoot(() => {
+      expect(() => artifactPath('../escape.json')).toThrow(
+        /escapes artifact root/
+      );
+    });
+  });
+
+  it('ESCAPE: rejects ../../etc/passwd-style traversal', () => {
+    withArtifactRoot(() => {
+      expect(() => artifactPath('../../etc/passwd')).toThrow(
+        /escapes artifact root/
+      );
+    });
+  });
+
+  it('ESCAPE: rejects foo/../../../x nested traversal', () => {
+    withArtifactRoot(() => {
+      expect(() => artifactPath('foo/../../../x')).toThrow(
+        /escapes artifact root/
+      );
+    });
+  });
+
+  it('ESCAPE: rejects an absolute path segment outside the root', () => {
+    withArtifactRoot(() => {
+      expect(() => artifactPath('/etc/passwd')).toThrow(
+        /escapes artifact root/
+      );
+    });
+  });
+});

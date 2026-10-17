@@ -16,7 +16,7 @@
  * Unknown flags exit 2. Import from harnesses (e.g. console-sweep, flake-rate).
  */
 import { mkdirSync as fsMkdirSync } from 'node:fs';
-import { isAbsolute, join, resolve } from 'node:path';
+import { isAbsolute, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseHelpOnlyArgv } from './help-only-cli.mjs';
 
@@ -92,13 +92,35 @@ export function resolveArtifactDir(options = {}) {
 }
 
 /**
+ * True when `candidate` is the same as `root` or a path under it.
+ * Rejects `..` / absolute escapes (q-mp-1495).
+ *
+ * @param {string} root
+ * @param {string} candidate
+ * @returns {boolean}
+ */
+function isPathInsideRoot(root, candidate) {
+  const rel = relative(root, candidate);
+  return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
+}
+
+/**
  * Join path segments under the resolved artifact root.
+ * Rejects joined paths that would resolve outside the root (q-mp-1495).
  *
  * @param {...string} parts
  * @returns {string}
  */
 export function artifactPath(...parts) {
-  return join(resolveArtifactDir(), ...parts);
+  const root = resolve(resolveArtifactDir());
+  const candidate = resolve(root, ...parts);
+  if (!isPathInsideRoot(root, candidate)) {
+    const label = parts.length > 0 ? parts.join('/') : '(empty)';
+    throw new Error(
+      `artifactPath: path escapes artifact root (${root}): ${label}`
+    );
+  }
+  return candidate;
 }
 
 /**
