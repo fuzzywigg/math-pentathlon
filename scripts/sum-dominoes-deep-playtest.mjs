@@ -27,6 +27,7 @@ import {
   resolvePlaytestSeed,
 } from './lib/playtest-seed.mjs';
 import { joinPlaytestGameUrl } from './lib/playtest-url.mjs';
+import { isIllicitHumanRollSkip } from './lib/sum-dominoes-illicit-roll.mjs';
 
 const USAGE = `Usage: node scripts/sum-dominoes-deep-playtest.mjs
 
@@ -361,14 +362,9 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
     measures = await measureTargets(page);
 
     for (turns = 0; turns < MAX_HUMAN_TURNS; turns++) {
-      const before = await page.evaluate(() => ({
-        status: document.querySelector('.sd-status')?.textContent?.trim() ?? '',
-        dice: !!document.querySelector('.sd-dice-display'),
-        roll: !!document.querySelector('.sd-roll-btn:not([disabled])'),
-      }));
-
       // Detect illicit auto-roll: human turn jumps from Roll affordance to dice
-      // without our click — sampled between AI handoff waits.
+      // without our click. Sample roll AFTER human-seat wait (q-mp-1467) —
+      // pre-wait before.roll is typically false during AI think and undercounts.
       const gate = await waitForHumanOrEnd(page, Date.now() + STALL_MS);
       lastStatus = gate.status;
       if (gate.kind === 'ended') {
@@ -387,6 +383,12 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
       if (/computer|thinking/i.test(gate.status) || gate.thinking) {
         aiThinkSeen.count++;
       }
+
+      // Post-wait latch: enabled Roll once human seat is established.
+      const seat = await page.evaluate(() => ({
+        dice: !!document.querySelector('.sd-dice-display'),
+        roll: !!document.querySelector('.sd-roll-btn:not([disabled])'),
+      }));
 
       // Snapshot mid-game once
       if (turns === 2 && gameIndex === 0) {
@@ -411,7 +413,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
             dice: !!document.querySelector('.sd-dice-display'),
             roll: !!document.querySelector('.sd-roll-btn'),
           }));
-          if (before.roll && after.dice && !after.roll) {
+          if (isIllicitHumanRollSkip(seat, after)) {
             illicitHumanRollSkip++;
           }
           lastStatus = after.status;
