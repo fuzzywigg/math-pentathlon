@@ -281,7 +281,7 @@ export const n: N = 1;
   });
 
   it('default tip constants leave retired wave5 (q-mp-1357/1377/1500)', () => {
-    expect(DEFAULT_TIP_REMOTE).toBe('origin/cursor/mp-tip-postc84fb89');
+    expect(DEFAULT_TIP_REMOTE).toBe('origin/cursor/mp-tip-postdffc239');
     expect(DEFAULT_TIP_FALLBACK_REMOTE).toBe('origin/alpha');
     expect(DEFAULT_TIP_REMOTE).not.toMatch(/integration-fold-wave5/);
     expect(DEFAULT_TIP_REMOTE).not.toMatch(/mp-tip-post38d2/);
@@ -310,7 +310,7 @@ export const n: N = 1;
       _opts?: { encoding?: string; cwd?: string }
     ) => {
       const key = args.join(' ');
-      if (key === 'merge-base HEAD origin/cursor/mp-tip-postc84fb89') {
+      if (key === 'merge-base HEAD origin/cursor/mp-tip-postdffc239') {
         return { status: 0, stdout: 'living-tip-mb\n', stderr: '' };
       }
       return { status: 128, stdout: '', stderr: 'unused\n' };
@@ -327,7 +327,7 @@ export const n: N = 1;
     ) => {
       calls.push(args);
       const key = args.join(' ');
-      if (key === 'merge-base HEAD origin/cursor/mp-tip-postc84fb89') {
+      if (key === 'merge-base HEAD origin/cursor/mp-tip-postdffc239') {
         return { status: 128, stdout: '', stderr: 'missing tip\n' };
       }
       if (key === 'merge-base HEAD origin/alpha') {
@@ -341,7 +341,7 @@ export const n: N = 1;
     expect(calls[0]).toEqual([
       'merge-base',
       'HEAD',
-      'origin/cursor/mp-tip-postc84fb89',
+      'origin/cursor/mp-tip-postdffc239',
     ]);
     expect(calls[1]).toEqual(['merge-base', 'HEAD', 'origin/alpha']);
 
@@ -1314,6 +1314,81 @@ export const n: N = 1;
     writeFileSync(cleanList, 'src/games/hex/ai.ts\n');
     try {
       for (const listPath of [oldList, saveList, backupList, swpList]) {
+        const bad = spawnSync(
+          process.execPath,
+          [EMIT_SCRIPT, '--base', 'HEAD', '--files-from', listPath],
+          { encoding: 'utf8' }
+        );
+        expect(bad.status).toBe(2);
+        expect(bad.stderr + bad.stdout).toContain(
+          'path contains invalid characters'
+        );
+        expect(bad.stderr + bad.stdout).not.toContain('MISSING-BASE');
+      }
+
+      const clean = spawnSync(
+        process.execPath,
+        [EMIT_SCRIPT, '--base', 'HEAD', '--files-from', cleanList],
+        { encoding: 'utf8' }
+      );
+      expect(clean.status).toBe(0);
+      expect(clean.stdout).toContain('OK');
+      expect(clean.stdout).toContain('src/games/hex/ai.ts');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('normalizeRepoRelativePath rejects numbered tilde backups (q-mp-1507)', () => {
+    for (const bad of [
+      'src/games/hex/ai.ts~1',
+      'src/games/hex/ai.ts~2',
+      'src/games/hex/ai.ts~99',
+      // retained bare-tilde control from q-mp-1497
+      'src/games/hex/ai.ts~',
+    ]) {
+      expect(pathHasEditorBackupSuffix(bad)).toBe(true);
+      expect(pathHasInvalidCharacters(bad)).toBe(false);
+      const r = normalizeRepoRelativePath(bad);
+      expect(r.ok).toBe(false);
+      if (!r.ok) {
+        expect(r.message).toBe(pathJunkErrorMessage(bad));
+        expect(r.message).toContain('path contains invalid characters');
+        expect(r.message).not.toContain('MISSING-BASE');
+      }
+    }
+    expect(pathHasEditorBackupSuffix('src/games/hex/ai.ts')).toBe(false);
+    expect(normalizeRepoRelativePath('src/games/hex/ai.ts')).toEqual({
+      ok: true,
+      path: 'src/games/hex/ai.ts',
+    });
+  });
+
+  it('loadFilesFromList / CLI reject numbered tilde backups before missing-base (q-mp-1507)', () => {
+    const junk = loadFilesFromList('/virtual/tilde-n.txt', {
+      existsSync: () => true,
+      statSync: () => ({ isFile: () => true }),
+      readFileSync: () => 'src/games/hex/ai.ts~1\n',
+    });
+    expect(junk.ok).toBe(false);
+    if (!junk.ok) {
+      expect(junk.message).toContain('path contains invalid characters');
+      expect(junk.message).not.toContain('MISSING-BASE');
+    }
+
+    const dir = mkdtempSync(join(tmpdir(), 'emit-1507-'));
+    const n1List = join(dir, 'tilde1.txt');
+    const n2List = join(dir, 'tilde2.txt');
+    const n99List = join(dir, 'tilde99.txt');
+    const bareList = join(dir, 'tilde.txt');
+    const cleanList = join(dir, 'clean.txt');
+    writeFileSync(n1List, 'src/games/hex/ai.ts~1\n');
+    writeFileSync(n2List, 'src/games/hex/ai.ts~2\n');
+    writeFileSync(n99List, 'src/games/hex/ai.ts~99\n');
+    writeFileSync(bareList, 'src/games/hex/ai.ts~\n');
+    writeFileSync(cleanList, 'src/games/hex/ai.ts\n');
+    try {
+      for (const listPath of [n1List, n2List, n99List, bareList]) {
         const bad = spawnSync(
           process.execPath,
           [EMIT_SCRIPT, '--base', 'HEAD', '--files-from', listPath],
