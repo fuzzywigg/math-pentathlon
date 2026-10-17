@@ -6,6 +6,9 @@
  * q-mp-1403: reject star-track mid-game "Draw chains …" (title-case verb).
  * q-mp-1404: reject hyphenated forms (pre-tie / re-draw / pre-wins / tie-breaker)
  * via lookaround that treats `-` like a word char (plain `\b` does not).
+ * q-mp-1476: reject non-banner phrases — interrogative who/what/which wins,
+ * "No … yet", "Please draw …", "thinking about Draw" — while keeping real
+ * banners ("Blue wins!", "It's a draw!", "Game Over! Tie!", "Draw!").
  * Keep browser waitForFunction bodies in sync with END_RE_SOURCE (page callbacks
  * cannot import this module).
  *
@@ -28,13 +31,24 @@ Options:
 /**
  * Token edges treat ASCII letters/digits/`_`/`-` as interior (q-mp-1404
  * lookaround; plain `\b` still matches after `-`). Draw arm rejects
- * star-track "Draw chains" (q-mp-1403). Chromium waitForFunction supports
+ * star-track "Draw chains" (q-mp-1403). Wins / tie / draw arms reject
+ * non-banner mid-game copy (q-mp-1476). Chromium waitForFunction supports
  * these lookarounds.
  */
+/** Wins token: not who/what/which-wins, not "wins … yet", not "wins?". */
+const WINS_RE_SOURCE = String.raw`(?<![A-Za-z0-9_-])(?<!who\s)(?<!what\s)(?<!which\s)wins(?![A-Za-z0-9_-])(?!\?)(?!\s+yet\b)`;
+/** Tie token: not "tie … yet", not "tie?". */
+export const TIE_RE_SOURCE = String.raw`(?<![A-Za-z0-9_-])tie(?![A-Za-z0-9_-])(?!\?)(?!\s+yet\b)`;
+/**
+ * Draw token: not "Draw chains", not "Please draw", not "about Draw",
+ * not "draw … yet", not "draw?".
+ */
+const DRAW_TOKEN_RE_SOURCE = String.raw`(?<![A-Za-z0-9_-])(?<!please\s)(?<!about\s)draw(?![A-Za-z0-9_-])(?!\?)(?!\s+chains\b)(?!\s+yet\b)`;
+
 /** Source body for page.waitForFunction (no flags; callers add `i`). */
-export const END_RE_SOURCE = String.raw`(?<![A-Za-z0-9_-])wins(?![A-Za-z0-9_-])|(?<![A-Za-z0-9_-])tie(?![A-Za-z0-9_-])|(?<![A-Za-z0-9_-])draw(?![A-Za-z0-9_-])(?!\s+chains\b)`;
-const DRAW_RE_SOURCE = String.raw`(?<![A-Za-z0-9_-])tie(?![A-Za-z0-9_-])|(?<![A-Za-z0-9_-])draw(?![A-Za-z0-9_-])(?!\s+chains\b)`;
-const TIE_RE_SOURCE = String.raw`(?<![A-Za-z0-9_-])tie(?![A-Za-z0-9_-])`;
+export const END_RE_SOURCE = `${WINS_RE_SOURCE}|${TIE_RE_SOURCE}|${DRAW_TOKEN_RE_SOURCE}`;
+/** Tie or draw (not win) — same token guards as END_RE_SOURCE arms. */
+export const DRAW_RE_SOURCE = `${TIE_RE_SOURCE}|${DRAW_TOKEN_RE_SOURCE}`;
 
 const END_RE = new RegExp(END_RE_SOURCE, 'i');
 const DRAW_RE = new RegExp(DRAW_RE_SOURCE, 'i');
