@@ -35,6 +35,7 @@ import {
   pathSlashCommentErrorMessage,
   pathIsDirectoryErrorMessage,
   pathHasInvalidCharacters,
+  pathHasJunkBackslashExtra,
   stripInlinePathComment,
 } from '../../scripts/check-emit-identity.mjs';
 
@@ -933,6 +934,184 @@ export const n: N = 1;
     if (!junk.ok) {
       expect(junk.message).toContain('path contains invalid characters');
       expect(junk.message).not.toContain('MISSING-BASE');
+    }
+  });
+
+  it('normalizeRepoRelativePath rejects shell-metachar path junk (q-mp-1478)', () => {
+    for (const bad of [
+      'src/games/hex/ai.ts|x',
+      'src/games/hex/ai.ts<x',
+      'src/games/hex/ai.ts>x',
+      'src/games/hex/ai.ts;rm',
+      'src/games/hex/ai.ts"x',
+      "src/games/hex/ai.ts'x",
+      'src/games/hex/ai.ts`x',
+      'src/games/hex/ai.ts$HOME',
+    ]) {
+      expect(pathHasInvalidCharacters(bad)).toBe(true);
+      const r = normalizeRepoRelativePath(bad);
+      expect(r.ok).toBe(false);
+      if (!r.ok) {
+        expect(r.message).toBe(pathJunkErrorMessage(bad));
+        expect(r.message).not.toContain('MISSING-BASE');
+      }
+    }
+    expect(pathHasInvalidCharacters('src/games/hex/ai.ts')).toBe(false);
+    expect(normalizeRepoRelativePath('src/games/hex/ai.ts')).toEqual({
+      ok: true,
+      path: 'src/games/hex/ai.ts',
+    });
+  });
+
+  it('loadFilesFromList / CLI reject shell-metachar before missing-base (q-mp-1478)', () => {
+    const junk = loadFilesFromList('/virtual/shell.txt', {
+      existsSync: () => true,
+      statSync: () => ({ isFile: () => true }),
+      readFileSync: () => 'src/games/hex/ai.ts|x\n',
+    });
+    expect(junk.ok).toBe(false);
+    if (!junk.ok) {
+      expect(junk.message).toContain('path contains invalid characters');
+      expect(junk.message).not.toContain('MISSING-BASE');
+    }
+
+    const dir = mkdtempSync(join(tmpdir(), 'emit-1478-'));
+    const listPath = join(dir, 'pipe.txt');
+    writeFileSync(listPath, 'src/games/hex/ai.ts|x\n');
+    try {
+      const r = spawnSync(
+        process.execPath,
+        [EMIT_SCRIPT, '--base', 'HEAD', '--files-from', listPath],
+        { encoding: 'utf8' }
+      );
+      expect(r.status).toBe(2);
+      expect(r.stderr + r.stdout).toContain('path contains invalid characters');
+      expect(r.stderr + r.stdout).not.toContain('MISSING-BASE');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('normalizeRepoRelativePath rejects unicode format / invisible junk (q-mp-1479)', () => {
+    for (const bad of [
+      'src/games/hex/ai.ts\u200B',
+      'src/games/hex/ai.ts\u200C',
+      'src/games/hex/ai.ts\u00AD',
+      'src/games/hex/ai.ts\u202E',
+    ]) {
+      expect(pathHasInvalidCharacters(bad)).toBe(true);
+      const r = normalizeRepoRelativePath(bad);
+      expect(r.ok).toBe(false);
+      if (!r.ok) {
+        expect(r.message).toBe(pathJunkErrorMessage(bad));
+        expect(r.message).not.toContain('MISSING-BASE');
+      }
+    }
+    expect(normalizeRepoRelativePath('src/games/hex/ai.ts')).toEqual({
+      ok: true,
+      path: 'src/games/hex/ai.ts',
+    });
+  });
+
+  it('loadFilesFromList / CLI reject ZWSP suffix before missing-base (q-mp-1479)', () => {
+    const zwsp = 'src/games/hex/ai.ts\u200B';
+    const junk = loadFilesFromList('/virtual/zwsp.txt', {
+      existsSync: () => true,
+      statSync: () => ({ isFile: () => true }),
+      readFileSync: () => `${zwsp}\n`,
+    });
+    expect(junk.ok).toBe(false);
+    if (!junk.ok) {
+      expect(junk.message).toContain('path contains invalid characters');
+      expect(junk.message).not.toContain('MISSING-BASE');
+    }
+
+    const dir = mkdtempSync(join(tmpdir(), 'emit-1479-'));
+    const listPath = join(dir, 'zwsp.txt');
+    writeFileSync(listPath, `${zwsp}\n`);
+    try {
+      const r = spawnSync(
+        process.execPath,
+        [EMIT_SCRIPT, '--base', 'HEAD', '--files-from', listPath],
+        { encoding: 'utf8' }
+      );
+      expect(r.status).toBe(2);
+      expect(r.stderr + r.stdout).toContain('path contains invalid characters');
+      expect(r.stderr + r.stdout).not.toContain('MISSING-BASE');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('normalizeRepoRelativePath rejects junk \\extra after a file path (q-mp-1480)', () => {
+    expect(pathHasJunkBackslashExtra('src/games/hex/ai.ts/extra')).toBe(true);
+    expect(pathHasJunkBackslashExtra('src/games/hex/ai.ts')).toBe(false);
+
+    const junk = normalizeRepoRelativePath('src/games/hex/ai.ts\\extra');
+    expect(junk.ok).toBe(false);
+    if (!junk.ok) {
+      expect(junk.message).toBe(
+        pathJunkErrorMessage('src/games/hex/ai.ts\\extra')
+      );
+      expect(junk.message).not.toContain('MISSING-BASE');
+      expect(junk.message).not.toMatch(/ai\.ts\/extra/);
+    }
+    // Nested Windows relatives with a trailing junk segment also reject.
+    const nested = normalizeRepoRelativePath('src\\games\\hex\\ai.ts\\extra');
+    expect(nested.ok).toBe(false);
+    if (!nested.ok) {
+      expect(nested.message).toContain('path contains invalid characters');
+    }
+    // Real Windows-style relatives still normalize (q-mp-1463).
+    expect(normalizeRepoRelativePath('src\\games\\hex\\ai.ts')).toEqual({
+      ok: true,
+      path: 'src/games/hex/ai.ts',
+    });
+    expect(normalizeRepoRelativePath('src/games/hex/ai.ts')).toEqual({
+      ok: true,
+      path: 'src/games/hex/ai.ts',
+    });
+  });
+
+  it('loadFilesFromList / CLI reject ai.ts\\extra before missing-base (q-mp-1480)', () => {
+    const junk = loadFilesFromList('/virtual/bs-extra.txt', {
+      existsSync: () => true,
+      statSync: () => ({ isFile: () => true }),
+      readFileSync: () => 'src/games/hex/ai.ts\\extra\n',
+    });
+    expect(junk.ok).toBe(false);
+    if (!junk.ok) {
+      expect(junk.message).toContain('path contains invalid characters');
+      expect(junk.message).not.toContain('MISSING-BASE');
+    }
+
+    const dir = mkdtempSync(join(tmpdir(), 'emit-1480-'));
+    const junkList = join(dir, 'extra.txt');
+    const cleanList = join(dir, 'clean.txt');
+    writeFileSync(junkList, 'src/games/hex/ai.ts\\extra\n');
+    writeFileSync(cleanList, 'src/games/hex/ai.ts\n');
+    try {
+      const bad = spawnSync(
+        process.execPath,
+        [EMIT_SCRIPT, '--base', 'HEAD', '--files-from', junkList],
+        { encoding: 'utf8' }
+      );
+      expect(bad.status).toBe(2);
+      expect(bad.stderr + bad.stdout).toContain(
+        'path contains invalid characters'
+      );
+      expect(bad.stderr + bad.stdout).not.toContain('MISSING-BASE');
+
+      const clean = spawnSync(
+        process.execPath,
+        [EMIT_SCRIPT, '--base', 'HEAD', '--files-from', cleanList],
+        { encoding: 'utf8' }
+      );
+      expect(clean.status).toBe(0);
+      expect(clean.stdout).toContain('OK');
+      expect(clean.stdout).toContain('src/games/hex/ai.ts');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
     }
   });
 
