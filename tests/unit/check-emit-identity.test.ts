@@ -281,7 +281,7 @@ export const n: N = 1;
   });
 
   it('default tip constants leave retired wave5 (q-mp-1357/1377/1500)', () => {
-    expect(DEFAULT_TIP_REMOTE).toBe('origin/cursor/mp-tip-post4c24321');
+    expect(DEFAULT_TIP_REMOTE).toBe('origin/cursor/mp-tip-post3c7bf5e');
     expect(DEFAULT_TIP_FALLBACK_REMOTE).toBe('origin/alpha');
     expect(DEFAULT_TIP_REMOTE).not.toMatch(/integration-fold-wave5/);
     expect(DEFAULT_TIP_REMOTE).not.toMatch(/mp-tip-post38d2/);
@@ -310,7 +310,7 @@ export const n: N = 1;
       _opts?: { encoding?: string; cwd?: string }
     ) => {
       const key = args.join(' ');
-      if (key === 'merge-base HEAD origin/cursor/mp-tip-post4c24321') {
+      if (key === 'merge-base HEAD origin/cursor/mp-tip-post3c7bf5e') {
         return { status: 0, stdout: 'living-tip-mb\n', stderr: '' };
       }
       return { status: 128, stdout: '', stderr: 'unused\n' };
@@ -327,7 +327,7 @@ export const n: N = 1;
     ) => {
       calls.push(args);
       const key = args.join(' ');
-      if (key === 'merge-base HEAD origin/cursor/mp-tip-post4c24321') {
+      if (key === 'merge-base HEAD origin/cursor/mp-tip-post3c7bf5e') {
         return { status: 128, stdout: '', stderr: 'missing tip\n' };
       }
       if (key === 'merge-base HEAD origin/alpha') {
@@ -341,7 +341,7 @@ export const n: N = 1;
     expect(calls[0]).toEqual([
       'merge-base',
       'HEAD',
-      'origin/cursor/mp-tip-post4c24321',
+      'origin/cursor/mp-tip-post3c7bf5e',
     ]);
     expect(calls[1]).toEqual(['merge-base', 'HEAD', 'origin/alpha']);
 
@@ -1239,6 +1239,81 @@ export const n: N = 1;
     writeFileSync(cleanList, 'src/games/hex/ai.ts\n');
     try {
       for (const listPath of [swoList, swnList, swxList, swpList]) {
+        const bad = spawnSync(
+          process.execPath,
+          [EMIT_SCRIPT, '--base', 'HEAD', '--files-from', listPath],
+          { encoding: 'utf8' }
+        );
+        expect(bad.status).toBe(2);
+        expect(bad.stderr + bad.stdout).toContain(
+          'path contains invalid characters'
+        );
+        expect(bad.stderr + bad.stdout).not.toContain('MISSING-BASE');
+      }
+
+      const clean = spawnSync(
+        process.execPath,
+        [EMIT_SCRIPT, '--base', 'HEAD', '--files-from', cleanList],
+        { encoding: 'utf8' }
+      );
+      expect(clean.status).toBe(0);
+      expect(clean.stdout).toContain('OK');
+      expect(clean.stdout).toContain('src/games/hex/ai.ts');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('normalizeRepoRelativePath rejects OS/editor backup suffixes (q-mp-1503)', () => {
+    for (const bad of [
+      'src/games/hex/ai.ts.old',
+      'src/games/hex/ai.ts.save',
+      'src/games/hex/ai.ts.backup',
+      // retained primary-swap control from q-mp-1497
+      'src/games/hex/ai.ts.swp',
+    ]) {
+      expect(pathHasEditorBackupSuffix(bad)).toBe(true);
+      expect(pathHasInvalidCharacters(bad)).toBe(false);
+      const r = normalizeRepoRelativePath(bad);
+      expect(r.ok).toBe(false);
+      if (!r.ok) {
+        expect(r.message).toBe(pathJunkErrorMessage(bad));
+        expect(r.message).toContain('path contains invalid characters');
+        expect(r.message).not.toContain('MISSING-BASE');
+      }
+    }
+    expect(pathHasEditorBackupSuffix('src/games/hex/ai.ts')).toBe(false);
+    expect(normalizeRepoRelativePath('src/games/hex/ai.ts')).toEqual({
+      ok: true,
+      path: 'src/games/hex/ai.ts',
+    });
+  });
+
+  it('loadFilesFromList / CLI reject OS/editor backups before missing-base (q-mp-1503)', () => {
+    const junk = loadFilesFromList('/virtual/old.txt', {
+      existsSync: () => true,
+      statSync: () => ({ isFile: () => true }),
+      readFileSync: () => 'src/games/hex/ai.ts.old\n',
+    });
+    expect(junk.ok).toBe(false);
+    if (!junk.ok) {
+      expect(junk.message).toContain('path contains invalid characters');
+      expect(junk.message).not.toContain('MISSING-BASE');
+    }
+
+    const dir = mkdtempSync(join(tmpdir(), 'emit-1503-'));
+    const oldList = join(dir, 'old.txt');
+    const saveList = join(dir, 'save.txt');
+    const backupList = join(dir, 'backup.txt');
+    const swpList = join(dir, 'swp.txt');
+    const cleanList = join(dir, 'clean.txt');
+    writeFileSync(oldList, 'src/games/hex/ai.ts.old\n');
+    writeFileSync(saveList, 'src/games/hex/ai.ts.save\n');
+    writeFileSync(backupList, 'src/games/hex/ai.ts.backup\n');
+    writeFileSync(swpList, 'src/games/hex/ai.ts.swp\n');
+    writeFileSync(cleanList, 'src/games/hex/ai.ts\n');
+    try {
+      for (const listPath of [oldList, saveList, backupList, swpList]) {
         const bad = spawnSync(
           process.execPath,
           [EMIT_SCRIPT, '--base', 'HEAD', '--files-from', listPath],
