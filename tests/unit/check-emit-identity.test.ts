@@ -32,6 +32,10 @@ import {
   dedupePreserveOrder,
   pathNotInRepoErrorMessage,
   pathJunkErrorMessage,
+  pathSlashCommentErrorMessage,
+  pathIsDirectoryErrorMessage,
+  pathHasInvalidCharacters,
+  stripInlinePathComment,
 } from '../../scripts/check-emit-identity.mjs';
 
 const EMIT_SCRIPT = resolve(process.cwd(), 'scripts/check-emit-identity.mjs');
@@ -583,7 +587,7 @@ export const n: N = 1;
       existsSync: () => true,
       statSync: () => ({ isFile: () => true }),
       readFileSync: () =>
-        'src/games/hex/ai.ts\n# comment\n\nsrc/games/fiar/ai.ts\n',
+        'src/games/hex/ai.ts\n# comment\n// c-style\n\nsrc/games/fiar/ai.ts\n',
     });
     expect(loaded).toEqual({
       ok: true,
@@ -819,6 +823,116 @@ export const n: N = 1;
       expect(junk.message).toContain('path contains invalid characters');
       expect(junk.message).not.toContain('MISSING-BASE');
       expect(junk.message).not.toContain('MISSING-HEAD');
+    }
+  });
+
+  it('stripInlinePathComment / full-line // skip; inline // not collapsed (q-mp-1471)', () => {
+    expect(stripInlinePathComment('src/games/hex/ai.ts // trailing')).toBe(
+      'src/games/hex/ai.ts'
+    );
+    // Leading blanks + `//` strip to a blank prefix; callers trim/skip.
+    expect(stripInlinePathComment('  // only').trim()).toBe('');
+    expect(
+      normalizeRepoRelativePath('src/games/hex/ai.ts // trailing')
+    ).toEqual({
+      ok: true,
+      path: 'src/games/hex/ai.ts',
+    });
+    const fullLine = normalizeRepoRelativePath('// c-style');
+    expect(fullLine.ok).toBe(false);
+    if (!fullLine.ok) {
+      expect(fullLine.message).toBe(pathSlashCommentErrorMessage('// c-style'));
+      expect(fullLine.message).not.toContain('path escapes repository root');
+    }
+    const collapsed = normalizeRepoRelativePath(
+      'src/games/hex/ai.ts//trailing'
+    );
+    expect(collapsed.ok).toBe(false);
+    if (!collapsed.ok) {
+      expect(collapsed.message).toContain("path contains '//'");
+      expect(collapsed.message).not.toMatch(/ai\.ts \/ trailing/);
+    }
+
+    const loaded = loadFilesFromList('/virtual/slash-comments.txt', {
+      existsSync: () => true,
+      statSync: () => ({ isFile: () => true }),
+      readFileSync: () =>
+        '// full-line c-style\n# hash\nsrc/games/hex/ai.ts // trailing note\nsrc/games/fiar/ai.ts\n',
+    });
+    expect(loaded).toEqual({
+      ok: true,
+      files: ['src/games/hex/ai.ts', 'src/games/fiar/ai.ts'],
+    });
+  });
+
+  it('normalizeRepoRelativePath rejects directory / ..-collapsed directory (q-mp-1472)', () => {
+    const dir = normalizeRepoRelativePath('src/games/hex');
+    expect(dir.ok).toBe(false);
+    if (!dir.ok) {
+      expect(dir.message).toBe(pathIsDirectoryErrorMessage('src/games/hex'));
+      expect(dir.message).not.toMatch(/EISDIR/);
+    }
+    const collapsed = normalizeRepoRelativePath('src/games/hex/ai.ts/..');
+    expect(collapsed.ok).toBe(false);
+    if (!collapsed.ok) {
+      expect(collapsed.message).toContain('path is a directory');
+      expect(collapsed.message).toContain('src/games/hex');
+    }
+    expect(normalizeRepoRelativePath('src/games/hex/ai.ts')).toEqual({
+      ok: true,
+      path: 'src/games/hex/ai.ts',
+    });
+  });
+
+  it('loadFilesFromList rejects directory paths before EISDIR (q-mp-1472)', () => {
+    const dirList = loadFilesFromList('/virtual/dir.txt', {
+      existsSync: () => true,
+      statSync: () => ({ isFile: () => true }),
+      readFileSync: () => 'src/games/hex\n',
+    });
+    expect(dirList.ok).toBe(false);
+    if (!dirList.ok) {
+      expect(dirList.message).toContain('path is a directory');
+      expect(dirList.message).not.toMatch(/EISDIR/);
+    }
+  });
+
+  it('normalizeRepoRelativePath rejects ADS / percent / & / * junk (q-mp-1473)', () => {
+    expect(
+      pathHasInvalidCharacters('src/games/hex/ai.ts:Zone.Identifier')
+    ).toBe(true);
+    expect(pathHasInvalidCharacters('src%2Fgames%2Fhex%2Fai.ts')).toBe(true);
+    expect(pathHasInvalidCharacters('src/games/hex/ai.ts&x')).toBe(true);
+    expect(pathHasInvalidCharacters('src/games/hex/ai.ts*')).toBe(true);
+    expect(pathHasInvalidCharacters('src/games/hex/ai.ts')).toBe(false);
+    // Windows drive absolute still allowed (colon after letter + slash).
+    expect(pathHasInvalidCharacters('C:\\workspace\\src\\x.ts')).toBe(false);
+
+    for (const bad of [
+      'src/games/hex/ai.ts:Zone.Identifier',
+      'src%2Fgames%2Fhex%2Fai.ts',
+      'src/games/hex/ai.ts&x',
+      'src/games/hex/ai.ts*',
+    ]) {
+      const r = normalizeRepoRelativePath(bad);
+      expect(r.ok).toBe(false);
+      if (!r.ok) {
+        expect(r.message).toBe(pathJunkErrorMessage(bad));
+        expect(r.message).not.toContain('MISSING-BASE');
+      }
+    }
+  });
+
+  it('loadFilesFromList rejects ADS / percent / & / * before missing-base (q-mp-1473)', () => {
+    const junk = loadFilesFromList('/virtual/ads.txt', {
+      existsSync: () => true,
+      statSync: () => ({ isFile: () => true }),
+      readFileSync: () => 'src/games/hex/ai.ts:Zone.Identifier\n',
+    });
+    expect(junk.ok).toBe(false);
+    if (!junk.ok) {
+      expect(junk.message).toContain('path contains invalid characters');
+      expect(junk.message).not.toContain('MISSING-BASE');
     }
   });
 
