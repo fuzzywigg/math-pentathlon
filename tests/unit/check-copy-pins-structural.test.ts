@@ -1,7 +1,9 @@
 /**
- * Hermetic structural coverage for check-copy-pins (q-mp-1453…1456, 1465, 1477):
+ * Hermetic structural coverage for check-copy-pins (q-mp-1453…1456, 1465, 1477, 1481, 1488, 1489):
  * multiline WINDOW_LINES, stripComments line map, wins! registry suffixes,
- * and template-split debris rejection (paren + name/prefix + mid-fragment).
+ * template-split debris rejection (paren + name/prefix + mid-fragment),
+ * softRe honesty for seat-status apostrophes (`Blue's` / `Red's`),
+ * extractExpectUnit regex apostrophes (1488) and char-class `)` (1489).
  * No tip-wide scan / findings-total stamp.
  *
  * Stays on the default unit-shared project (no vitest.config nodePureFiles edit).
@@ -53,7 +55,7 @@ describe('wave55 shape', () => {
 });
 `;
 
-describe('check-copy-pins structural (q-mp-1453…1456, 1465, 1477)', () => {
+describe('check-copy-pins structural (q-mp-1453…1456, 1465, 1477, 1481, 1488, 1489)', () => {
   it('WINDOW_LINES covers 7–8 line phase-message expects (q-mp-1453)', () => {
     expect(WINDOW_LINES).toBeGreaterThanOrEqual(8);
 
@@ -248,5 +250,114 @@ it('pins phase', () => {
       registry
     );
     expect(place.some((f) => f.kind === 'registry-string')).toBe(true);
+  });
+
+  it("softRe matches Blue's / Red's seat-status pins (q-mp-1481)", () => {
+    const registry = harvestCopyRegistry();
+    expect(registry.length).toBe(13);
+
+    // Measured miss: apostrophe inside double-quoted matcher stopped
+    // `[^'"\`]*` before the distinctive needle.
+    const blueDraw = scanSource(
+      'virtual/blues-draw-chains.ts',
+      'expect(t).toBe("Blue\'s turn - Draw chains from the bucket");',
+      registry
+    );
+    expect(blueDraw.some((f) => f.kind === 'registry-string')).toBe(true);
+
+    const blueShield = scanSource(
+      'virtual/blues-select-shield.ts',
+      'expect(t).toBe("Blue\'s turn - Select a shield to distribute");',
+      registry
+    );
+    expect(blueShield.some((f) => f.kind === 'registry-string')).toBe(true);
+
+    const redDraw = scanSource(
+      'virtual/reds-draw-chains.ts',
+      'expect(t).toBe("Red\'s turn - Draw chains from the bucket");',
+      registry
+    );
+    expect(redDraw.some((f) => f.kind === 'registry-string')).toBe(true);
+
+    // Escaped apostrophe inside a single-quoted matcher arg.
+    const blueEscaped = scanSource(
+      'virtual/blues-escaped-sq.ts',
+      "expect(t).toBe('Blue\\'s turn - Select a shield to distribute');",
+      registry
+    );
+    expect(blueEscaped.some((f) => f.kind === 'registry-string')).toBe(true);
+
+    // No-apostrophe control + real Place / message-api unchanged.
+    const blueChoose = scanSource(
+      'virtual/blue-choose-chain.ts',
+      'expect(t).toBe("Blue: Choose a chain to move");',
+      registry
+    );
+    expect(blueChoose.some((f) => f.kind === 'registry-string')).toBe(true);
+
+    const place = scanSource(
+      'virtual/place-quad-1481.ts',
+      "expect(msg).toBe('Player 2: Place a Quadraphage');",
+      registry
+    );
+    expect(place.some((f) => f.kind === 'registry-string')).toBe(true);
+
+    const messageApi = scanSource(
+      'virtual/message-api-1481.ts',
+      "expect(getPhaseMessage(state)).toBe('Blue is distributing cubes...');",
+      registry
+    );
+    expect(messageApi.some((f) => f.kind === 'message-api')).toBe(true);
+    expect(messageApi.some((f) => f.kind === 'registry-string')).toBe(false);
+
+    // Junk `debug:` + full distinctive phrase still soft-hits (true pin of
+    // registry copy). It must not be the *only* soft hit — seat-status
+    // apostrophe pins above must win the same needle path.
+    const junkDebug = scanSource(
+      'virtual/debug-draw-chains.ts',
+      'expect(t).toBe("debug: Draw chains from the bucket");',
+      registry
+    );
+    expect(junkDebug.some((f) => f.kind === 'registry-string')).toBe(true);
+  });
+
+  it('extractExpectUnit keeps matcherArg for regex apostrophes (q-mp-1488)', () => {
+    // Measured null: `'` inside `/It's…/` entered string mode and never
+    // found the matcher `)`.
+    const draw = extractExpectUnit("expect(msg).toMatch(/It's a draw!/);");
+    expect(draw).not.toBeNull();
+    expect(draw?.matcherArg).toBe("/It's a draw!/");
+
+    const tie = extractExpectUnit("expect(msg).toMatch(/It's a tie!/i);");
+    expect(tie).not.toBeNull();
+    expect(tie?.matcherArg).toBe("/It's a tie!/i");
+
+    // Twin without apostrophe still extracts (control).
+    const blue = extractExpectUnit('expect(msg).toMatch(/Blue wins!/i);');
+    expect(blue).not.toBeNull();
+    expect(blue?.matcherArg).toBe('/Blue wins!/i');
+
+    // String / toBe paths unchanged.
+    const toBeDq = extractExpectUnit('expect(msg).toBe("Blue\'s turn");');
+    expect(toBeDq).not.toBeNull();
+    expect(toBeDq?.matcherArg).toBe('"Blue\'s turn"');
+
+    const toBeSq = extractExpectUnit("expect(msg).toBe('It\\'s a draw!');");
+    expect(toBeSq).not.toBeNull();
+    expect(toBeSq?.matcherArg).toBe("'It\\'s a draw!'");
+  });
+
+  it('extractExpectUnit does not truncate on ) inside regex char classes (q-mp-1489)', () => {
+    // Measured truncate: `)` in `/[^)]+/` closed the matcher early.
+    const charClass = extractExpectUnit('expect(x).toMatch(/[^)]+/);');
+    expect(charClass).not.toBeNull();
+    expect(charClass?.matcherArg).toBe('/[^)]+/');
+
+    // OWL-shaped soft-fail residual pin (escaped groups + char-class `)`).
+    const owl = extractExpectUnit(
+      String.raw`expect(x).not.toMatch(/\.get\([^)]+\)\s*\?\?\s*\[\]/);`
+    );
+    expect(owl).not.toBeNull();
+    expect(owl?.matcherArg).toBe(String.raw`/\.get\([^)]+\)\s*\?\?\s*\[\]/`);
   });
 });
