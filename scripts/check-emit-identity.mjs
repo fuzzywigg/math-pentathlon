@@ -86,9 +86,22 @@ export function pathNotInRepoErrorMessage(file) {
 }
 
 /**
+ * Usage text when a list/positional path carries `?` / `#` / NUL / control
+ * junk that must not be treated as a real repo file (q-mp-1464).
+ * @param {string} file
+ */
+export function pathJunkErrorMessage(file) {
+  return `error: path contains invalid characters: ${file}\n${USAGE}`;
+}
+
+/** `?` / `#` / NUL / other C0+DEL controls — not valid emit paths (q-mp-1464). */
+const PATH_JUNK_RE = /[?#\u0000-\u001F\u007F]/;
+
+/**
  * Normalize a file path for emit compare: strip leading `./`, map absolute
- * paths under the repo root to repo-relative, reject escapes (q-mp-1429 /
- * q-mp-1430).
+ * paths under the repo root to repo-relative, accept Windows-style relative
+ * `\` separators as `/` (q-mp-1463), reject `?`/`#`/NUL/control junk
+ * (q-mp-1464), reject escapes (q-mp-1429 / q-mp-1430).
  * @param {string} file
  * @param {string} [root]
  * @returns {{ ok: true, path: string } | { ok: false, message: string }}
@@ -98,7 +111,16 @@ export function normalizeRepoRelativePath(file, root = ROOT) {
   if (!raw) {
     return { ok: false, message: pathNotInRepoErrorMessage(file) };
   }
+  if (PATH_JUNK_RE.test(raw)) {
+    return { ok: false, message: pathJunkErrorMessage(raw) };
+  }
   let candidate = raw;
+  // POSIX `path.resolve` treats `\` as a literal filename char; convert
+  // Windows-style relative separators before join (q-mp-1463). Absolute
+  // inputs keep platform semantics via path.isAbsolute(raw).
+  if (!path.isAbsolute(raw) && candidate.includes('\\')) {
+    candidate = candidate.split('\\').join('/');
+  }
   while (candidate.startsWith('./')) {
     candidate = candidate.slice(2);
   }
@@ -131,8 +153,9 @@ export function dedupePreserveOrder(files) {
 
 /**
  * Read a `--files-from` list without throwing ENOENT/EISDIR stacks.
- * Normalizes `./` and absolute-under-root paths; rejects escapes; first-wins
- * dedupe within the list (q-mp-1429 / q-mp-1430).
+ * Normalizes `./`, Windows-style relative `\`, and absolute-under-root paths;
+ * rejects path junk (`?`/`#`/NUL/controls) and escapes; first-wins dedupe
+ * within the list (q-mp-1429 / q-mp-1430 / q-mp-1463 / q-mp-1464).
  * @param {string} filesFrom
  * @param {{
  *   existsSync?: (p: string) => boolean,

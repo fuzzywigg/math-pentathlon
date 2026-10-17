@@ -31,6 +31,7 @@ import {
   normalizeRepoRelativePath,
   dedupePreserveOrder,
   pathNotInRepoErrorMessage,
+  pathJunkErrorMessage,
 } from '../../scripts/check-emit-identity.mjs';
 
 const EMIT_SCRIPT = resolve(process.cwd(), 'scripts/check-emit-identity.mjs');
@@ -754,6 +755,70 @@ export const n: N = 1;
     expect(escape.ok).toBe(false);
     if (!escape.ok) {
       expect(escape.message).toContain('path escapes repository root');
+    }
+  });
+
+  it('normalizeRepoRelativePath accepts Windows-style relative separators (q-mp-1463)', () => {
+    expect(normalizeRepoRelativePath('src\\games\\hex\\ai.ts')).toEqual({
+      ok: true,
+      path: 'src/games/hex/ai.ts',
+    });
+    expect(normalizeRepoRelativePath('.\\src\\games\\hex\\ai.ts')).toEqual({
+      ok: true,
+      path: 'src/games/hex/ai.ts',
+    });
+  });
+
+  it('loadFilesFromList normalizes backslash relatives and dedupes (q-mp-1463)', () => {
+    const loaded = loadFilesFromList('/virtual/bs.txt', {
+      existsSync: () => true,
+      statSync: () => ({ isFile: () => true }),
+      readFileSync: () =>
+        'src\\games\\hex\\ai.ts\nsrc/games/hex/ai.ts\nsrc\\games\\fiar\\ai.ts\n',
+    });
+    expect(loaded).toEqual({
+      ok: true,
+      files: ['src/games/hex/ai.ts', 'src/games/fiar/ai.ts'],
+    });
+  });
+
+  it('normalizeRepoRelativePath rejects ? / # / NUL / control junk (q-mp-1464)', () => {
+    const q = normalizeRepoRelativePath('src/games/hex/ai.ts?x');
+    expect(q.ok).toBe(false);
+    if (!q.ok) {
+      expect(q.message).toContain('path contains invalid characters');
+      expect(q.message).toContain('src/games/hex/ai.ts?x');
+      expect(q.message).toContain(USAGE);
+    }
+    const hash = normalizeRepoRelativePath('src/games/hex/ai.ts#frag');
+    expect(hash.ok).toBe(false);
+    if (!hash.ok) {
+      expect(hash.message).toBe(
+        pathJunkErrorMessage('src/games/hex/ai.ts#frag')
+      );
+    }
+    const nul = normalizeRepoRelativePath('src/games/hex/ai.ts\0');
+    expect(nul.ok).toBe(false);
+    if (!nul.ok) {
+      expect(nul.message).toContain('path contains invalid characters');
+    }
+    expect(normalizeRepoRelativePath('src/games/hex/ai.ts')).toEqual({
+      ok: true,
+      path: 'src/games/hex/ai.ts',
+    });
+  });
+
+  it('loadFilesFromList rejects path junk before missing-file theater (q-mp-1464)', () => {
+    const junk = loadFilesFromList('/virtual/junk.txt', {
+      existsSync: () => true,
+      statSync: () => ({ isFile: () => true }),
+      readFileSync: () => 'src/games/hex/ai.ts?x\n',
+    });
+    expect(junk.ok).toBe(false);
+    if (!junk.ok) {
+      expect(junk.message).toContain('path contains invalid characters');
+      expect(junk.message).not.toContain('MISSING-BASE');
+      expect(junk.message).not.toContain('MISSING-HEAD');
     }
   });
 

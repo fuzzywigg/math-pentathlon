@@ -143,7 +143,7 @@ Workflows under `.github/workflows/`:
 
 ### Unit job runtime
 
-Live tip `cursor/mp-tip-postcde8` (cut from `alpha` @ `cde8ca31` after #1509 squash-merge, 2026-10-11): tip-owner fold on draft tip PR (q-mp-026aj); live unit suite **3465** files @ tip open (remasure). Counts move every fold — tip owner remasures; do not treat these numbers as tip-head truth between folds. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
+Live tip `cursor/mp-tip-post7a9d` (cut from `alpha` @ `7a9d6540` after #1517 squash-merge, 2026-10-13): tip-owner fold on draft tip PR (q-mp-026an); live unit suite remasured each fold — do not treat stale counts as tip-head truth between folds. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`).
 
 - Job `timeout-minutes: 14` and step `timeout-minutes: 12` so overrun fails loudly
 - CI prints the unit file count up front

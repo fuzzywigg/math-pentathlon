@@ -15,7 +15,7 @@ Key files and patterns to inspect
 - Tests: unit tests under `tests/unit` use `vitest`+`jsdom`. E2E tests under `tests/e2e` use Playwright and expect a dev server.
 
 Draft PR into tip
-- Target **`cursor/mp-tip-postcde8`** as a **draft** PR. Do not merge, mark ready, or push to `alpha` / `main` / the tip branch. Tip owner folds; end PR bodies with `Next action: fold into tip by the tip owner`.
+- Target **`cursor/mp-tip-post7a9d`** as a **draft** PR. Do not merge, mark ready, or push to `alpha` / `main` / the tip branch. Tip owner folds; end PR bodies with `Next action: fold into tip by the tip owner`.
 - Scan open tip drafts before starting; if covered, comment `superseded` / `contained` — do not close other PRs.
 
 Developer workflows (commands)
