@@ -100,7 +100,9 @@ describe('nav-away-sweep harness wiring (q-mp-1482)', () => {
     const src = readFileSync(HARNESS, 'utf8');
     expect(src).toMatch(/from ['"]\.\/lib\/stars-bars-new-game-race\.mjs['"]/);
     expect(src).toMatch(/waitForAiThinkingChrome/);
-    expect(src).toMatch(/\.status-ai-thinking/);
+    // q-mp-1493: tip-real chrome via shared SETTLE_THINKING_SELECTOR (incl.
+    // .status-ai-thinking / .sd-computer-thinking), not a locator-only sample.
+    expect(src).toMatch(/SETTLE_THINKING_SELECTOR/);
     // Must not reintroduce fixed 100ms sleep before leave.
     expect(src).not.toMatch(/await page\.waitForTimeout\(100\);/);
     expect(src).not.toMatch(/waitForTimeout\(100\).*mid-AI/);
