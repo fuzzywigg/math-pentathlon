@@ -583,8 +583,12 @@ function scanSource(fileRel, source, registry) {
           for (const needle of needles) {
             if (needle.length < 8 && !/^wins!?\.?$/i.test(needle)) continue;
             const nEsc = escapeRegExp(needle);
+            // Delimiter-aware soft match (q-mp-1481): `[^'"\`]*` stops at any
+            // quote, so seat-status pins like `"Blue's turn - Draw chains…"`
+            // miss while junk `"debug: Draw chains…"` (no apostrophe) still
+            // hits. Match only until the *opening* delimiter; allow escapes.
             const softRe = new RegExp(
-              String.raw`(['"\`])[^'"\`]*(?:${nEsc})[^'"\`]*\1|\/[^/\n]*(?:${nEsc})[^/\n]*\/`
+              String.raw`(['"\`])(?:\\.|(?!\1).)*(?:${nEsc})(?:\\.|(?!\1).)*\1|\/[^/\n]*(?:${nEsc})[^/\n]*\/`
             );
             if (softRe.test(matcherArg)) {
               hit = true;
