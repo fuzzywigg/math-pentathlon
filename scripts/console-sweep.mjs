@@ -19,6 +19,12 @@ import {
 } from './lib/console-sweep-summary.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
 import { waitDoubleRaf } from './lib/page-settle.mjs';
+import {
+  COMPUTER_OR_THINKING_RE,
+  SETTLE_HIDDEN_MS,
+  SETTLE_THINKING_SELECTOR,
+  SETTLE_VISIBLE_MS,
+} from './lib/console-sweep-settle.mjs';
 
 applyBrowserHarnessCli(process.argv.slice(2), CONSOLE_SWEEP_USAGE);
 
@@ -52,20 +58,51 @@ const BASE = process.env.BASE_URL || 'http://127.0.0.1:5173';
 const OUT = process.env.SWEEP_OUT || artifactPath('console-sweep-raw.json');
 
 /**
- * After a human move vs AI: wait for thinking chrome to appear (soft) then
- * clear, then paint-settle. Soft timeouts keep the sweep moving when a game
- * never flashes `.status-ai-thinking`.
+ * After a human move vs AI: wait for tip-real thinking chrome / status to
+ * appear (soft) then clear, then paint-settle (q-mp-1491).
+ *
+ * Tip-real classes include `.status-ai-thinking` and sum-dominoes
+ * `.sd-computer-thinking` (product never uses status-ai-thinking there).
+ * Soft timeouts keep the sweep moving when a game never flashes chrome.
  */
 async function settleAfterMove(page) {
+  const reSource = COMPUTER_OR_THINKING_RE.source;
+  const sel = SETTLE_THINKING_SELECTOR;
+  // Soft visible: chrome class OR /computer|thinking/i status text.
   await page
-    .locator('.status-ai-thinking')
-    .first()
-    .waitFor({ state: 'visible', timeout: 500 })
+    .waitForFunction(
+      ({ thinkingSel, statusReSource }) => {
+        if (document.querySelector(thinkingSel)) return true;
+        const re = new RegExp(statusReSource, 'i');
+        const nodes = document.querySelectorAll(
+          '[class$="-status"], .sd-status, .sd-computer-thinking'
+        );
+        for (const n of nodes) {
+          if (re.test(n.textContent || '')) return true;
+        }
+        return false;
+      },
+      { thinkingSel: sel, statusReSource: reSource },
+      { timeout: SETTLE_VISIBLE_MS }
+    )
     .catch(() => {});
+  // Soft hidden: no tip-real chrome and status no longer computer|thinking.
   await page
-    .locator('.status-ai-thinking')
-    .first()
-    .waitFor({ state: 'hidden', timeout: 8_000 })
+    .waitForFunction(
+      ({ thinkingSel, statusReSource }) => {
+        if (document.querySelector(thinkingSel)) return false;
+        const re = new RegExp(statusReSource, 'i');
+        const nodes = document.querySelectorAll(
+          '[class$="-status"], .sd-status'
+        );
+        for (const n of nodes) {
+          if (re.test(n.textContent || '')) return false;
+        }
+        return true;
+      },
+      { thinkingSel: sel, statusReSource: reSource },
+      { timeout: SETTLE_HIDDEN_MS }
+    )
     .catch(() => {});
   await waitDoubleRaf(page);
 }
