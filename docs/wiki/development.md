@@ -143,7 +143,7 @@ Workflows under `.github/workflows/`:
 
 ### Unit job runtime
 
-Live tip `cursor/mp-tip-post7a9d` (cut from `alpha` @ `7a9d6540` after #1517 squash-merge, 2026-10-13): tip-owner fold on draft tip PR (q-mp-026am); live unit suite remasured each fold — do not treat stale counts as tip-head truth between folds. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`).
+Live tip `cursor/mp-tip-post7a9d` (cut from `alpha` @ `7a9d6540` after #1517 squash-merge, 2026-10-13): tip-owner fold on draft tip PR (q-mp-026an); live unit suite remasured each fold — do not treat stale counts as tip-head truth between folds. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`).
 
 - Job `timeout-minutes: 14` and step `timeout-minutes: 12` so overrun fails loudly
 - CI prints the unit file count up front
