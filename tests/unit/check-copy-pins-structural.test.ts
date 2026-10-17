@@ -1,8 +1,8 @@
 /**
- * Hermetic structural coverage for check-copy-pins (q-mp-1453…1456, 1465):
+ * Hermetic structural coverage for check-copy-pins (q-mp-1453…1456, 1465, 1477):
  * multiline WINDOW_LINES, stripComments line map, wins! registry suffixes,
- * and template-split debris rejection (paren + name/prefix). No tip-wide
- * scan / findings-total stamp.
+ * and template-split debris rejection (paren + name/prefix + mid-fragment).
+ * No tip-wide scan / findings-total stamp.
  *
  * Stays on the default unit-shared project (no vitest.config nodePureFiles edit).
  */
@@ -53,7 +53,7 @@ describe('wave55 shape', () => {
 });
 `;
 
-describe('check-copy-pins structural (q-mp-1453…1456, 1465)', () => {
+describe('check-copy-pins structural (q-mp-1453…1456, 1465, 1477)', () => {
   it('WINDOW_LINES covers 7–8 line phase-message expects (q-mp-1453)', () => {
     expect(WINDOW_LINES).toBeGreaterThanOrEqual(8);
 
@@ -187,6 +187,63 @@ it('pins phase', () => {
 
     const place = scanSource(
       'virtual/place-quad-1465.ts',
+      "expect(msg).toBe('Player 2: Place a Quadraphage');",
+      registry
+    );
+    expect(place.some((f) => f.kind === 'registry-string')).toBe(true);
+  });
+
+  it('registry drops mid-fragment name-split debris so junk soft-match fails (q-mp-1477)', () => {
+    const registry = harvestCopyRegistry();
+    // Verb / count continuation segments must not be registry keys.
+    expect(registry.some((e) => e.value === 'is distributing cubes...')).toBe(
+      false
+    );
+    expect(
+      registry.some(
+        (e) => e.value === 'block(s) selected. Select more or confirm.'
+      )
+    ).toBe(false);
+    expect(
+      registry.some(
+        (e) => /^[a-z]/.test(e.value) && !/^wins!?\.?$/i.test(e.value)
+      )
+    ).toBe(false);
+
+    // Measured soft false-positive: junk prefix + mid-fragment verb.
+    const softDebug = scanSource(
+      'virtual/soft-debug-distributing.ts',
+      "expect(t).toBe('debug: is distributing cubes...');",
+      registry
+    );
+    expect(softDebug.some((f) => f.kind === 'registry-string')).toBe(false);
+
+    const softBlock = scanSource(
+      'virtual/soft-debug-blocks.ts',
+      "expect(t).toBe('debug: block(s) selected. Select more or confirm.');",
+      registry
+    );
+    expect(softBlock.some((f) => f.kind === 'registry-string')).toBe(false);
+
+    // Real getPhaseMessage pins stay message-api (unchanged).
+    const messageApi = scanSource(
+      'virtual/calla-distributing-api.ts',
+      "expect(getPhaseMessage(state)).toBe('Blue is distributing cubes...');",
+      registry
+    );
+    expect(messageApi.some((f) => f.kind === 'message-api')).toBe(true);
+    expect(messageApi.some((f) => f.kind === 'registry-string')).toBe(false);
+
+    // wins! soft-match + recovered imperative phrases still work.
+    const wins = scanSource(
+      'virtual/wins-1477.ts',
+      "expect(el.textContent).toBe('Blue wins!');",
+      registry
+    );
+    expect(wins.some((f) => f.kind === 'registry-string')).toBe(true);
+
+    const place = scanSource(
+      'virtual/place-quad-1477.ts',
       "expect(msg).toBe('Player 2: Place a Quadraphage');",
       registry
     );
