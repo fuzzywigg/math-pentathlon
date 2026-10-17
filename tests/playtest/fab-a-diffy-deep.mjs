@@ -22,6 +22,9 @@ import { requireEnvNumber } from '../../scripts/lib/env-number.mjs';
 import { utcPlaytestDateStamp } from '../../scripts/lib/playtest-date.mjs';
 import { joinPlaytestGameUrl } from '../../scripts/lib/playtest-url.mjs';
 import {
+  FAB_TIP_EMITS_STATUS_AI_THINKING,
+  evaluateFabDeepGameOk,
+  isFabAiSeatFromStatus,
   isSkipExtraShotsEnabled,
   resolveFabDifficulties,
   resolveFabViewports,
@@ -74,16 +77,94 @@ async function startVsAi(page, difficulty) {
   await dismissOwl(page);
 }
 
-async function waitNotThinking(page, timeout = 25_000) {
-  const thinking = page.locator('.fab-status.status-ai-thinking');
-  if (await thinking.isVisible().catch(() => false)) {
-    await thinking.waitFor({ state: 'hidden', timeout });
+/**
+ * q-mp-1484: tip never emits `.status-ai-thinking`. Wait on tip-real human seat
+ * (`.fab-status.player1` / Blue turn text) or winner banner / end status.
+ */
+async function waitForHumanSeatOrEnd(page, timeout = 25_000) {
+  await page
+    .waitForFunction(
+      () => {
+        const banner = document.querySelector('.fab-winner-banner');
+        if (banner) {
+          const style = window.getComputedStyle(banner);
+          if (style.display !== 'none' && style.visibility !== 'hidden') {
+            return true;
+          }
+        }
+        const status = document.querySelector('.fab-status');
+        if (!status) return false;
+        const className = status.className || '';
+        const text = status.textContent || '';
+        // No trailing \b after `!` — `!` is non-word so `\bwins!\b` never matches.
+        if (/\bwins!/i.test(text)) return true;
+        if (/\bplayer1\b/.test(className)) return true;
+        if (/\bBlue'?s turn\b/i.test(text)) return true;
+        if (/\bYou'?s turn\b/i.test(text)) return true;
+        if (/\bYour turn\b/i.test(text)) return true;
+        return false;
+      },
+      null,
+      { timeout }
+    )
+    .catch(() => {});
+}
+
+/** Sample tip-real AI-seat status (class + text). No missing thinking class. */
+async function sampleAiSeatSignals(page) {
+  return page.evaluate(() => {
+    const status = document.querySelector('.fab-status');
+    if (!status) return { className: '', text: '' };
+    return {
+      className: status.className || '',
+      text: status.textContent || '',
+    };
+  });
+}
+
+/**
+ * After a human claim/pass: wait for AI to finish via tip-real signals
+ * (human seat returns, winner, or history growth past the human ply).
+ * Returns elapsed ms; pushes stall error on timeout.
+ */
+async function waitAfterHumanPly(page, historyFloor, errors, timeout = 30_000) {
+  const t0 = Date.now();
+  const ok = await page
+    .waitForFunction(
+      (floor) => {
+        const banner = document.querySelector('.fab-winner-banner');
+        if (banner) {
+          const style = window.getComputedStyle(banner);
+          if (style.display !== 'none' && style.visibility !== 'hidden') {
+            return true;
+          }
+        }
+        const status = document.querySelector('.fab-status');
+        const className = status?.className || '';
+        const text = status?.textContent || '';
+        if (/\bwins!/i.test(text)) return true;
+        if (/\bplayer1\b/.test(className)) return true;
+        if (/\bBlue'?s turn\b/i.test(text)) return true;
+        const hist = document.querySelectorAll('.fab-history-move').length;
+        // AI completed a ply: history grew while seat is no longer human-only wait.
+        if (hist > floor && /\bplayer1\b/.test(className)) return true;
+        if (hist > floor && !/\bplayer2\b/.test(className)) return true;
+        return false;
+      },
+      historyFloor,
+      { timeout }
+    )
+    .then(() => true)
+    .catch(() => false);
+  if (!ok) {
+    errors.push('AI think stall (>30s)');
   }
+  return Date.now() - t0;
 }
 
 /** Find a valid human claim via DOM probing. */
 async function humanClaim(page) {
-  await waitNotThinking(page);
+  await waitForHumanSeatOrEnd(page);
   if (
     await page
       .locator('.fab-winner-banner')
@@ -110,7 +191,7 @@ async function humanClaim(page) {
   for (let i = 0; i < ids.length; i++) {
     for (let j = 0; j < ids.length; j++) {
       if (i === j) continue;
-      await waitNotThinking(page);
+      await waitForHumanSeatOrEnd(page);
       if (
         await page
           .locator('.fab-winner-banner')
@@ -206,23 +287,23 @@ async function playOneGame(page, difficulty) {
       break;
     }
 
-    const thinking = page.locator('.fab-status.status-ai-thinking');
-    if (await thinking.isVisible().catch(() => false)) {
-      // Verify input lock while thinking
+    // q-mp-1484: tip-real AI seat via status class/text + history growth.
+    // Missing `.status-ai-thinking`; tip never passes allowInput=false (#422 HOLD).
+    // Lock metric gated on FAB_TIP_EMITS_STATUS_AI_THINKING (false on tip → skip).
+    const historyFloor = await page.locator('.fab-history-move').count();
+    const aiSignals = await sampleAiSeatSignals(page);
+    const sawAiSeat = isFabAiSeatFromStatus(aiSignals);
+    if (sawAiSeat && FAB_TIP_EMITS_STATUS_AI_THINKING) {
       const selectable = await page
         .locator('.fab-bar-wrapper:not(.fab-bar-disabled)')
         .count();
       if (selectable !== 0) {
         errors.push('AI-seat lock failed: selectable bars while thinking');
       }
-      const tThink = Date.now();
-      await thinking.waitFor({ state: 'hidden', timeout: 30_000 }).catch(() => {
-        errors.push('AI think stall (>30s)');
-      });
-      const dt = Date.now() - tThink;
-      aiThinkMs += dt;
-      maxAiThink = Math.max(maxAiThink, dt);
     }
+    const dt = await waitAfterHumanPly(page, historyFloor, errors);
+    aiThinkMs += dt;
+    maxAiThink = Math.max(maxAiThink, dt);
   }
 
   const winnerVisible = await page
@@ -232,6 +313,15 @@ async function playOneGame(page, difficulty) {
   const history = await page.locator('.fab-history-move').count();
   const scores = await page.locator('.fab-score-value').allTextContents();
   const status = (await page.locator('.fab-status').textContent()) || '';
+  const consoleErrors = errors.filter((e) => !/favicon/i.test(e));
+  // q-mp-1485: ok requires real end; progress-only games are incomplete.
+  const verdict = evaluateFabDeepGameOk({
+    stalls,
+    pageErrors,
+    consoleErrors,
+    winnerVisible,
+    status: status.trim(),
+  });
 
   page.off('console', onConsole);
 
@@ -247,13 +337,10 @@ async function playOneGame(page, difficulty) {
     status: status.trim(),
     aiThinkMs,
     maxAiThink,
-    consoleErrors: errors.filter((e) => !/favicon/i.test(e)),
+    consoleErrors,
     pageErrors,
-    ok:
-      stalls === 0 &&
-      pageErrors.length === 0 &&
-      errors.filter((e) => /stall|lock failed|AI:/i.test(e)).length === 0 &&
-      (winnerVisible || history > 0 || claims + passes > 0),
+    incomplete: verdict.incomplete,
+    ok: verdict.ok,
   };
 }
 
@@ -352,19 +439,17 @@ async function main() {
     );
     summary.screenshots.push('fab-desktop-human-turn.png');
 
-    // Trigger AI think
+    // Trigger AI seat; tip-real signal is `.fab-status.player2` (no thinking class).
     await humanClaim(page);
-    const thinking = page.locator('.fab-status.status-ai-thinking');
-    if (await thinking.isVisible().catch(() => false)) {
+    const aiSeat = page.locator('.fab-status.player2');
+    if (await aiSeat.isVisible().catch(() => false)) {
+      const aiShot = 'fab-desktop-ai-seat.png';
       await page.screenshot({
-        path: path.join(SHOT_DIR, 'fab-desktop-ai-thinking.png'),
+        path: path.join(SHOT_DIR, aiShot),
         fullPage: true,
       });
-      fs.copyFileSync(
-        path.join(SHOT_DIR, 'fab-desktop-ai-thinking.png'),
-        path.join(ART_DIR, 'fab-desktop-ai-thinking.png')
-      );
-      summary.screenshots.push('fab-desktop-ai-thinking.png');
+      fs.copyFileSync(path.join(SHOT_DIR, aiShot), path.join(ART_DIR, aiShot));
+      summary.screenshots.push(aiShot);
     }
 
     const contextT = await browser.newContext({
