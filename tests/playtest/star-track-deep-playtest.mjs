@@ -2,8 +2,12 @@
  * Star Track deep playtest — 60 full HvA games.
  * Matrix: desktop + tablet Chromium × Easy/Medium/Hard × 10.
  *
- * Usage (dev server on :5173):
- *   node tests/playtest/star-track-deep-playtest.mjs
+ * Usage: node tests/playtest/star-track-deep-playtest.mjs
+ * Requires: npm run dev on :5173 (or PLAYTEST_BASE; PLAYTEST_BASE_URL alias).
+ *
+ * Env:
+ *   PLAYTEST_BASE             Base URL (default http://127.0.0.1:5173)
+ *   PLAYTEST_BASE_URL         Alias for PLAYTEST_BASE (fallback if PLAYTEST_BASE unset)
  *
  * Writes JSON + PNGs under docs/playtest/ and the shared artifact root
  * (`MP_ARTIFACT_DIR` / cloud / local fallback) at `…/star-track-playtest/`.
@@ -29,7 +33,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '../..');
 const DOCS = join(ROOT, 'docs/playtest');
 const ARTIFACTS = artifactPath('star-track-playtest');
-const BASE = process.env.PLAYTEST_BASE_URL ?? 'http://127.0.0.1:5173';
+// Peer harnesses (calla/fab/ramrod/par-55/stars-bars/sum-dominoes) use
+// PLAYTEST_BASE + 127.0.0.1. Keep PLAYTEST_BASE_URL as a fallback alias.
+const BASE =
+  process.env.PLAYTEST_BASE ||
+  process.env.PLAYTEST_BASE_URL ||
+  'http://127.0.0.1:5173';
 const STALL_MS = 12_000;
 const GAME_TIMEOUT_MS = 90_000;
 
