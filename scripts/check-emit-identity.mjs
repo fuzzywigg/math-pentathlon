@@ -36,7 +36,7 @@ export const USAGE =
   'Usage: node scripts/check-emit-identity.mjs [options] [files...]';
 
 /** Living tip remote (live tip / AGENTS tip stamp). Dead wave5 tip must not invent AI DIFFs (q-mp-1357 / q-mp-1500). */
-export const DEFAULT_TIP_REMOTE = 'origin/cursor/mp-tip-post3c7bf5e';
+export const DEFAULT_TIP_REMOTE = 'origin/cursor/mp-tip-postc84fb89';
 /** Fallback when the living tip ref is missing locally (q-mp-1357). */
 export const DEFAULT_TIP_FALLBACK_REMOTE = 'origin/alpha';
 
@@ -1019,7 +1019,7 @@ export function parseArgs(argv) {
     }
   }
   if (!base) {
-    // Living tip (cursor/mp-tip-post3c7bf5e); fall back to origin/alpha,
+    // Living tip (cursor/mp-tip-postc84fb89); fall back to origin/alpha,
     // then HEAD — never retired wave5 (q-mp-1357 / q-mp-1377 / q-mp-1500).
     base = resolveDefaultMergeBase();
   }
