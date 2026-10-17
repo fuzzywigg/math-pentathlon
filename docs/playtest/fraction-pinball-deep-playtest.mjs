@@ -33,7 +33,10 @@ async function dismissOwl(page) {
 
 async function startVsAi(page, difficulty) {
   await page.goto(joinPlaytestGameUrl(BASE, 'fraction-pinball'));
-  await page.getByTestId('game-loading').waitFor({ state: 'hidden', timeout: 15000 }).catch(() => {});
+  await page
+    .getByTestId('game-loading')
+    .waitFor({ state: 'hidden', timeout: 15000 })
+    .catch(() => {});
   await page.locator('#new-game-btn, h1').first().waitFor({ timeout: 15000 });
   await dismissOwl(page);
   await page.locator('#new-game-btn').click();
@@ -62,7 +65,10 @@ async function measureTouch(page) {
   });
 }
 
-async function playOneGame(page, { profile, difficulty, gameIndex, forceWrong }) {
+async function playOneGame(
+  page,
+  { profile, difficulty, gameIndex, forceWrong }
+) {
   const consoleErrors = [];
   const pageErrors = [];
   const onConsole = (msg) => {
@@ -94,7 +100,12 @@ async function playOneGame(page, { profile, difficulty, gameIndex, forceWrong })
     const deadline = Date.now() + 120_000;
     while (Date.now() < deadline) {
       // Game over?
-      if (await page.locator('.pinball-game-over').isVisible().catch(() => false)) {
+      if (
+        await page
+          .locator('.pinball-game-over')
+          .isVisible()
+          .catch(() => false)
+      ) {
         ended = true;
         if (gameIndex === 0) {
           await page.screenshot({
@@ -105,10 +116,16 @@ async function playOneGame(page, { profile, difficulty, gameIndex, forceWrong })
         break;
       }
 
-      const thinking = await page.locator('.status-ai-thinking').isVisible().catch(() => false);
+      const thinking = await page
+        .locator('.status-ai-thinking')
+        .isVisible()
+        .catch(() => false);
       if (thinking) {
         const thinkStart = Date.now();
-        await page.locator('.status-ai-thinking').waitFor({ state: 'hidden', timeout: 8000 }).catch(() => {});
+        await page
+          .locator('.status-ai-thinking')
+          .waitFor({ state: 'hidden', timeout: 8000 })
+          .catch(() => {});
         aiThinkSamples.push(Date.now() - thinkStart);
         continue;
       }
@@ -122,7 +139,12 @@ async function playOneGame(page, { profile, difficulty, gameIndex, forceWrong })
       }
 
       // AI result auto-advances (no Continue) — wait briefly for next challenge
-      if (await page.locator('.pinball-auto-advance').isVisible().catch(() => false)) {
+      if (
+        await page
+          .locator('.pinball-auto-advance')
+          .isVisible()
+          .catch(() => false)
+      ) {
         await page
           .locator('.pinball-choice-btn:not([disabled]), .pinball-game-over')
           .first()
@@ -152,23 +174,52 @@ async function playOneGame(page, { profile, difficulty, gameIndex, forceWrong })
       await page.waitForTimeout(200);
       const stillNothing =
         !(await page.locator('.pinball-choice-btn:not([disabled])').count()) &&
-        !(await page.locator('.pinball-continue-btn').isVisible().catch(() => false)) &&
-        !(await page.locator('.pinball-auto-advance').isVisible().catch(() => false)) &&
-        !(await page.locator('.status-ai-thinking').isVisible().catch(() => false)) &&
-        !(await page.locator('.pinball-game-over').isVisible().catch(() => false));
+        !(await page
+          .locator('.pinball-continue-btn')
+          .isVisible()
+          .catch(() => false)) &&
+        !(await page
+          .locator('.pinball-auto-advance')
+          .isVisible()
+          .catch(() => false)) &&
+        !(await page
+          .locator('.status-ai-thinking')
+          .isVisible()
+          .catch(() => false)) &&
+        !(await page
+          .locator('.pinball-game-over')
+          .isVisible()
+          .catch(() => false));
       if (stillNothing) {
         // brief grace for AI think / auto-advance
         await page.waitForTimeout(1500);
         const still =
-          !(await page.locator('.pinball-choice-btn:not([disabled])').count()) &&
-          !(await page.locator('.pinball-continue-btn').isVisible().catch(() => false)) &&
-          !(await page.locator('.pinball-auto-advance').isVisible().catch(() => false)) &&
-          !(await page.locator('.status-ai-thinking').isVisible().catch(() => false)) &&
-          !(await page.locator('.pinball-game-over').isVisible().catch(() => false));
+          !(await page
+            .locator('.pinball-choice-btn:not([disabled])')
+            .count()) &&
+          !(await page
+            .locator('.pinball-continue-btn')
+            .isVisible()
+            .catch(() => false)) &&
+          !(await page
+            .locator('.pinball-auto-advance')
+            .isVisible()
+            .catch(() => false)) &&
+          !(await page
+            .locator('.status-ai-thinking')
+            .isVisible()
+            .catch(() => false)) &&
+          !(await page
+            .locator('.pinball-game-over')
+            .isVisible()
+            .catch(() => false));
         if (still) {
           stalled = true;
           await page.screenshot({
-            path: path.join(OUT, `${profile}-${difficulty}-stall-g${gameIndex}.png`),
+            path: path.join(
+              OUT,
+              `${profile}-${difficulty}-stall-g${gameIndex}.png`
+            ),
             fullPage: true,
           });
           break;
@@ -180,10 +231,15 @@ async function playOneGame(page, { profile, difficulty, gameIndex, forceWrong })
   } catch (e) {
     crash = true;
     pageErrors.push(String(e));
-    await page.screenshot({
-      path: path.join(OUT, `${profile}-${difficulty}-crash-g${gameIndex}.png`),
-      fullPage: true,
-    }).catch(() => {});
+    await page
+      .screenshot({
+        path: path.join(
+          OUT,
+          `${profile}-${difficulty}-crash-g${gameIndex}.png`
+        ),
+        fullPage: true,
+      })
+      .catch(() => {});
   } finally {
     page.off('console', onConsole);
     page.off('pageerror', onPageError);
@@ -191,7 +247,9 @@ async function playOneGame(page, { profile, difficulty, gameIndex, forceWrong })
 
   const avgThink =
     aiThinkSamples.length > 0
-      ? Math.round(aiThinkSamples.reduce((a, b) => a + b, 0) / aiThinkSamples.length)
+      ? Math.round(
+          aiThinkSamples.reduce((a, b) => a + b, 0) / aiThinkSamples.length
+        )
       : null;
 
   return {
@@ -230,7 +288,12 @@ async function runProfile(browser, profile) {
       const context = await browser.newContext(contextOptions);
       const page = await context.newPage();
       const forceWrong = g === GAMES_PER - 1; // last game: hammer wrong answers to stress balls
-      const r = await playOneGame(page, { profile, difficulty, gameIndex: g, forceWrong });
+      const r = await playOneGame(page, {
+        profile,
+        difficulty,
+        gameIndex: g,
+        forceWrong,
+      });
       results.push(r);
       console.log(
         JSON.stringify({
@@ -270,28 +333,50 @@ const summary = {
     all.length === 0
       ? null
       : Math.round(all.reduce((a, b) => a + b.durationMs, 0) / all.length),
-  touchSamples: all.filter((r) => r.touch?.choice).map((r) => ({
-    profile: r.profile,
-    difficulty: r.difficulty,
-    choice: r.touch.choice,
-    continueBtn: r.touch.continueBtn,
-  })),
+  touchSamples: all
+    .filter((r) => r.touch?.choice)
+    .map((r) => ({
+      profile: r.profile,
+      difficulty: r.difficulty,
+      choice: r.touch.choice,
+      continueBtn: r.touch.continueBtn,
+    })),
   pageErrorSamples: all.flatMap((r) =>
-    r.pageErrors.map((e) => ({ profile: r.profile, difficulty: r.difficulty, gameIndex: r.gameIndex, e }))
+    r.pageErrors.map((e) => ({
+      profile: r.profile,
+      difficulty: r.difficulty,
+      gameIndex: r.gameIndex,
+      e,
+    }))
   ),
   consoleErrorSamples: all.flatMap((r) =>
-    r.consoleErrors.map((e) => ({ profile: r.profile, difficulty: r.difficulty, gameIndex: r.gameIndex, e }))
+    r.consoleErrors.map((e) => ({
+      profile: r.profile,
+      difficulty: r.difficulty,
+      gameIndex: r.gameIndex,
+      e,
+    }))
   ),
   results: all,
 };
 
-fs.writeFileSync(path.join(OUT, 'summary.json'), JSON.stringify(summary, null, 2));
-console.log('SUMMARY', JSON.stringify({
-  totalGames: summary.totalGames,
-  ended: summary.ended,
-  stalled: summary.stalled,
-  crashed: summary.crashed,
-  withPageErrors: summary.withPageErrors,
-  pageErrorSamples: summary.pageErrorSamples.slice(0, 10),
-  touchSamples: summary.touchSamples.slice(0, 6),
-}, null, 2));
+fs.writeFileSync(
+  path.join(OUT, 'summary.json'),
+  JSON.stringify(summary, null, 2)
+);
+console.log(
+  'SUMMARY',
+  JSON.stringify(
+    {
+      totalGames: summary.totalGames,
+      ended: summary.ended,
+      stalled: summary.stalled,
+      crashed: summary.crashed,
+      withPageErrors: summary.withPageErrors,
+      pageErrorSamples: summary.pageErrorSamples.slice(0, 10),
+      touchSamples: summary.touchSamples.slice(0, 6),
+    },
+    null,
+    2
+  )
+);
