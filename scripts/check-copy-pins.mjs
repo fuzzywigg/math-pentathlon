@@ -421,11 +421,23 @@ function extractExpectUnit(text) {
   const openExpect = text.indexOf('(', start);
   if (openExpect < 0) return null;
 
-  /** @param {number} from open paren index */
+  /**
+   * Balance to the matching `)` starting at open-paren index `from`.
+   * Tracks string and regex literals so:
+   * - `'` inside `/It's…/` does not enter string mode (q-mp-1488)
+   * - `)` inside `/[^)]+/` / escaped groups does not close early (q-mp-1489)
+   * @param {number} from open paren index
+   */
   function closeParen(from) {
     let depth = 0;
     let inStr = /** @type {null | string} */ (null);
+    let inRe = false;
+    let inReClass = false;
+    /** When true, the next `]` after `[` (optional `^`) is a literal, not a closer. */
+    let reClassAllowLiteralClose = false;
     let escape = false;
+    /** Last non-whitespace char outside strings/regex — regex-vs-division heuristic. */
+    let prevSignificant = '';
     for (let i = from; i < text.length; i++) {
       const ch = text[i];
       if (inStr) {
@@ -437,17 +449,77 @@ function extractExpectUnit(text) {
           escape = true;
           continue;
         }
-        if (ch === inStr) inStr = null;
+        if (ch === inStr) {
+          inStr = null;
+          prevSignificant = ch;
+        }
+        continue;
+      }
+      if (inRe) {
+        if (escape) {
+          escape = false;
+          continue;
+        }
+        if (ch === '\\') {
+          escape = true;
+          reClassAllowLiteralClose = false;
+          continue;
+        }
+        if (inReClass) {
+          if (reClassAllowLiteralClose) {
+            reClassAllowLiteralClose = false;
+            // First `]` (or `^` then `]`) after `[` is literal; keep class open.
+            if (ch === '^') {
+              reClassAllowLiteralClose = true;
+              continue;
+            }
+            continue;
+          }
+          if (ch === ']') inReClass = false;
+          continue;
+        }
+        if (ch === '[') {
+          inReClass = true;
+          reClassAllowLiteralClose = true;
+          continue;
+        }
+        if (ch === '/') {
+          // End of regex literal; flags (gimsuy…) are ordinary chars next.
+          inRe = false;
+          prevSignificant = '/';
+          continue;
+        }
+        // Parens / quotes inside `/…/` never affect outer depth (1488 / 1489).
         continue;
       }
       if (ch === "'" || ch === '"' || ch === '`') {
         inStr = ch;
+        prevSignificant = ch;
         continue;
       }
-      if (ch === '(') depth += 1;
-      else if (ch === ')') {
+      if (/\s/.test(ch)) continue;
+      // `/` starts a regex when the preceding token expects an expression
+      // (not after an identifier/number/`)` where `/` is division).
+      if (
+        ch === '/' &&
+        (prevSignificant === '' ||
+          '([{=,;:!&|?+-*%<>~^'.includes(prevSignificant))
+      ) {
+        inRe = true;
+        inReClass = false;
+        reClassAllowLiteralClose = false;
+        escape = false;
+        continue;
+      }
+      if (ch === '(') {
+        depth += 1;
+        prevSignificant = '(';
+      } else if (ch === ')') {
         depth -= 1;
+        prevSignificant = ')';
         if (depth === 0) return i;
+      } else {
+        prevSignificant = ch;
       }
     }
     return -1;
