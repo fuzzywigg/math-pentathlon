@@ -1,9 +1,10 @@
 /**
- * Hermetic structural coverage for check-copy-pins (q-mp-1453…1456, 1465, 1477, 1481, 1488, 1489):
+ * Hermetic structural coverage for check-copy-pins (q-mp-1453…1456, 1465, 1477, 1481, 1488, 1489, 1494):
  * multiline WINDOW_LINES, stripComments line map, wins! registry suffixes,
  * template-split debris rejection (paren + name/prefix + mid-fragment),
  * softRe honesty for seat-status apostrophes (`Blue's` / `Red's`),
- * extractExpectUnit regex apostrophes (1488) and char-class `)` (1489).
+ * extractExpectUnit regex apostrophes (1488) and char-class `)` (1489),
+ * registry-string polarity gate for `.not.toMatch` tooling/absence (1494).
  * No tip-wide scan / findings-total stamp.
  *
  * Stays on the default unit-shared project (no vitest.config nodePureFiles edit).
@@ -55,7 +56,7 @@ describe('wave55 shape', () => {
 });
 `;
 
-describe('check-copy-pins structural (q-mp-1453…1456, 1465, 1477, 1481, 1488, 1489)', () => {
+describe('check-copy-pins structural (q-mp-1453…1456, 1465, 1477, 1481, 1488, 1489, 1494)', () => {
   it('WINDOW_LINES covers 7–8 line phase-message expects (q-mp-1453)', () => {
     expect(WINDOW_LINES).toBeGreaterThanOrEqual(8);
 
@@ -359,5 +360,58 @@ it('pins phase', () => {
     );
     expect(owl).not.toBeNull();
     expect(owl?.matcherArg).toBe(String.raw`/\.get\([^)]+\)\s*\?\?\s*\[\]/`);
+  });
+
+  it('registry-string skips .not.toMatch tooling/absence wins! (q-mp-1494)', () => {
+    // Hermetic mini-registry: short `wins!` kept by q-mp-1455 (live tip harvest).
+    const registry = [{ value: 'wins!', source: 'src/games/calla/rules.ts' }];
+
+    // Live fixture L67: deep-playtest-end source-inspection (tooling regex shape).
+    const toolingDraw = scanSource(
+      'virtual/tooling-wins-draw.ts',
+      String.raw`expect(src).not.toMatch(/\/wins!?\|draw\|tie\/i/);`,
+      registry
+    );
+    expect(toolingDraw.some((f) => f.kind === 'registry-string')).toBe(false);
+
+    // Live fixture L69 twin.
+    const toolingTie = scanSource(
+      'virtual/tooling-wins-tie.ts',
+      String.raw`expect(src).not.toMatch(/\/wins!?\|tie\/i/);`,
+      registry
+    );
+    expect(toolingTie.some((f) => f.kind === 'registry-string')).toBe(false);
+
+    // Live fixture L159: kings supply-exhaustion absence check.
+    const absence = scanSource(
+      'virtual/absence-wins.ts',
+      'expect(winnerText).not.toMatch(/wins!/i);',
+      registry
+    );
+    expect(absence.some((f) => f.kind === 'registry-string')).toBe(false);
+
+    // True-pin controls: positive player-facing toBe / toMatch still flag.
+    const trueBe = scanSource(
+      'virtual/true-pin-toBe-wins.ts',
+      "expect(el.textContent).toBe('Blue wins!');",
+      registry
+    );
+    expect(trueBe.some((f) => f.kind === 'registry-string')).toBe(true);
+
+    const trueMatch = scanSource(
+      'virtual/true-pin-toMatch-wins.ts',
+      'expect(status).toMatch(/Blue wins!/i);',
+      registry
+    );
+    expect(trueMatch.some((f) => f.kind === 'registry-string')).toBe(true);
+
+    // Message-api `.not.` policy unchanged (still reports).
+    const messageNot = scanSource(
+      'virtual/message-api-not-1494.ts',
+      `import { getPhaseMessage } from '../../src/games/calla/rules';
+expect(getPhaseMessage(s)).not.toBe('');`,
+      registry
+    );
+    expect(messageNot.some((f) => f.kind === 'message-api')).toBe(true);
   });
 });

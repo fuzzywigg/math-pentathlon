@@ -630,7 +630,17 @@ function scanSource(fileRel, source, registry) {
     }
 
     // --- Copy-registry string pins (exact phrase / substantial substring) ---
-    if (!flaggedApi) {
+    // Polarity gate (q-mp-1494): `.not.toMatch` / `.not.toBe` … are absence or
+    // source-inspection checks, not player-copy pins. Soft needle `wins!`
+    // (q-mp-1455 keep) otherwise soft-hits tooling
+    // `expect(src).not.toMatch(/\/wins!?\|…/)` and absence
+    // `expect(winnerText).not.toMatch(/wins!/i)`. Message-api still flags
+    // `.not.` variants (intentional doc policy — leave alone).
+    const negativeMatcher =
+      /\.\s*not\s*\.\s*(?:toBeInTheDocument|toHaveAccessibleDescription|toHaveAccessibleName|toHaveTextContent|toHaveAttribute|toHaveValue|toHaveText|toBe|toEqual|toStrictEqual|toMatch|toContain)\s*\(/.test(
+        unit
+      );
+    if (!flaggedApi && !negativeMatcher) {
       for (const entry of registry) {
         const lit = entry.value;
         if (lit === 'Coming Soon') {
