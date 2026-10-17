@@ -13,10 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { resolveArtifactDir } from './lib/artifact-dir.mjs';
 import { applyDeepPlaytestCli } from './lib/deep-playtest-cli.mjs';
-import {
-  isDeepPlaytestDrawStatus,
-  isDeepPlaytestEndStatus,
-} from './lib/deep-playtest-end.mjs';
+import { isDeepPlaytestEndStatus } from './lib/deep-playtest-end.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { utcPlaytestDateStamp } from './lib/playtest-date.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
@@ -26,6 +23,10 @@ import {
   resolvePlaytestSeed,
 } from './lib/playtest-seed.mjs';
 import { joinPlaytestGameUrl } from './lib/playtest-url.mjs';
+import {
+  classifyStarsBarsHvAOutcome,
+  statusShowsAiThinking,
+} from './lib/stars-bars-deep-outcome.mjs';
 import { waitForAiThinkingChrome } from './lib/stars-bars-new-game-race.mjs';
 
 const USAGE = `Usage: node scripts/stars-bars-deep-playtest.mjs
@@ -144,15 +145,17 @@ async function measureTargets(page) {
           minOk: r.width >= 44 && r.height >= 44,
         };
       });
+    // q-mp-1490: tip never emits .status-ai-thinking; metric is status text.
+    const status =
+      document.querySelector('.stars-status')?.textContent?.trim() ?? '';
     return {
       pass: box('.stars-pass-btn, .stars-btn'),
       clear: box('.stars-btn-secondary'),
       cards: all('.stars-hand-container:first-child .stars-card'),
       cells: all('.stars-cell'),
       valid: all('.stars-cell.valid'),
-      thinking: !!document.querySelector('.status-ai-thinking'),
-      status:
-        document.querySelector('.stars-status')?.textContent?.trim() ?? '',
+      thinking: /computer is thinking/i.test(status),
+      status,
       scores:
         document.querySelector('.stars-scores')?.textContent?.trim() ?? '',
     };
@@ -207,19 +210,19 @@ function isEnded(statusText) {
 
 async function waitForHumanOrEnd(page, deadline) {
   while (Date.now() < deadline) {
+    // q-mp-1490: tip-real thinking is status text, not missing chrome class.
     const info = await page.evaluate(() => {
       const status =
         document.querySelector('.stars-status')?.textContent?.trim() ?? '';
-      const thinking = !!document.querySelector('.status-ai-thinking');
+      const computerText = /computer is thinking/i.test(status);
       const pass = !!document.querySelector('.stars-pass-btn');
       const playable = document.querySelectorAll(
         '.stars-hand-container:first-child .stars-card:not(.disabled)'
       ).length;
-      const computerText = /computer is thinking/i.test(status);
       const yourTurn = /your turn/i.test(status);
       return {
         status,
-        thinking,
+        thinking: computerText,
         pass,
         playable,
         computerText,
@@ -248,18 +251,15 @@ async function probeNewGameRace(page, difficulty) {
   await startVsAi(page, difficulty);
   // One human place to hand off to AI
   await playHumanTurn(page);
-  // q-mp-1474: poll for thinking chrome (par-55 shape); do not race a 100ms sleep.
+  // q-mp-1474: poll for thinking (par-55 shape); do not race a 100ms sleep.
+  // q-mp-1490: tip-real signal is status text (shared sampleShowsAiThinking).
   const thinkWait = await waitForAiThinkingChrome({
     sample: async () => {
       const status = await page
         .locator('.stars-status')
         .textContent()
         .catch(() => '');
-      const thinking = await page
-        .locator('.status-ai-thinking')
-        .isVisible()
-        .catch(() => false);
-      return { status: status?.trim() ?? '', thinking };
+      return { status: status?.trim() ?? '' };
     },
     sleep: (ms) => page.waitForTimeout(ms),
     isEnded,
@@ -328,11 +328,8 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
       const gate = await waitForHumanOrEnd(page, Date.now() + STALL_MS);
       lastStatus = gate.status;
       if (gate.kind === 'ended') {
-        outcome = isDeepPlaytestDrawStatus(gate.status)
-          ? 'draw'
-          : /computer/i.test(gate.status)
-            ? 'ai-win'
-            : 'human-win';
+        // q-mp-1486: Red wins → ai-win (product labels are Blue/Red).
+        outcome = classifyStarsBarsHvAOutcome(gate.status);
         break;
       }
       if (gate.kind === 'stall') {
@@ -368,11 +365,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
             .catch(() => '');
           lastStatus = after?.trim() ?? '';
           if (isEnded(lastStatus)) {
-            outcome = isDeepPlaytestDrawStatus(lastStatus)
-              ? 'draw'
-              : /computer/i.test(lastStatus)
-                ? 'ai-win'
-                : 'human-win';
+            outcome = classifyStarsBarsHvAOutcome(lastStatus);
             break;
           }
           continue;
@@ -384,7 +377,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
         .locator('.stars-status')
         .textContent()
         .catch(() => '');
-      if (/computer is thinking/i.test(flash || '')) {
+      if (statusShowsAiThinking(flash)) {
         aiThinkSeen.count++;
         if (gameIndex === 0 && difficulty === 'medium') {
           const shot = path.join(OUT, `${viewport.name}-ai-thinking.png`);
@@ -399,11 +392,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
         maxAiThinkMs = Math.max(maxAiThinkMs, Date.now() - thinkStart);
         lastStatus = humanBack.status;
         if (humanBack.kind === 'ended') {
-          outcome = isDeepPlaytestDrawStatus(humanBack.status)
-            ? 'draw'
-            : /computer/i.test(humanBack.status)
-              ? 'ai-win'
-              : 'human-win';
+          outcome = classifyStarsBarsHvAOutcome(humanBack.status);
           break;
         }
         if (humanBack.kind === 'stall') {
@@ -415,11 +404,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
 
       lastStatus = flash?.trim() ?? '';
       if (isEnded(lastStatus)) {
-        outcome = isDeepPlaytestDrawStatus(lastStatus)
-          ? 'draw'
-          : /computer/i.test(lastStatus)
-            ? 'ai-win'
-            : 'human-win';
+        outcome = classifyStarsBarsHvAOutcome(lastStatus);
         break;
       }
     }
