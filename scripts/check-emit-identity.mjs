@@ -35,8 +35,8 @@ const ROOT = path.resolve(__dirname, '..');
 export const USAGE =
   'Usage: node scripts/check-emit-identity.mjs [options] [files...]';
 
-/** Living tip remote (AGENTS.md). Dead wave5 tip must not invent AI DIFFs (q-mp-1357). */
-export const DEFAULT_TIP_REMOTE = 'origin/cursor/mp-tip-post38d2';
+/** Living tip remote (live tip / AGENTS tip stamp). Dead wave5 tip must not invent AI DIFFs (q-mp-1357 / q-mp-1500). */
+export const DEFAULT_TIP_REMOTE = 'origin/cursor/mp-tip-post4c24321';
 /** Fallback when the living tip ref is missing locally (q-mp-1357). */
 export const DEFAULT_TIP_FALLBACK_REMOTE = 'origin/alpha';
 
@@ -90,8 +90,8 @@ export function pathNotInRepoErrorMessage(file) {
  * junk (q-mp-1464), ADS / percent-encoded / `&` / `*` junk (q-mp-1473),
  * shell-metachar junk (q-mp-1478), unicode format/invisible junk (q-mp-1479),
  * junk `\segment` after a file path (q-mp-1480), or editor backup / swap /
- * temp / patch suffixes `~` / `.bak` / `.swp` / `.tmp` / `.orig` / `.rej`
- * (q-mp-1497).
+ * temp / patch suffixes `~` / `.bak` / `.swp` / `.swo` / `.swn` / `.swx` /
+ * `.tmp` / `.orig` / `.rej` (q-mp-1497 / q-mp-1499).
  * @param {string} file
  */
 export function pathJunkErrorMessage(file) {
@@ -121,17 +121,21 @@ export function pathIsDirectoryErrorMessage(file) {
  * such as ZWSP / soft hyphen / RLO (q-mp-1479). Bare `\` is not junk here —
  * Windows relatives stay accepted (q-mp-1463); junk `file.ts\extra` is gated
  * in normalize (q-mp-1480). Editor backup suffixes (`~` / `.bak` / `.swp` /
- * `.tmp` / `.orig` / `.rej`) are gated separately (q-mp-1497). Colon (ADS) is
- * checked separately so Windows drive absolutes stay valid.
+ * `.swo` / `.swn` / `.swx` / `.tmp` / `.orig` / `.rej`) are gated separately
+ * (q-mp-1497 / q-mp-1499). Colon (ADS) is checked separately so Windows drive
+ * absolutes stay valid.
  */
 const PATH_JUNK_RE = /[?#\u0000-\u001F\u007F%&*|<>;"'`$]|\p{Cf}/u;
 
 /**
- * Trailing editor backup / swap / temp / patch leftovers (q-mp-1497).
- * Suffix-only so shell/unicode/`\extra` / `?`/`#`/NUL / ADS/`%&*` / `//` /
- * directory gates stay untouched. Includes cheap `.orig` / `.rej`.
+ * Trailing editor backup / swap / temp / patch leftovers (q-mp-1497 /
+ * q-mp-1499). Suffix-only so shell/unicode/`\extra` / `?`/`#`/NUL / ADS/`%&*` /
+ * `//` / directory gates stay untouched. Includes vim secondary swaps
+ * (`.swo` / `.swn` / `.swx`) when `.swp` already exists, plus cheap `.orig` /
+ * `.rej`.
  */
-const EDITOR_BACKUP_SUFFIX_RE = /(?:~|\.bak|\.swp|\.tmp|\.orig|\.rej)$/i;
+const EDITOR_BACKUP_SUFFIX_RE =
+  /(?:~|\.bak|\.swp|\.swo|\.swn|\.swx|\.tmp|\.orig|\.rej)$/i;
 
 /**
  * True when `raw` has invalid path characters (q-mp-1464 / q-mp-1473 /
@@ -148,7 +152,8 @@ export function pathHasInvalidCharacters(raw) {
 
 /**
  * True when the path ends with an editor backup / swap / temp / patch suffix
- * (`~` / `.bak` / `.swp` / `.tmp` / `.orig` / `.rej`) — q-mp-1497.
+ * (`~` / `.bak` / `.swp` / `.swo` / `.swn` / `.swx` / `.tmp` / `.orig` /
+ * `.rej`) — q-mp-1497 / q-mp-1499.
  * @param {string} raw
  */
 export function pathHasEditorBackupSuffix(raw) {
@@ -188,9 +193,10 @@ export function stripInlinePathComment(line) {
  * (q-mp-1464), reject ADS / `%` / `&` / `*` junk (q-mp-1473), reject
  * shell-metachar junk (q-mp-1478), reject unicode format/invisible junk
  * (q-mp-1479), reject junk `file.ts\extra` remaps (q-mp-1480), reject
- * editor backup suffixes `~` / `.bak` / `.swp` / `.tmp` / `.orig` / `.rej`
- * (q-mp-1497), reject remaining `//` (q-mp-1471), reject directories
- * (q-mp-1472), reject escapes (q-mp-1429 / q-mp-1430).
+ * editor backup suffixes `~` / `.bak` / `.swp` / `.swo` / `.swn` / `.swx` /
+ * `.tmp` / `.orig` / `.rej` (q-mp-1497 / q-mp-1499), reject remaining `//`
+ * (q-mp-1471), reject directories (q-mp-1472), reject escapes (q-mp-1429 /
+ * q-mp-1430).
  * @param {string} file
  * @param {string} [root]
  * @returns {{ ok: true, path: string } | { ok: false, message: string }}
@@ -1012,8 +1018,8 @@ export function parseArgs(argv) {
     }
   }
   if (!base) {
-    // Living tip from AGENTS.md (cursor/mp-tip-post38d2); fall back to
-    // origin/alpha, then HEAD — never retired wave5 (q-mp-1357 / q-mp-1377).
+    // Living tip (cursor/mp-tip-post4c24321); fall back to origin/alpha,
+    // then HEAD — never retired wave5 (q-mp-1357 / q-mp-1377 / q-mp-1500).
     base = resolveDefaultMergeBase();
   }
   if (sawFilesFrom) {
