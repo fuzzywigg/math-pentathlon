@@ -21,6 +21,8 @@ import { waitForGameReady } from './lib/page-ready.mjs';
 import { waitDoubleRaf } from './lib/page-settle.mjs';
 import {
   COMPUTER_OR_THINKING_RE,
+  documentHasSettleThinkingSignal,
+  documentSettleThinkingCleared,
   SETTLE_HIDDEN_MS,
   SETTLE_THINKING_SELECTOR,
   SETTLE_VISIBLE_MS,
@@ -59,48 +61,39 @@ const OUT = process.env.SWEEP_OUT || artifactPath('console-sweep-raw.json');
 
 /**
  * After a human move vs AI: wait for tip-real thinking chrome / status to
- * appear (soft) then clear, then paint-settle (q-mp-1491).
+ * appear (soft) then clear, then paint-settle (q-mp-1491 / q-mp-1492).
  *
  * Tip-real classes include `.status-ai-thinking` and sum-dominoes
  * `.sd-computer-thinking` (product never uses status-ai-thinking there).
+ * Status scan uses class-token `*-status` match so multi-class
+ * `stars-status player2` nodes are found (attribute-suffix misses them).
  * Soft timeouts keep the sweep moving when a game never flashes chrome.
  */
 async function settleAfterMove(page) {
   const reSource = COMPUTER_OR_THINKING_RE.source;
   const sel = SETTLE_THINKING_SELECTOR;
+  const visibleFnSrc = documentHasSettleThinkingSignal.toString();
+  const clearedFnSrc = documentSettleThinkingCleared.toString();
   // Soft visible: chrome class OR /computer|thinking/i status text.
   await page
     .waitForFunction(
-      ({ thinkingSel, statusReSource }) => {
-        if (document.querySelector(thinkingSel)) return true;
-        const re = new RegExp(statusReSource, 'i');
-        const nodes = document.querySelectorAll(
-          '[class$="-status"], .sd-status, .sd-computer-thinking'
-        );
-        for (const n of nodes) {
-          if (re.test(n.textContent || '')) return true;
-        }
-        return false;
+      ({ thinkingSel, statusReSource, fnSrc }) => {
+        // Reconstruct shared helper in page context (no module imports).
+        const fn = (0, eval)('(' + fnSrc + ')');
+        return fn(document, thinkingSel, statusReSource);
       },
-      { thinkingSel: sel, statusReSource: reSource },
+      { thinkingSel: sel, statusReSource: reSource, fnSrc: visibleFnSrc },
       { timeout: SETTLE_VISIBLE_MS }
     )
     .catch(() => {});
   // Soft hidden: no tip-real chrome and status no longer computer|thinking.
   await page
     .waitForFunction(
-      ({ thinkingSel, statusReSource }) => {
-        if (document.querySelector(thinkingSel)) return false;
-        const re = new RegExp(statusReSource, 'i');
-        const nodes = document.querySelectorAll(
-          '[class$="-status"], .sd-status'
-        );
-        for (const n of nodes) {
-          if (re.test(n.textContent || '')) return false;
-        }
-        return true;
+      ({ thinkingSel, statusReSource, fnSrc }) => {
+        const fn = (0, eval)('(' + fnSrc + ')');
+        return fn(document, thinkingSel, statusReSource);
       },
-      { thinkingSel: sel, statusReSource: reSource },
+      { thinkingSel: sel, statusReSource: reSource, fnSrc: clearedFnSrc },
       { timeout: SETTLE_HIDDEN_MS }
     )
     .catch(() => {});

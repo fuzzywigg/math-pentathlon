@@ -7,11 +7,18 @@
 import { chromium } from '@playwright/test';
 import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
 import { NAV_AWAY_SWEEP_USAGE } from './lib/browser-harness-script-usage.mjs';
+import {
+  browserSampleSettleThinking,
+  SETTLE_THINKING_SELECTOR,
+} from './lib/console-sweep-settle.mjs';
 import { dismissOwl } from './lib/dismiss-owl.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
 import { waitForAiThinkingChrome } from './lib/stars-bars-new-game-race.mjs';
 
 applyBrowserHarnessCli(process.argv.slice(2), NAV_AWAY_SWEEP_USAGE);
+
+/** Browser-serializable sample (class-token status + tip-real chrome). */
+const NAV_AWAY_SAMPLE_FN_SRC = browserSampleSettleThinking.toString();
 
 const BASE = process.env.BASE_URL || 'http://127.0.0.1:5173';
 const GAMES = [
@@ -73,28 +80,28 @@ async function main() {
           .click({ force: true })
           .catch(() => {});
       }
-      // q-mp-1482: poll thinking chrome (par-55 / 1474 shape); not a fixed 100ms sleep.
+      // q-mp-1482 / q-mp-1493: poll tip-real thinking chrome + multi-class status.
+      // Uses shared settle selector (incl. .sd-computer-thinking) and class-token
+      // `*-status` scan — not attribute-suffix / status-ai-thinking-only.
       // If !sawThinking, AI may have finished instantly; still leave (timeout short-circuit).
       await waitForAiThinkingChrome({
         sample: async () => {
-          const thinking = await page
-            .locator('.status-ai-thinking')
-            .first()
-            .isVisible()
-            .catch(() => false);
-          const status = await page
-            .evaluate(() => {
-              const nodes = document.querySelectorAll(
-                '[class$="-status"], .status-ai-thinking'
-              );
-              for (const n of nodes) {
-                const t = n.textContent?.trim() ?? '';
-                if (t) return t;
+          const snap = await page
+            .evaluate(
+              ({ thinkingSel, fnSrc }) => {
+                const fn = (0, eval)('(' + fnSrc + ')');
+                return fn(document, { thinkingSelector: thinkingSel });
+              },
+              {
+                thinkingSel: SETTLE_THINKING_SELECTOR,
+                fnSrc: NAV_AWAY_SAMPLE_FN_SRC,
               }
-              return '';
-            })
-            .catch(() => '');
-          return { thinking: !!thinking, status: status || '' };
+            )
+            .catch(() => ({ thinking: false, status: '' }));
+          return {
+            thinking: !!snap?.thinking,
+            status: snap?.status || '',
+          };
         },
         sleep: (ms) => page.waitForTimeout(ms),
       });
