@@ -335,6 +335,14 @@ function harvestCopyRegistry() {
       add(body, source);
       return;
     }
+    // Mid-template name/count-split debris (q-mp-1477): continuation segments
+    // after `${playerName}` / `${count}` that start lowercase, e.g.
+    // `is distributing cubes...` from `${playerName} is distributing…`,
+    // `block(s) selected…` from `…${count} block(s) selected…`. Soft-matching
+    // these as needles flags junk like `debug: is distributing…`. Keep wins!
+    // (q-mp-1455). Drop — no distinctive full phrase to reconstruct without
+    // inventing seat labels / counts.
+    if (/^[a-z]/.test(v) && !/^wins!?\.?$/i.test(v)) return;
     const key = v.toLowerCase();
     if (seen.has(key)) return;
     seen.add(key);
