@@ -281,7 +281,7 @@ export const n: N = 1;
   });
 
   it('default tip constants leave retired wave5 (q-mp-1357/1377/1500)', () => {
-    expect(DEFAULT_TIP_REMOTE).toBe('origin/cursor/mp-tip-postc84fb89');
+    expect(DEFAULT_TIP_REMOTE).toBe('origin/cursor/mp-tip-postdffc239');
     expect(DEFAULT_TIP_FALLBACK_REMOTE).toBe('origin/alpha');
     expect(DEFAULT_TIP_REMOTE).not.toMatch(/integration-fold-wave5/);
     expect(DEFAULT_TIP_REMOTE).not.toMatch(/mp-tip-post38d2/);
@@ -310,7 +310,7 @@ export const n: N = 1;
       _opts?: { encoding?: string; cwd?: string }
     ) => {
       const key = args.join(' ');
-      if (key === 'merge-base HEAD origin/cursor/mp-tip-postc84fb89') {
+      if (key === 'merge-base HEAD origin/cursor/mp-tip-postdffc239') {
         return { status: 0, stdout: 'living-tip-mb\n', stderr: '' };
       }
       return { status: 128, stdout: '', stderr: 'unused\n' };
@@ -327,7 +327,7 @@ export const n: N = 1;
     ) => {
       calls.push(args);
       const key = args.join(' ');
-      if (key === 'merge-base HEAD origin/cursor/mp-tip-postc84fb89') {
+      if (key === 'merge-base HEAD origin/cursor/mp-tip-postdffc239') {
         return { status: 128, stdout: '', stderr: 'missing tip\n' };
       }
       if (key === 'merge-base HEAD origin/alpha') {
@@ -341,7 +341,7 @@ export const n: N = 1;
     expect(calls[0]).toEqual([
       'merge-base',
       'HEAD',
-      'origin/cursor/mp-tip-postc84fb89',
+      'origin/cursor/mp-tip-postdffc239',
     ]);
     expect(calls[1]).toEqual(['merge-base', 'HEAD', 'origin/alpha']);
 

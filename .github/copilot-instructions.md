@@ -18,7 +18,7 @@ Key files and patterns to inspect
 
 Draft PR into tip
 
-- Target **`cursor/mp-tip-postc84fb89`** as a **draft** PR. Do not merge, mark ready, or push to `alpha` / `main` / the tip branch. Tip owner folds; end PR bodies with `Next action: fold into tip by the tip owner`.
+- Target **`cursor/mp-tip-postdffc239`** as a **draft** PR. Do not merge, mark ready, or push to `alpha` / `main` / the tip branch. Tip owner folds; end PR bodies with `Next action: fold into tip by the tip owner`.
 - Scan open tip drafts before starting; if covered, comment `superseded` / `contained` — do not close other PRs.
 
 Developer workflows (commands)
