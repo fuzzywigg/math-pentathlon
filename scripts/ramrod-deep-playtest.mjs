@@ -30,6 +30,12 @@ import {
   isBlueSelectStatus,
   isIllicitPassSkip,
 } from './lib/ramrod-illicit-pass.mjs';
+import {
+  RAMROD_AI_THINKING_STATUS_RE,
+  RAMROD_TIP_EMITS_COMPUTER_THINKING_CLASS,
+  isRamrodAiThinkingStatus,
+  resolveRamrodThinkingMetric,
+} from './lib/ramrod-thinking.mjs';
 
 const USAGE = `Usage: node scripts/ramrod-deep-playtest.mjs
 
@@ -175,7 +181,9 @@ async function startVsAi(page, difficulty) {
 }
 
 async function measureTargets(page) {
-  return page.evaluate(() => {
+  // q-mp-1487: tip never applies `.ramrod-computer-thinking` (CSS-only).
+  // Sample tip-real status / seat class / history; resolve `thinking` in Node.
+  const raw = await page.evaluate(() => {
     const box = (sel) => {
       const el = document.querySelector(sel);
       if (!el) return null;
@@ -191,6 +199,7 @@ async function measureTargets(page) {
         const r = el.getBoundingClientRect();
         return { w: Math.round(r.width), h: Math.round(r.height) };
       });
+    const statusEl = document.querySelector('.ramrod-status');
     return {
       pass: box('.ramrod-btn-secondary'),
       clear: [...document.querySelectorAll('.ramrod-btn-secondary')].map(
@@ -206,13 +215,22 @@ async function measureTargets(page) {
       selectableRods: all('.ramrod-rod-wrapper.selectable'),
       validSlots: all('.ramrod-slot.valid'),
       slots: all('.ramrod-slot'),
-      thinking: !!document.querySelector('.ramrod-computer-thinking'),
+      statusClass: statusEl?.className ?? '',
+      historyCount: document.querySelectorAll('.ramrod-history-move').length,
       hint:
         document.querySelector('.ramrod-turn-hint')?.textContent?.trim() ?? '',
-      status:
-        document.querySelector('.ramrod-status')?.textContent?.trim() ?? '',
+      status: statusEl?.textContent?.trim() ?? '',
     };
   });
+  return {
+    ...raw,
+    // Dead-class query skipped on tip (RAMROD_TIP_EMITS_COMPUTER_THINKING_CLASS).
+    thinking: resolveRamrodThinkingMetric({
+      statusText: raw.status,
+      classPresent: false,
+      tipEmitsClass: RAMROD_TIP_EMITS_COMPUTER_THINKING_CLASS,
+    }),
+  };
 }
 
 /** Click via DOM dispatch — survives shell overflow-clip quirks. */
@@ -360,27 +378,32 @@ function isEnded(statusText) {
 async function waitForHumanOrEnd(page, deadline) {
   const timeout = Math.max(0, deadline - Date.now());
   try {
+    // q-mp-1487: tip-real AI seat via status text / `.ramrod-status` class —
+    // never wait on missing `.ramrod-computer-thinking`.
     const handle = await page.waitForFunction(
-      (endReSource) => {
+      ({ endReSource, thinkingReSource }) => {
         const endRe = new RegExp(endReSource, 'i');
-        const status =
-          document.querySelector('.ramrod-status')?.textContent?.trim() ?? '';
-        const thinking = !!document.querySelector('.ramrod-computer-thinking');
+        const thinkingRe = new RegExp(thinkingReSource, 'i');
+        const statusEl = document.querySelector('.ramrod-status');
+        const status = statusEl?.textContent?.trim() ?? '';
+        const statusClass = statusEl?.className ?? '';
+        const thinking = thinkingRe.test(status);
         const pass = [
           ...document.querySelectorAll('.ramrod-btn-secondary'),
         ].some((b) => b.textContent?.includes('Pass Turn'));
         const selectable = document.querySelectorAll(
           '.ramrod-rod-wrapper.selectable'
         ).length;
-        const computerText = /computer|thinking/i.test(status);
+        const computerText = thinking;
         const banner = !!document.querySelector('.ramrod-winner-banner');
         // q-mp-1259: word boundaries via END_RE_SOURCE.
         const ended = banner || endRe.test(status);
-        const human = !computerText && !thinking && (pass || selectable > 0);
+        const human = !computerText && (pass || selectable > 0);
         if (ended) {
           return {
             kind: 'ended',
             status,
+            statusClass,
             thinking,
             pass,
             selectable,
@@ -392,6 +415,7 @@ async function waitForHumanOrEnd(page, deadline) {
           return {
             kind: 'human',
             status,
+            statusClass,
             thinking,
             pass,
             selectable,
@@ -401,7 +425,10 @@ async function waitForHumanOrEnd(page, deadline) {
         }
         return false;
       },
-      END_RE_SOURCE,
+      {
+        endReSource: END_RE_SOURCE,
+        thinkingReSource: RAMROD_AI_THINKING_STATUS_RE.source,
+      },
       { timeout }
     );
     return await handle.jsonValue();
@@ -470,7 +497,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
 
       const blueSelectAfterWait = isBlueSelectStatus(gate.status);
 
-      if (/computer|thinking/i.test(gate.status) || gate.thinking) {
+      if (isRamrodAiThinkingStatus(gate.status) || gate.thinking) {
         aiThinkSeen.count++;
       }
 
@@ -548,32 +575,44 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
         }
       }
 
-      // Measure AI think flash duration roughly (condition wait, no fixed sleep)
+      // Measure AI think flash via tip-real status / history growth (q-mp-1487).
+      // Tip never applies `.ramrod-computer-thinking` — do not wait on that class.
+      const historyBefore = await page
+        .locator('.ramrod-history-move')
+        .count()
+        .catch(() => 0);
       const thinkStart = Date.now();
       let sawThink = false;
       const flash = await page
         .waitForFunction(
-          (endReSource) => {
+          ({ endReSource, thinkingReSource, historyBefore }) => {
             const endRe = new RegExp(endReSource, 'i');
-            const status =
-              document.querySelector('.ramrod-status')?.textContent?.trim() ??
-              '';
-            const thinking = !!document.querySelector(
-              '.ramrod-computer-thinking'
-            );
-            if (/computer|thinking/i.test(status) || thinking) {
-              return { kind: 'think', status, thinking };
+            const thinkingRe = new RegExp(thinkingReSource, 'i');
+            const statusEl = document.querySelector('.ramrod-status');
+            const status = statusEl?.textContent?.trim() ?? '';
+            const statusClass = statusEl?.className ?? '';
+            const historyCount = document.querySelectorAll(
+              '.ramrod-history-move'
+            ).length;
+            const historyGrew = historyCount > historyBefore;
+            const thinking = thinkingRe.test(status);
+            if (thinking || (historyGrew && /\bplayer2\b/.test(statusClass))) {
+              return { kind: 'think', status, thinking, historyGrew };
             }
             // q-mp-1259: word boundaries via END_RE_SOURCE.
             if (endRe.test(status)) {
-              return { kind: 'ended', status, thinking };
+              return { kind: 'ended', status, thinking, historyGrew };
             }
             if (/Blue's turn/.test(status)) {
-              return { kind: 'human', status, thinking };
+              return { kind: 'human', status, thinking, historyGrew };
             }
             return false;
           },
-          END_RE_SOURCE,
+          {
+            endReSource: END_RE_SOURCE,
+            thinkingReSource: RAMROD_AI_THINKING_STATUS_RE.source,
+            historyBefore,
+          },
           { timeout: 1_600 }
         )
         .then((h) => h.jsonValue())
@@ -677,7 +716,9 @@ async function captureAiThinkingShot(browser) {
   await installPageSeededRandom(page, SEED);
   try {
     await startVsAi(page, 'medium');
-    // Place one blue move quickly then catch thinking
+    // Place one blue move quickly then catch tip-real AI seat (q-mp-1487).
+    // Tip never attaches `.ramrod-computer-thinking` — wait on status text /
+    // `.ramrod-status.player2` instead.
     const rod = page.locator('.ramrod-rod-wrapper.selectable').first();
     if (await rod.isVisible()) {
       await rod.click({ force: true });
@@ -685,8 +726,18 @@ async function captureAiThinkingShot(browser) {
       if (await slot.isVisible()) {
         await slot.click({ force: true });
         await page
-          .locator('.ramrod-computer-thinking')
-          .waitFor({ state: 'attached', timeout: 2000 })
+          .waitForFunction(
+            (thinkingReSource) => {
+              const el = document.querySelector('.ramrod-status');
+              if (!el) return false;
+              const text = el.textContent?.trim() ?? '';
+              const thinkingRe = new RegExp(thinkingReSource, 'i');
+              if (thinkingRe.test(text)) return true;
+              return /\bplayer2\b/.test(el.className) && !/Blue/i.test(text);
+            },
+            RAMROD_AI_THINKING_STATUS_RE.source,
+            { timeout: 2000 }
+          )
           .catch(() => {});
         const shot = path.join(OUT, 'tablet-ai-thinking.png');
         await page.screenshot({ path: shot, fullPage: false });
