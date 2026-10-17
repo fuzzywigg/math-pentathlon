@@ -26,6 +26,10 @@ import {
   resolvePlaytestSeed,
 } from './lib/playtest-seed.mjs';
 import { joinPlaytestGameUrl } from './lib/playtest-url.mjs';
+import {
+  isBlueSelectStatus,
+  isIllicitPassSkip,
+} from './lib/ramrod-illicit-pass.mjs';
 
 const USAGE = `Usage: node scripts/ramrod-deep-playtest.mjs
 
@@ -44,9 +48,7 @@ applyDeepPlaytestCli(process.argv.slice(2), USAGE);
 
 const BASE = process.env.PLAYTEST_BASE || 'http://127.0.0.1:5173';
 const SEED = resolvePlaytestSeed(process.env);
-const OUT = path.resolve(
-  `docs/playtest/ramrod-deep-${utcPlaytestDateStamp()}`
-);
+const OUT = path.resolve(`docs/playtest/ramrod-deep-${utcPlaytestDateStamp()}`);
 const ART = resolveArtifactDir();
 const GAMES_PER_DIFF = requireEnvNumber('RAMROD_GAMES', 10);
 const MAX_HUMAN_TURNS = 80;
@@ -449,16 +451,8 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
     }
 
     for (turns = 0; turns < MAX_HUMAN_TURNS; turns++) {
-      const beforePlayer = await page.evaluate(() => {
-        const status =
-          document.querySelector('.ramrod-status')?.textContent?.trim() ?? '';
-        return {
-          status,
-          blueSelect: /Blue's turn - Select a rod/.test(status),
-          history: document.querySelectorAll('.ramrod-history-move').length,
-        };
-      });
-
+      // q-mp-1468: sample Blue select *after* the human-seat wait — pre-wait
+      // status is often still AI-thinking, so a stale select flag undercounts.
       const gate = await waitForHumanOrEnd(page, Date.now() + STALL_MS);
       lastStatus = gate.status;
       if (gate.kind === 'ended') {
@@ -473,6 +467,8 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
         outcome = 'stall';
         break;
       }
+
+      const blueSelectAfterWait = isBlueSelectStatus(gate.status);
 
       if (/computer|thinking/i.test(gate.status) || gate.thinking) {
         aiThinkSeen.count++;
@@ -529,11 +525,13 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
               '.ramrod-rod-wrapper.selectable'
             ).length,
           }));
-          // Illicit: Blue had select affordance, then suddenly computer without our place
+          // Illicit: Blue had select affordance (post-wait), then computer without our place
           if (
-            beforePlayer.blueSelect &&
-            /computer|thinking/i.test(after.status) &&
-            after.selectable === 0
+            isIllicitPassSkip({
+              blueSelectAfterWait,
+              afterStatus: after.status,
+              afterSelectable: after.selectable,
+            })
           ) {
             illicitPassSkip++;
           }
