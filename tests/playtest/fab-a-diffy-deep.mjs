@@ -4,10 +4,11 @@
  * Writes JSON summary + screenshots under docs/playtest/.
  *
  * Usage: node tests/playtest/fab-a-diffy-deep.mjs
- * Requires: npm run dev on :5173 (or PLAYTEST_BASE_URL).
+ * Requires: npm run dev on :5173 (or PLAYTEST_BASE; PLAYTEST_BASE_URL alias).
  *
  * Env:
- *   PLAYTEST_BASE_URL         Base URL (default http://localhost:5173)
+ *   PLAYTEST_BASE             Base URL (default http://127.0.0.1:5173)
+ *   PLAYTEST_BASE_URL         Alias for PLAYTEST_BASE (fallback if PLAYTEST_BASE unset)
  *   PLAYTEST_GAMES_PER        Games per difficulty×viewport (default 10; rejects NaN / ≤0)
  *   PLAYTEST_ONLY_VP          Filter viewport: desktop | tablet
  *   PLAYTEST_ONLY_DIFF        Filter difficulty: easy | medium | hard
@@ -30,7 +31,12 @@ import {
   resolveFabViewports,
 } from './fab-a-diffy-env.mjs';
 
-const BASE = process.env.PLAYTEST_BASE_URL || 'http://localhost:5173';
+// Peer harnesses (calla/ramrod/par-55/stars-bars/sum-dominoes) use PLAYTEST_BASE +
+// 127.0.0.1. Keep PLAYTEST_BASE_URL as a fallback alias for older callers.
+const BASE =
+  process.env.PLAYTEST_BASE ||
+  process.env.PLAYTEST_BASE_URL ||
+  'http://127.0.0.1:5173';
 const GAMES_PER = requireEnvNumber('PLAYTEST_GAMES_PER', 10);
 const OUT_DIR = path.resolve('docs/playtest');
 const SHOT_DIR = path.join(
