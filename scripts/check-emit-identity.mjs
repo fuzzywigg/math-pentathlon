@@ -18,7 +18,7 @@
  *   1 — any emit mismatch
  *   2 — usage / git-ref error (unknown flag, duplicate --base/--head/boolean
  *       flags, missing/flag-like --base/--head value, duplicate/missing/flag-like
- *       --files-from, bad --files-from path,
+ *       --files-from, bad --files-from path, path junk / comment / directory,
  *       non-zero `git diff` for an invalid --base/--head; no stack)
  */
 
@@ -87,32 +87,84 @@ export function pathNotInRepoErrorMessage(file) {
 
 /**
  * Usage text when a list/positional path carries `?` / `#` / NUL / control
- * junk that must not be treated as a real repo file (q-mp-1464).
+ * junk (q-mp-1464) or ADS / percent-encoded / `&` / `*` junk (q-mp-1473).
  * @param {string} file
  */
 export function pathJunkErrorMessage(file) {
   return `error: path contains invalid characters: ${file}\n${USAGE}`;
 }
 
-/** `?` / `#` / NUL / other C0+DEL controls — not valid emit paths (q-mp-1464). */
-const PATH_JUNK_RE = /[?#\u0000-\u001F\u007F]/;
+/**
+ * Usage text when a path still contains `//` after stripping a trailing
+ * ` // comment` (q-mp-1471) — must not claim repo escape or collapse to `/`.
+ * @param {string} file
+ */
+export function pathSlashCommentErrorMessage(file) {
+  return `error: path contains '//' (use # or full-line // for list comments): ${file}\n${USAGE}`;
+}
+
+/**
+ * Usage text when a normalized path resolves to a directory (q-mp-1472).
+ * @param {string} file
+ */
+export function pathIsDirectoryErrorMessage(file) {
+  return `error: path is a directory (need a file): ${file}\n${USAGE}`;
+}
+
+/**
+ * `?` / `#` / NUL / C0+DEL (q-mp-1464); `%` / `&` / `*` (q-mp-1473).
+ * Colon (ADS) is checked separately so Windows drive absolutes stay valid.
+ */
+const PATH_JUNK_RE = /[?#\u0000-\u001F\u007F%&*]/;
+
+/**
+ * True when `raw` has invalid path characters (q-mp-1464 / q-mp-1473).
+ * Allows a Windows drive absolute (`C:\` / `C:/`) but rejects ADS colons.
+ * @param {string} raw
+ */
+export function pathHasInvalidCharacters(raw) {
+  if (PATH_JUNK_RE.test(raw)) return true;
+  if (!raw.includes(':')) return false;
+  const rest = /^[A-Za-z]:[\\/]/.test(raw) ? raw.slice(2) : raw;
+  return rest.includes(':');
+}
+
+/**
+ * Strip a trailing ` // …` line comment from a list/positional path
+ * (q-mp-1471). Does not touch `#` (owned by PATH_JUNK / full-line skip).
+ * @param {string} line
+ */
+export function stripInlinePathComment(line) {
+  const s = String(line ?? '');
+  const idx = s.indexOf(' //');
+  if (idx === -1) return s;
+  return s.slice(0, idx);
+}
 
 /**
  * Normalize a file path for emit compare: strip leading `./`, map absolute
  * paths under the repo root to repo-relative, accept Windows-style relative
  * `\` separators as `/` (q-mp-1463), reject `?`/`#`/NUL/control junk
- * (q-mp-1464), reject escapes (q-mp-1429 / q-mp-1430).
+ * (q-mp-1464), reject ADS / `%` / `&` / `*` junk (q-mp-1473), reject
+ * remaining `//` (q-mp-1471), reject directories (q-mp-1472), reject escapes
+ * (q-mp-1429 / q-mp-1430).
  * @param {string} file
  * @param {string} [root]
  * @returns {{ ok: true, path: string } | { ok: false, message: string }}
  */
 export function normalizeRepoRelativePath(file, root = ROOT) {
-  const raw = String(file ?? '').trim();
+  const rawInput = stripInlinePathComment(String(file ?? '')).trim();
+  const raw = rawInput;
   if (!raw) {
     return { ok: false, message: pathNotInRepoErrorMessage(file) };
   }
-  if (PATH_JUNK_RE.test(raw)) {
+  if (pathHasInvalidCharacters(raw)) {
     return { ok: false, message: pathJunkErrorMessage(raw) };
+  }
+  // Full-line `//` or any remaining `//` must not resolve as abs/UNC or
+  // collapse into `/` (q-mp-1471).
+  if (raw.startsWith('//') || raw.includes('//')) {
+    return { ok: false, message: pathSlashCommentErrorMessage(raw) };
   }
   let candidate = raw;
   // POSIX `path.resolve` treats `\` as a literal filename char; convert
@@ -131,7 +183,16 @@ export function normalizeRepoRelativePath(file, root = ROOT) {
   if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) {
     return { ok: false, message: pathNotInRepoErrorMessage(raw) };
   }
-  return { ok: true, path: rel.split(path.sep).join('/') };
+  const posixRel = rel.split(path.sep).join('/');
+  // Reject directory / `..`-collapsed directory before EISDIR (q-mp-1472).
+  try {
+    if (fs.existsSync(abs) && fs.statSync(abs).isDirectory()) {
+      return { ok: false, message: pathIsDirectoryErrorMessage(posixRel) };
+    }
+  } catch {
+    // Missing path is fine — MISSING-BASE / MISSING-HEAD later.
+  }
+  return { ok: true, path: posixRel };
 }
 
 /**
@@ -154,8 +215,11 @@ export function dedupePreserveOrder(files) {
 /**
  * Read a `--files-from` list without throwing ENOENT/EISDIR stacks.
  * Normalizes `./`, Windows-style relative `\`, and absolute-under-root paths;
- * rejects path junk (`?`/`#`/NUL/controls) and escapes; first-wins dedupe
- * within the list (q-mp-1429 / q-mp-1430 / q-mp-1463 / q-mp-1464).
+ * skips `#` and full-line `//` comments (q-mp-1471); strips trailing
+ * ` // …` comments; rejects path junk (`?`/`#`/NUL/controls / ADS / `%` /
+ * `&` / `*`), directories, and escapes; first-wins dedupe within the list
+ * (q-mp-1429 / q-mp-1430 / q-mp-1463 / q-mp-1464 / q-mp-1471 / q-mp-1472 /
+ * q-mp-1473).
  * @param {string} filesFrom
  * @param {{
  *   existsSync?: (p: string) => boolean,
@@ -199,8 +263,10 @@ export function loadFilesFromList(filesFrom, io = {}) {
   /** @type {string[]} */
   const files = [];
   for (const line of text.split('\n')) {
-    const t = line.trim();
-    if (!t || t.startsWith('#')) continue;
+    const t = stripInlinePathComment(line).trim();
+    // `#` and full-line `//` are list comments (q-mp-1471); mid-line `#` is
+    // still path junk via normalize (q-mp-1464).
+    if (!t || t.startsWith('#') || t.startsWith('//')) continue;
     const normalized = normalizeRepoRelativePath(t, root);
     if (!normalized.ok) return normalized;
     files.push(normalized.path);
