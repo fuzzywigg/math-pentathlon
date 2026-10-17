@@ -26,6 +26,7 @@ import {
   resolvePlaytestSeed,
 } from './lib/playtest-seed.mjs';
 import { joinPlaytestGameUrl } from './lib/playtest-url.mjs';
+import { waitForAiThinkingChrome } from './lib/stars-bars-new-game-race.mjs';
 
 const USAGE = `Usage: node scripts/stars-bars-deep-playtest.mjs
 
@@ -75,8 +76,16 @@ async function dismissOwl(page) {
   const dismiss = page.locator(
     '#ollie-owl button[aria-label="Dismiss message"], #ollie-owl .owl-bubble-dismiss'
   );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click({ force: true }).catch(() => {});
+  if (
+    await dismiss
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
+    await dismiss
+      .first()
+      .click({ force: true })
+      .catch(() => {});
   }
   const minimize = page.locator('#ollie-owl .owl-minimize-btn');
   if (await minimize.isVisible().catch(() => false)) {
@@ -89,10 +98,12 @@ async function dismissOwl(page) {
 }
 
 async function expectHidden(locator) {
-  await locator.waitFor({ state: 'hidden', timeout: 10_000 }).catch(async () => {
-    const cls = await locator.getAttribute('class');
-    if (!cls?.includes('hidden')) throw new Error('modal still open');
-  });
+  await locator
+    .waitFor({ state: 'hidden', timeout: 10_000 })
+    .catch(async () => {
+      const cls = await locator.getAttribute('class');
+      if (!cls?.includes('hidden')) throw new Error('modal still open');
+    });
 }
 
 async function startVsAi(page, difficulty) {
@@ -140,8 +151,10 @@ async function measureTargets(page) {
       cells: all('.stars-cell'),
       valid: all('.stars-cell.valid'),
       thinking: !!document.querySelector('.status-ai-thinking'),
-      status: document.querySelector('.stars-status')?.textContent?.trim() ?? '',
-      scores: document.querySelector('.stars-scores')?.textContent?.trim() ?? '',
+      status:
+        document.querySelector('.stars-status')?.textContent?.trim() ?? '',
+      scores:
+        document.querySelector('.stars-scores')?.textContent?.trim() ?? '',
     };
   });
 }
@@ -223,7 +236,10 @@ async function waitForHumanOrEnd(page, deadline) {
     }
     await page.waitForTimeout(120);
   }
-  const status = await page.locator('.stars-status').textContent().catch(() => '');
+  const status = await page
+    .locator('.stars-status')
+    .textContent()
+    .catch(() => '');
   return { kind: 'stall', status: status?.trim() ?? '' };
 }
 
@@ -232,11 +248,23 @@ async function probeNewGameRace(page, difficulty) {
   await startVsAi(page, difficulty);
   // One human place to hand off to AI
   await playHumanTurn(page);
-  await page.waitForTimeout(100);
-  const thinking = await page
-    .locator('.status-ai-thinking')
-    .isVisible()
-    .catch(() => false);
+  // q-mp-1474: poll for thinking chrome (par-55 shape); do not race a 100ms sleep.
+  const thinkWait = await waitForAiThinkingChrome({
+    sample: async () => {
+      const status = await page
+        .locator('.stars-status')
+        .textContent()
+        .catch(() => '');
+      const thinking = await page
+        .locator('.status-ai-thinking')
+        .isVisible()
+        .catch(() => false);
+      return { status: status?.trim() ?? '', thinking };
+    },
+    sleep: (ms) => page.waitForTimeout(ms),
+    isEnded,
+  });
+  // If !sawThinking, AI may have finished instantly; still try race (par-55).
   await page.locator('#new-game-btn').click();
   const modal = page.locator('#new-game-modal');
   await modal.waitFor({ state: 'visible', timeout: 10_000 });
@@ -249,16 +277,18 @@ async function probeNewGameRace(page, difficulty) {
     const status =
       document.querySelector('.stars-status')?.textContent?.trim() ?? '';
     const history = document.querySelectorAll('.stars-move-item').length;
-    const filled = document.querySelectorAll('.stars-cell.player1, .stars-cell.player2')
-      .length;
+    const filled = document.querySelectorAll(
+      '.stars-cell.player1, .stars-cell.player2'
+    ).length;
     return { status, history, filled };
   });
   return {
-    sawThinkingBefore: thinking,
+    sawThinkingBefore: thinkWait.sawThinking,
     status: after.status,
     history: after.history,
     filled: after.filled,
-    suspicious: after.history > 0 || after.filled > 0 || /thinking/i.test(after.status),
+    suspicious:
+      after.history > 0 || after.filled > 0 || /thinking/i.test(after.status),
   };
 }
 
@@ -394,7 +424,8 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
       }
     }
 
-    if (outcome === 'unknown' && turns >= MAX_HUMAN_TURNS) outcome = 'turn-budget';
+    if (outcome === 'unknown' && turns >= MAX_HUMAN_TURNS)
+      outcome = 'turn-budget';
 
     if (gameIndex === 0) {
       const shot = path.join(OUT, `${viewport.name}-${difficulty}-end.png`);
@@ -495,7 +526,8 @@ async function main() {
       (r) => r.outcome === 'stall' || r.outcome === 'turn-budget'
     ),
     errors: results.filter(
-      (r) => r.outcome === 'error' || r.consoleErrors.length || r.pageErrors.length
+      (r) =>
+        r.outcome === 'error' || r.consoleErrors.length || r.pageErrors.length
     ),
     touchSamples: results
       .filter((r) => r.gameIndex === 0)
