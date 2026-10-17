@@ -28,6 +28,7 @@ import {
   resolvePlaytestSeed,
 } from './lib/playtest-seed.mjs';
 import { joinPlaytestGameUrl } from './lib/playtest-url.mjs';
+import { isIllicitBluePassSample } from './lib/par-55-illicit-pass.mjs';
 
 const USAGE = `Usage: node scripts/par-55-deep-playtest.mjs
 
@@ -48,9 +49,7 @@ applyDeepPlaytestCli(process.argv.slice(2), USAGE);
 
 const BASE = process.env.PLAYTEST_BASE || 'http://127.0.0.1:5173';
 const SEED = resolvePlaytestSeed(process.env);
-const OUT = path.resolve(
-  `docs/playtest/par-55-deep-${utcPlaytestDateStamp()}`
-);
+const OUT = path.resolve(`docs/playtest/par-55-deep-${utcPlaytestDateStamp()}`);
 const ART = resolveArtifactDir();
 // q-mp-1260: only 1/true/yes enable quick mode; '0'/'false' use PAR55_GAMES.
 const GAMES_PER_DIFF = isPar55QuickEnabled(process.env.PAR55_QUICK)
@@ -66,7 +65,11 @@ function copyArt(src, destName) {
   try {
     fs.copyFileSync(src, path.join(ART, destName));
   } catch (err) {
-    console.warn('artifact copy skipped:', destName, String(err?.message || err));
+    console.warn(
+      'artifact copy skipped:',
+      destName,
+      String(err?.message || err)
+    );
   }
 }
 
@@ -89,8 +92,16 @@ async function dismissOwl(page) {
   const dismiss = page.locator(
     '#ollie-owl button[aria-label="Dismiss message"], #ollie-owl .owl-bubble-dismiss'
   );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click({ force: true }).catch(() => {});
+  if (
+    await dismiss
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
+    await dismiss
+      .first()
+      .click({ force: true })
+      .catch(() => {});
   }
   const minimize = page.locator('#ollie-owl .owl-minimize-btn');
   if (await minimize.isVisible().catch(() => false)) {
@@ -103,10 +114,12 @@ async function dismissOwl(page) {
 }
 
 async function expectHidden(locator) {
-  await locator.waitFor({ state: 'hidden', timeout: 10_000 }).catch(async () => {
-    const cls = await locator.getAttribute('class');
-    if (!cls?.includes('hidden')) throw new Error('modal still open');
-  });
+  await locator
+    .waitFor({ state: 'hidden', timeout: 10_000 })
+    .catch(async () => {
+      const cls = await locator.getAttribute('class');
+      if (!cls?.includes('hidden')) throw new Error('modal still open');
+    });
 }
 
 async function startVsAi(page, difficulty) {
@@ -180,8 +193,11 @@ async function measureTargets(page) {
       thinking: /computer|thinking/i.test(
         document.querySelector('.par55-status')?.textContent || ''
       ),
-      status: document.querySelector('.par55-status')?.textContent?.trim() ?? '',
-      phaseHint: document.querySelector('.par55-turn-hint')?.textContent?.trim(),
+      status:
+        document.querySelector('.par55-status')?.textContent?.trim() ?? '',
+      phaseHint: document
+        .querySelector('.par55-turn-hint')
+        ?.textContent?.trim(),
     };
   });
 }
@@ -216,7 +232,10 @@ async function waitForHumanOrEnd(page, deadline) {
     }
     await page.waitForTimeout(120);
   }
-  const status = await page.locator('.par55-status').textContent().catch(() => '');
+  const status = await page
+    .locator('.par55-status')
+    .textContent()
+    .catch(() => '');
   return { kind: 'stall', status: status?.trim() ?? '' };
 }
 
@@ -224,9 +243,9 @@ async function playHumanTurn(page) {
   // Prefer DOM activation so harness still works if a shell overlay steals
   // Playwright's hit-test — mirrors real click handlers on the nodes.
   const result = await page.evaluate(() => {
-    const pass = [...document.querySelectorAll('.par55-controls .par55-btn')].find(
-      (b) => /pass/i.test(b.textContent || '')
-    );
+    const pass = [
+      ...document.querySelectorAll('.par55-controls .par55-btn'),
+    ].find((b) => /pass/i.test(b.textContent || ''));
     if (pass) {
       pass.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       return 'pass';
@@ -246,11 +265,8 @@ async function playHumanTurn(page) {
       return 'no-move';
     }
 
-    const idx =
-      clickables.length > 2 && Math.random() < 0.3 ? 1 : 0;
-    clickables[idx].dispatchEvent(
-      new MouseEvent('click', { bubbles: true })
-    );
+    const idx = clickables.length > 2 && Math.random() < 0.3 ? 1 : 0;
+    clickables[idx].dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
     const valids = [
       ...document.querySelectorAll('.par55-base-hit, .par55-valid-base'),
@@ -280,13 +296,17 @@ async function probeNewGameRace(page, difficulty) {
   await startVsAi(page, difficulty);
   // Make one human move to hand off to AI
   const gate = await waitForHumanOrEnd(page, Date.now() + STALL_MS);
-  if (gate.kind !== 'human') return { ok: false, reason: 'no-human-open', gate };
+  if (gate.kind !== 'human')
+    return { ok: false, reason: 'no-human-open', gate };
   await playHumanTurn(page);
   // Wait until computer thinking
   const thinkDeadline = Date.now() + 3000;
   let sawThink = false;
   while (Date.now() < thinkDeadline) {
-    const st = await page.locator('.par55-status').textContent().catch(() => '');
+    const st = await page
+      .locator('.par55-status')
+      .textContent()
+      .catch(() => '');
     if (/computer|thinking/i.test(st || '')) {
       sawThink = true;
       break;
@@ -383,18 +403,47 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
         };
       }
 
-      const histBefore = await page
-        .locator('.par55-history-move')
-        .count()
-        .catch(() => 0);
+      const histBeforeSnap = await page.evaluate(() => {
+        const moves = [...document.querySelectorAll('.par55-history-move')];
+        return {
+          hist: moves.length,
+          blue: moves.filter((el) => el.classList.contains('player1')).length,
+        };
+      });
+      const histBefore = histBeforeSnap.hist;
+      const blueBefore = histBeforeSnap.blue;
 
-      const action = await playHumanTurn(page);
-      if (action === 'no-move' || action === 'no-valid') {
+      let humanAction = await playHumanTurn(page);
+      if (humanAction === 'no-move' || humanAction === 'no-valid') {
         await page.waitForTimeout(350);
         const again = await playHumanTurn(page);
         if (again === 'no-move' || again === 'no-valid') {
-          const st = await page.locator('.par55-status').textContent();
-          lastStatus = st?.trim() ?? '';
+          humanAction = again;
+          // q-mp-1466: sample illicit Blue pass on failed human seat (stolen passTurn).
+          const failedSnap = await page.evaluate(() => {
+            const moves = [...document.querySelectorAll('.par55-history-move')];
+            return {
+              hist: moves.length,
+              blue: moves.filter((el) => el.classList.contains('player1'))
+                .length,
+              status:
+                document.querySelector('.par55-status')?.textContent?.trim() ??
+                '',
+            };
+          });
+          lastStatus = failedSnap.status;
+          if (
+            isIllicitBluePassSample({
+              histBefore,
+              histAfter: failedSnap.hist,
+              blueCountBefore: blueBefore,
+              blueCountAfter: failedSnap.blue,
+              humanAction,
+              statusAfter: failedSnap.status,
+            })
+          ) {
+            illicitPass++;
+          }
           if (isEnded(lastStatus)) {
             outcome = isDeepPlaytestTieStatus(lastStatus)
               ? 'draw'
@@ -405,6 +454,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
           }
           continue;
         }
+        humanAction = again;
       }
 
       // Watch for AI thinking chrome
@@ -469,11 +519,28 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
       if (outcome !== 'unknown') break;
 
       // Detect illicit AI pass of Blue: history jumped with Blue pass while we acted
-      const statusNow = await page
-        .locator('.par55-status')
-        .textContent()
-        .catch(() => '');
-      lastStatus = statusNow?.trim() ?? '';
+      const afterSnap = await page.evaluate(() => {
+        const moves = [...document.querySelectorAll('.par55-history-move')];
+        return {
+          hist: moves.length,
+          blue: moves.filter((el) => el.classList.contains('player1')).length,
+          status:
+            document.querySelector('.par55-status')?.textContent?.trim() ?? '',
+        };
+      });
+      lastStatus = afterSnap.status;
+      if (
+        isIllicitBluePassSample({
+          histBefore,
+          histAfter: afterSnap.hist,
+          blueCountBefore: blueBefore,
+          blueCountAfter: afterSnap.blue,
+          humanAction,
+          statusAfter: afterSnap.status,
+        })
+      ) {
+        illicitPass++;
+      }
       if (isEnded(lastStatus)) {
         outcome = isDeepPlaytestTieStatus(lastStatus)
           ? 'draw'
@@ -561,7 +628,7 @@ async function main() {
         results.push(r);
         const errN = r.consoleErrors.length + r.pageErrors.length;
         console.log(
-          `[${r.viewport}/${r.difficulty}#${g}] ${r.outcome} turns=${r.turns} ${r.ms}ms think=${r.aiThinkCount} maxThink=${r.maxAiThinkMs}ms errs=${errN} :: ${String(r.lastStatus).slice(0, 80)}`
+          `[${r.viewport}/${r.difficulty}#${g}] ${r.outcome} turns=${r.turns} ${r.ms}ms think=${r.aiThinkCount} illicitPass=${r.illicitPass} maxThink=${r.maxAiThinkMs}ms errs=${errN} :: ${String(r.lastStatus).slice(0, 80)}`
         );
       }
     }
@@ -579,7 +646,8 @@ async function main() {
       (r) => r.outcome === 'stall' || r.outcome === 'turn-budget'
     ),
     errors: results.filter(
-      (r) => r.outcome === 'error' || r.consoleErrors.length || r.pageErrors.length
+      (r) =>
+        r.outcome === 'error' || r.consoleErrors.length || r.pageErrors.length
     ),
     touchSamples: results
       .filter((r) => r.gameIndex === 0)
@@ -589,6 +657,7 @@ async function main() {
         measures: r.measures,
       })),
     maxAiThinkMs: Math.max(0, ...results.map((r) => r.maxAiThinkMs || 0)),
+    illicitPasses: results.filter((r) => (r.illicitPass || 0) > 0),
     results,
   };
   for (const r of results) {
@@ -604,6 +673,7 @@ async function main() {
   console.log('\nSummary by outcome:', summary.byOutcome);
   console.log('Stalls/budget:', summary.stalls.length);
   console.log('Error games:', summary.errors.length);
+  console.log('Illicit passes:', summary.illicitPasses.length);
   console.log('Max AI think ms:', summary.maxAiThinkMs);
   console.log('Wrote', jsonPath);
 }
