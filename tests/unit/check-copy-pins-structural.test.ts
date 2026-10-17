@@ -1,7 +1,8 @@
 /**
- * Hermetic structural coverage for check-copy-pins (q-mp-1453…1456):
+ * Hermetic structural coverage for check-copy-pins (q-mp-1453…1456, 1465):
  * multiline WINDOW_LINES, stripComments line map, wins! registry suffixes,
- * and template-split debris rejection. No tip-wide scan / findings-total stamp.
+ * and template-split debris rejection (paren + name/prefix). No tip-wide
+ * scan / findings-total stamp.
  *
  * Stays on the default unit-shared project (no vitest.config nodePureFiles edit).
  */
@@ -52,7 +53,7 @@ describe('wave55 shape', () => {
 });
 `;
 
-describe('check-copy-pins structural (q-mp-1453…1456)', () => {
+describe('check-copy-pins structural (q-mp-1453…1456, 1465)', () => {
   it('WINDOW_LINES covers 7–8 line phase-message expects (q-mp-1453)', () => {
     expect(WINDOW_LINES).toBeGreaterThanOrEqual(8);
 
@@ -136,6 +137,56 @@ it('pins phase', () => {
     // Real phrase from kings still matches via registry / soft needle.
     const place = scanSource(
       'virtual/place-quad.ts',
+      "expect(msg).toBe('Player 2: Place a Quadraphage');",
+      registry
+    );
+    expect(place.some((f) => f.kind === 'registry-string')).toBe(true);
+  });
+
+  it("registry rejects leading 's / : name-prefix debris (q-mp-1465)", () => {
+    const registry = harvestCopyRegistry();
+    // Debris heads must not be keys; phrase bodies may be recovered.
+    expect(
+      registry.some(
+        (e) => e.value === "'s turn - Select a shield to distribute"
+      )
+    ).toBe(false);
+    expect(registry.some((e) => e.value === ': Place a Quadraphage')).toBe(
+      false
+    );
+    expect(registry.some((e) => /^'s\s/.test(e.value))).toBe(false);
+    expect(registry.some((e) => /^:\s/.test(e.value))).toBe(false);
+    expect(registry.some((e) => e.value === 'Place a Quadraphage')).toBe(true);
+    expect(
+      registry.some((e) => e.value === 'Select a shield to distribute')
+    ).toBe(true);
+
+    // Soft false-positive shape from the measured baseline (needle was the
+    // `'s turn - …` head, which matched inside "someone's turn - …").
+    const softSomeone = scanSource(
+      'virtual/soft-someone.ts',
+      'expect(debug).toBe("debug: someone\'s turn - Select a shield…");',
+      registry
+    );
+    expect(softSomeone.some((f) => f.kind === 'registry-string')).toBe(false);
+
+    // Intentional real phrases still match.
+    const comingSoon = scanSource(
+      'virtual/coming-soon.ts',
+      "expect(badge?.textContent).toBe('Coming Soon');",
+      registry
+    );
+    expect(comingSoon.some((f) => f.kind === 'coming-soon')).toBe(true);
+
+    const wins = scanSource(
+      'virtual/wins.ts',
+      "expect(el.textContent).toBe('Blue wins!');",
+      registry
+    );
+    expect(wins.some((f) => f.kind === 'registry-string')).toBe(true);
+
+    const place = scanSource(
+      'virtual/place-quad-1465.ts',
       "expect(msg).toBe('Player 2: Place a Quadraphage');",
       registry
     );

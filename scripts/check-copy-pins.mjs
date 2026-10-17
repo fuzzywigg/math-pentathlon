@@ -319,6 +319,22 @@ function harvestCopyRegistry() {
     // `remaining)` from `Place…(${remaining} remaining)` or trailing `(`.
     if (/\)\s*$/.test(v) && !/\(/.test(v)) return;
     if (/\(\s*$/.test(v) && !/\)/.test(v)) return;
+    // Name/prefix template-split debris (q-mp-1465): `'s turn - …` from
+    // `${name}'s turn - …`, or `: Place…` from `${name}: Place…`. Drop the
+    // head; keep the phrase body when it remains distinctive.
+    if (/^'s\s/.test(v) || /^:\s/.test(v)) {
+      let body = v;
+      if (/^'s\s+turn\s+-\s+/i.test(body)) {
+        body = body.replace(/^'s\s+turn\s+-\s+/i, '').trim();
+      } else if (/^:\s+/.test(body)) {
+        body = body.replace(/^:\s+/, '').trim();
+      } else {
+        return;
+      }
+      if (!body || body === v) return;
+      add(body, source);
+      return;
+    }
     const key = v.toLowerCase();
     if (seen.has(key)) return;
     seen.add(key);
