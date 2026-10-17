@@ -280,10 +280,11 @@ export const n: N = 1;
     expect(opts.json).toBe(true);
   });
 
-  it('default tip constants leave retired wave5 (q-mp-1357/1377)', () => {
-    expect(DEFAULT_TIP_REMOTE).toBe('origin/cursor/mp-tip-post38d2');
+  it('default tip constants leave retired wave5 (q-mp-1357/1377/1500)', () => {
+    expect(DEFAULT_TIP_REMOTE).toBe('origin/cursor/mp-tip-post4c24321');
     expect(DEFAULT_TIP_FALLBACK_REMOTE).toBe('origin/alpha');
     expect(DEFAULT_TIP_REMOTE).not.toMatch(/integration-fold-wave5/);
+    expect(DEFAULT_TIP_REMOTE).not.toMatch(/mp-tip-post38d2/);
     expect(DEFAULT_TIP_FALLBACK_REMOTE).not.toMatch(/integration-fold-wave5/);
     // parseArgs([]) must resolve some merge-base (tip → alpha → HEAD) and must
     // not invent the retired wave5 merge-base when that remote is present.
@@ -302,14 +303,14 @@ export const n: N = 1;
     expect(listed.ok).toBe(true);
   });
 
-  it('resolveDefaultMergeBase prefers living tip then alpha then HEAD (q-mp-1357)', () => {
+  it('resolveDefaultMergeBase prefers living tip then alpha then HEAD (q-mp-1357/1500)', () => {
     const tipSpawn = (
       _cmd: string,
       args: string[],
       _opts?: { encoding?: string; cwd?: string }
     ) => {
       const key = args.join(' ');
-      if (key === 'merge-base HEAD origin/cursor/mp-tip-post38d2') {
+      if (key === 'merge-base HEAD origin/cursor/mp-tip-post4c24321') {
         return { status: 0, stdout: 'living-tip-mb\n', stderr: '' };
       }
       return { status: 128, stdout: '', stderr: 'unused\n' };
@@ -326,7 +327,7 @@ export const n: N = 1;
     ) => {
       calls.push(args);
       const key = args.join(' ');
-      if (key === 'merge-base HEAD origin/cursor/mp-tip-post38d2') {
+      if (key === 'merge-base HEAD origin/cursor/mp-tip-post4c24321') {
         return { status: 128, stdout: '', stderr: 'missing tip\n' };
       }
       if (key === 'merge-base HEAD origin/alpha') {
@@ -340,7 +341,7 @@ export const n: N = 1;
     expect(calls[0]).toEqual([
       'merge-base',
       'HEAD',
-      'origin/cursor/mp-tip-post38d2',
+      'origin/cursor/mp-tip-post4c24321',
     ]);
     expect(calls[1]).toEqual(['merge-base', 'HEAD', 'origin/alpha']);
 
@@ -1142,6 +1143,31 @@ export const n: N = 1;
     });
   });
 
+  it('normalizeRepoRelativePath rejects vim secondary swap suffixes (q-mp-1499)', () => {
+    for (const bad of [
+      'src/games/hex/ai.ts.swo',
+      'src/games/hex/ai.ts.swn',
+      'src/games/hex/ai.ts.swx',
+      // retained primary-swap control from q-mp-1497
+      'src/games/hex/ai.ts.swp',
+    ]) {
+      expect(pathHasEditorBackupSuffix(bad)).toBe(true);
+      expect(pathHasInvalidCharacters(bad)).toBe(false);
+      const r = normalizeRepoRelativePath(bad);
+      expect(r.ok).toBe(false);
+      if (!r.ok) {
+        expect(r.message).toBe(pathJunkErrorMessage(bad));
+        expect(r.message).toContain('path contains invalid characters');
+        expect(r.message).not.toContain('MISSING-BASE');
+      }
+    }
+    expect(pathHasEditorBackupSuffix('src/games/hex/ai.ts')).toBe(false);
+    expect(normalizeRepoRelativePath('src/games/hex/ai.ts')).toEqual({
+      ok: true,
+      path: 'src/games/hex/ai.ts',
+    });
+  });
+
   it('loadFilesFromList / CLI reject ai.ts~ before missing-base (q-mp-1497)', () => {
     const junk = loadFilesFromList('/virtual/backup.txt', {
       existsSync: () => true,
@@ -1163,6 +1189,56 @@ export const n: N = 1;
     writeFileSync(cleanList, 'src/games/hex/ai.ts\n');
     try {
       for (const listPath of [junkList, bakList]) {
+        const bad = spawnSync(
+          process.execPath,
+          [EMIT_SCRIPT, '--base', 'HEAD', '--files-from', listPath],
+          { encoding: 'utf8' }
+        );
+        expect(bad.status).toBe(2);
+        expect(bad.stderr + bad.stdout).toContain(
+          'path contains invalid characters'
+        );
+        expect(bad.stderr + bad.stdout).not.toContain('MISSING-BASE');
+      }
+
+      const clean = spawnSync(
+        process.execPath,
+        [EMIT_SCRIPT, '--base', 'HEAD', '--files-from', cleanList],
+        { encoding: 'utf8' }
+      );
+      expect(clean.status).toBe(0);
+      expect(clean.stdout).toContain('OK');
+      expect(clean.stdout).toContain('src/games/hex/ai.ts');
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('loadFilesFromList / CLI reject vim secondary swaps before missing-base (q-mp-1499)', () => {
+    const junk = loadFilesFromList('/virtual/swo.txt', {
+      existsSync: () => true,
+      statSync: () => ({ isFile: () => true }),
+      readFileSync: () => 'src/games/hex/ai.ts.swo\n',
+    });
+    expect(junk.ok).toBe(false);
+    if (!junk.ok) {
+      expect(junk.message).toContain('path contains invalid characters');
+      expect(junk.message).not.toContain('MISSING-BASE');
+    }
+
+    const dir = mkdtempSync(join(tmpdir(), 'emit-1499-'));
+    const swoList = join(dir, 'swo.txt');
+    const swnList = join(dir, 'swn.txt');
+    const swxList = join(dir, 'swx.txt');
+    const swpList = join(dir, 'swp.txt');
+    const cleanList = join(dir, 'clean.txt');
+    writeFileSync(swoList, 'src/games/hex/ai.ts.swo\n');
+    writeFileSync(swnList, 'src/games/hex/ai.ts.swn\n');
+    writeFileSync(swxList, 'src/games/hex/ai.ts.swx\n');
+    writeFileSync(swpList, 'src/games/hex/ai.ts.swp\n');
+    writeFileSync(cleanList, 'src/games/hex/ai.ts\n');
+    try {
+      for (const listPath of [swoList, swnList, swxList, swpList]) {
         const bad = spawnSync(
           process.execPath,
           [EMIT_SCRIPT, '--base', 'HEAD', '--files-from', listPath],
