@@ -5,7 +5,7 @@
  * docs/playtest/fraction-pinball-deep-<UTC-YYYY-MM-DD>/
  *
  * Env:
- *   PLAYTEST_BASE   Base URL (default http://localhost:5173)
+ *   PLAYTEST_BASE   Base URL (default http://127.0.0.1:5173)
  *   PLAYTEST_GAMES  Games per difficulty×viewport (default 10; rejects NaN / non-positive)
  */
 import { chromium, devices } from '@playwright/test';
@@ -15,7 +15,7 @@ import { requireEnvNumber } from '../../scripts/lib/env-number.mjs';
 import { utcPlaytestDateStamp } from '../../scripts/lib/playtest-date.mjs';
 import { joinPlaytestGameUrl } from '../../scripts/lib/playtest-url.mjs';
 
-const BASE = process.env.PLAYTEST_BASE || 'http://localhost:5173';
+const BASE = process.env.PLAYTEST_BASE || 'http://127.0.0.1:5173';
 const OUT = path.resolve(
   `docs/playtest/fraction-pinball-deep-${utcPlaytestDateStamp()}`
 );
