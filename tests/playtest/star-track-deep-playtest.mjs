@@ -16,6 +16,9 @@ import { artifactPath } from '../../scripts/lib/artifact-dir.mjs';
 import { dismissOwl } from '../../scripts/lib/dismiss-owl.mjs';
 import { utcPlaytestDateStamp } from '../../scripts/lib/playtest-date.mjs';
 import { joinPlaytestGameUrl } from '../../scripts/lib/playtest-url.mjs';
+// q-mp-1475: gate confusing_turn_copy — do not flag normal "Blue's turn" /
+// "Blue:" drawChains/selectChain statuses (see star-track-confusing-turn-copy.mjs).
+import { confusingTurnCopyFinding } from './star-track-confusing-turn-copy.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '../..');
@@ -152,12 +155,10 @@ async function playOneGame(
       break;
     }
 
-    if (
-      /Blue's turn|Red's turn|^Blue:|^Red:/.test(snap.status) &&
-      !snap.thinking
-    ) {
-      turnCopySamples.push(snap.status.trim());
-      findings.push({ type: 'confusing_turn_copy', text: snap.status.trim() });
+    const confusing = confusingTurnCopyFinding(snap.status, snap.thinking);
+    if (confusing) {
+      turnCopySamples.push(confusing.text);
+      findings.push(confusing);
     }
 
     for (const t of snap.targets) {
