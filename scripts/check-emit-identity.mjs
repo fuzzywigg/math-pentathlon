@@ -91,7 +91,8 @@ export function pathNotInRepoErrorMessage(file) {
  * shell-metachar junk (q-mp-1478), unicode format/invisible junk (q-mp-1479),
  * junk `\segment` after a file path (q-mp-1480), or editor backup / swap /
  * temp / patch suffixes `~` / `.bak` / `.swp` / `.swo` / `.swn` / `.swx` /
- * `.tmp` / `.orig` / `.rej` (q-mp-1497 / q-mp-1499).
+ * `.tmp` / `.orig` / `.rej` / `.old` / `.save` / `.backup` (q-mp-1497 /
+ * q-mp-1499 / q-mp-1503).
  * @param {string} file
  */
 export function pathJunkErrorMessage(file) {
@@ -121,21 +122,21 @@ export function pathIsDirectoryErrorMessage(file) {
  * such as ZWSP / soft hyphen / RLO (q-mp-1479). Bare `\` is not junk here —
  * Windows relatives stay accepted (q-mp-1463); junk `file.ts\extra` is gated
  * in normalize (q-mp-1480). Editor backup suffixes (`~` / `.bak` / `.swp` /
- * `.swo` / `.swn` / `.swx` / `.tmp` / `.orig` / `.rej`) are gated separately
- * (q-mp-1497 / q-mp-1499). Colon (ADS) is checked separately so Windows drive
- * absolutes stay valid.
+ * `.swo` / `.swn` / `.swx` / `.tmp` / `.orig` / `.rej` / `.old` / `.save` /
+ * `.backup`) are gated separately (q-mp-1497 / q-mp-1499 / q-mp-1503). Colon
+ * (ADS) is checked separately so Windows drive absolutes stay valid.
  */
 const PATH_JUNK_RE = /[?#\u0000-\u001F\u007F%&*|<>;"'`$]|\p{Cf}/u;
 
 /**
  * Trailing editor backup / swap / temp / patch leftovers (q-mp-1497 /
- * q-mp-1499). Suffix-only so shell/unicode/`\extra` / `?`/`#`/NUL / ADS/`%&*` /
- * `//` / directory gates stay untouched. Includes vim secondary swaps
- * (`.swo` / `.swn` / `.swx`) when `.swp` already exists, plus cheap `.orig` /
- * `.rej`.
+ * q-mp-1499 / q-mp-1503). Suffix-only so shell/unicode/`\extra` / `?`/`#`/NUL /
+ * ADS/`%&*` / `//` / directory gates stay untouched. Includes vim secondary
+ * swaps (`.swo` / `.swn` / `.swx`) when `.swp` already exists, cheap `.orig` /
+ * `.rej`, and OS/editor backups (`.old` / `.save` / `.backup`).
  */
 const EDITOR_BACKUP_SUFFIX_RE =
-  /(?:~|\.bak|\.swp|\.swo|\.swn|\.swx|\.tmp|\.orig|\.rej)$/i;
+  /(?:~|\.bak|\.swp|\.swo|\.swn|\.swx|\.tmp|\.orig|\.rej|\.old|\.save|\.backup)$/i;
 
 /**
  * True when `raw` has invalid path characters (q-mp-1464 / q-mp-1473 /
@@ -153,7 +154,7 @@ export function pathHasInvalidCharacters(raw) {
 /**
  * True when the path ends with an editor backup / swap / temp / patch suffix
  * (`~` / `.bak` / `.swp` / `.swo` / `.swn` / `.swx` / `.tmp` / `.orig` /
- * `.rej`) — q-mp-1497 / q-mp-1499.
+ * `.rej` / `.old` / `.save` / `.backup`) — q-mp-1497 / q-mp-1499 / q-mp-1503.
  * @param {string} raw
  */
 export function pathHasEditorBackupSuffix(raw) {
@@ -194,9 +195,9 @@ export function stripInlinePathComment(line) {
  * shell-metachar junk (q-mp-1478), reject unicode format/invisible junk
  * (q-mp-1479), reject junk `file.ts\extra` remaps (q-mp-1480), reject
  * editor backup suffixes `~` / `.bak` / `.swp` / `.swo` / `.swn` / `.swx` /
- * `.tmp` / `.orig` / `.rej` (q-mp-1497 / q-mp-1499), reject remaining `//`
- * (q-mp-1471), reject directories (q-mp-1472), reject escapes (q-mp-1429 /
- * q-mp-1430).
+ * `.tmp` / `.orig` / `.rej` / `.old` / `.save` / `.backup` (q-mp-1497 /
+ * q-mp-1499 / q-mp-1503), reject remaining `//` (q-mp-1471), reject directories
+ * (q-mp-1472), reject escapes (q-mp-1429 / q-mp-1430).
  * @param {string} file
  * @param {string} [root]
  * @returns {{ ok: true, path: string } | { ok: false, message: string }}
