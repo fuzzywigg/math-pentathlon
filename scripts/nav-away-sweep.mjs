@@ -9,6 +9,7 @@ import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
 import { NAV_AWAY_SWEEP_USAGE } from './lib/browser-harness-script-usage.mjs';
 import { dismissOwl } from './lib/dismiss-owl.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
+import { waitForAiThinkingChrome } from './lib/stars-bars-new-game-race.mjs';
 
 applyBrowserHarnessCli(process.argv.slice(2), NAV_AWAY_SWEEP_USAGE);
 
@@ -72,7 +73,31 @@ async function main() {
           .click({ force: true })
           .catch(() => {});
       }
-      await page.waitForTimeout(100); // mid-AI
+      // q-mp-1482: poll thinking chrome (par-55 / 1474 shape); not a fixed 100ms sleep.
+      // If !sawThinking, AI may have finished instantly; still leave (timeout short-circuit).
+      await waitForAiThinkingChrome({
+        sample: async () => {
+          const thinking = await page
+            .locator('.status-ai-thinking')
+            .first()
+            .isVisible()
+            .catch(() => false);
+          const status = await page
+            .evaluate(() => {
+              const nodes = document.querySelectorAll(
+                '[class$="-status"], .status-ai-thinking'
+              );
+              for (const n of nodes) {
+                const t = n.textContent?.trim() ?? '';
+                if (t) return t;
+              }
+              return '';
+            })
+            .catch(() => '');
+          return { thinking: !!thinking, status: status || '' };
+        },
+        sleep: (ms) => page.waitForTimeout(ms),
+      });
       await page.goto(`${BASE}/#/`);
       await page.waitForTimeout(1500); // let stale timers fire
       const rej = await page.evaluate(() => window.__r || []);
