@@ -161,7 +161,8 @@ describe('burn-1008 registry module contract — menu tiles ↔ registry', () =>
         (c) => c.querySelector('.game-card-title')?.textContent === game.name
       );
       expect(card, `tile for ${game.id}`).toBeTruthy();
-      expect(card!.getAttribute('aria-label')).toContain(game.name);
+      expect(card!.hasAttribute('aria-label')).toBe(false);
+      expect(card!.textContent).toContain(game.name);
       expect(card!.querySelector('.game-card-icon')?.textContent).toBe(
         game.icon
       );

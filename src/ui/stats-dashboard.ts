@@ -267,7 +267,8 @@ export function renderStatsDashboardFromSnapshot(
   back.id = 'back-btn';
   back.className = 'back-button';
   back.type = 'button';
-  back.setAttribute('aria-label', 'Back to game list');
+  // Visible word "Games" must appear in the accessible name (WCAG 2.5.3).
+  back.setAttribute('aria-label', 'Games, back to game list');
   back.textContent = '← Games';
   const title = document.createElement('h1');
   title.id = 'stats-title';

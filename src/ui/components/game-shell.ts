@@ -353,7 +353,7 @@ function buildShellHtml(options: GameShellOptions): string {
 
   return `
     <header class="game-header">
-      <button id="back-btn" class="back-button" type="button" aria-label="Back to game list">← Games</button>
+      <button id="back-btn" class="back-button" type="button" aria-label="Games, back to game list">← Games</button>
       <h1 id="game-title">${escapeAttr(options.title)}</h1>
     </header>
     <nav class="button-row" aria-label="Game actions">
