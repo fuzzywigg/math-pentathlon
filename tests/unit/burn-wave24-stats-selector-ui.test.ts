@@ -254,7 +254,9 @@ describe('Wave 24 game-selector — hero / cards / accordion headers', () => {
     ) as HTMLElement;
     expect(card).toBeTruthy();
     expect(card.getAttribute('tabindex')).toBe('0');
-    expect(card.getAttribute('aria-label')).toMatch(/Available$/);
+    expect(card.getAttribute('role')).toBe('button');
+    // Name-from-content so the visible title stays in the accessible name.
+    expect(card.hasAttribute('aria-label')).toBe(false);
 
     const title = card.querySelector('.game-card-title')?.textContent ?? '';
     const game = GAMES.find((g) => g.name === title && g.available);

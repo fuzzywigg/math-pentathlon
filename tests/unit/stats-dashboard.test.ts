@@ -128,6 +128,10 @@ describe('stats dashboard view', () => {
   it('navigates home from the back button', () => {
     renderStatsDashboardFromSnapshot(container, emptySnapshot());
     const back = container.querySelector('#back-btn') as HTMLButtonElement;
+    expect(back.textContent).toContain('Games');
+    expect((back.getAttribute('aria-label') ?? '').toLowerCase()).toContain(
+      'games'
+    );
     back.click();
     expect(navigate).toHaveBeenCalledWith('/');
   });
@@ -165,6 +169,9 @@ describe('home entry to stats dashboard', () => {
     expect(link).toBeTruthy();
     expect(link.getAttribute('href')).toBe('#/stats');
     expect(link.textContent).toContain('Your Progress');
+    expect((link.getAttribute('aria-label') ?? '').toLowerCase()).toContain(
+      'your progress'
+    );
 
     link.click();
     expect(navigate).toHaveBeenCalledWith('/stats');

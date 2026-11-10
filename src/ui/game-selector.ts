@@ -20,10 +20,8 @@ function createGameCard(game: GameInfo): HTMLElement {
   card.className = `game-card ${game.available ? '' : 'game-card-disabled'}`;
   card.setAttribute('role', 'button');
   card.setAttribute('tabindex', game.available ? '0' : '-1');
-  card.setAttribute(
-    'aria-label',
-    `${game.name} - ${game.available ? 'Available' : 'Coming Soon'}`
-  );
+  // Name comes from the visible title, description, and meta. An aria-label
+  // that drops that text fails WCAG 2.5.3 (axe label-content-name-mismatch).
 
   const icon = document.createElement('div');
   icon.className = 'game-card-icon';
@@ -281,7 +279,11 @@ export function renderGameSelector(container: HTMLElement): void {
   progressLink.className = 'hero-progress-link';
   progressLink.href = '#/stats';
   progressLink.textContent = 'Your Progress';
-  progressLink.setAttribute('aria-label', 'View your play progress and stats');
+  // Visible label must lead the accessible name (WCAG 2.5.3).
+  progressLink.setAttribute(
+    'aria-label',
+    'Your Progress, view your play progress and stats'
+  );
   progressLink.addEventListener('click', (event) => {
     event.preventDefault();
     navigate('/stats');
